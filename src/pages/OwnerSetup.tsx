@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, UserRound, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, UserRound, ShieldCheck, LockKeyhole } from "lucide-react";
 import { Credit, Logo } from "../components/common";
 import { FinanceIllustration } from "../components/Brand";
 export function OwnerSetup({
@@ -21,11 +21,8 @@ export function OwnerSetup({
         <FinanceIllustration />
         <div className="login-heading">
           <Logo />
-          <h1>
-            Keuangan
-            <br />
-            Rumah Tangga
-          </h1>
+          <h1>FINORA</h1>
+          <p className="brand-descriptor">Keuangan Keluarga</p>
           <p className="tagline">
             Kelola • Rencanakan • Evaluasi
             <br />
@@ -82,13 +79,16 @@ export function OwnerSetup({
             </p>
             <label>
               Nama
-              <input
-                name="name"
-                aria-label="Nama"
-                defaultValue="FAHMI DJAWAS, S.Pd."
-                maxLength={120}
-                required
-              />
+              <div className="input-icon">
+                <UserRound size={18} />
+                <input
+                  name="name"
+                  aria-label="Nama"
+                  defaultValue="FAHMI DJAWAS, S.Pd."
+                  maxLength={120}
+                  required
+                />
+              </div>
             </label>
             <label>
               Username
@@ -107,6 +107,7 @@ export function OwnerSetup({
             <label>
               Password
               <div className="password-input">
+                <LockKeyhole size={18} className="password-lock" />
                 <input
                   name="password"
                   aria-label="Password"
@@ -128,40 +129,49 @@ export function OwnerSetup({
             </label>
             <label>
               Konfirmasi Password
-              <input
-                name="confirmPassword"
-                aria-label="Konfirmasi Password"
-                type={show ? "text" : "password"}
-                autoComplete="new-password"
-                required
-              />
+              <div className="input-icon">
+                <LockKeyhole size={18} />
+                <input
+                  name="confirmPassword"
+                  aria-label="Konfirmasi Password"
+                  type={show ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                />
+              </div>
             </label>
             <div className="form-grid">
               <label>
                 PIN 6 Digit
-                <input
-                  name="pin"
-                  aria-label="PIN 6 digit"
-                  type="password"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
-                  required
-                />
+                <div className="input-icon">
+                  <LockKeyhole size={18} />
+                  <input
+                    name="pin"
+                    aria-label="PIN 6 digit"
+                    type="password"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    required
+                  />
+                </div>
               </label>
               <label>
                 Konfirmasi PIN 6 Digit
-                <input
-                  name="confirmPin"
-                  aria-label="Konfirmasi PIN 6 digit"
-                  type="password"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
-                  required
-                />
+                <div className="input-icon">
+                  <LockKeyhole size={18} />
+                  <input
+                    name="confirmPin"
+                    aria-label="Konfirmasi PIN 6 digit"
+                    type="password"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    required
+                  />
+                </div>
               </label>
             </div>
             <label className="check">

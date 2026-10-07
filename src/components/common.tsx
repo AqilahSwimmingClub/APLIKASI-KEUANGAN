@@ -147,14 +147,16 @@ export function Panel({
   children,
   action,
   hidden = false,
+  className = "",
 }: {
   title: string;
   children: ReactNode;
   action?: ReactNode;
   hidden?: boolean;
+  className?: string;
 }) {
   return (
-    <section className="panel" hidden={hidden}>
+    <section className={`panel ${className}`} hidden={hidden}>
       <div className="panel-head">
         <h2>{title}</h2>
         {action}

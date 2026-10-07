@@ -1,4 +1,4 @@
-# Keuangan Rumah Tangga
+# FINORA — Keuangan Keluarga
 
 Kelola • Rencanakan • Evaluasi Keuangan Keluarga Anda.
 
@@ -44,15 +44,15 @@ npm run preview
 
 Jika Chromium sudah disediakan mesin, gunakan `PLAYWRIGHT_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`. Pengujian browser membuat akun dan transaksi dalam konteks browser terisolasi, bukan data produksi. Unit mencakup kalkulasi, tanggal, CRUD, kategori, backup/crypto dan persistensi. E2E mencakup akun, transaksi, laporan, tabungan, investasi, restore, export, PIN, tema, 21 ukuran layar wajib, rotasi form, history Back dan offline/reload.
 
-## Baseline visual dan akun pemilik (1.0.1)
+## FINORA dan akun pemilik (1.0.2)
 
-UI mengikuti gambar referensi final: ilustrasi finansial 3D yang dibundel, branding dua baris, login putih, footer gelombang biru, kartu saldo cyan/biru, KPI warna hijau/merah/biru/ungu, daftar tanggal, filter sheet, tabs laporan, target/progress, donut portfolio dan settings compact.
+UI mengikuti gambar referensi final: ilustrasi finansial 3D yang dibundel, branding FINORA dan descriptor Keuangan Keluarga, login putih, footer gelombang biru, kartu saldo cyan/biru, KPI warna hijau/merah/biru/ungu, daftar tanggal, filter sheet, tabs laporan, target/progress, donut portfolio dan settings compact.
 
 Instalasi pertama menampilkan **BUAT AKUN PEMILIK** dengan nama (default FAHMI DJAWAS, S.Pd.), username, password+konfirmasi, PIN+konfirmasi, dan opsi biometrik nanti. Setelah akun ada, startup menampilkan login normal atau Dashboard jika sesi valid. Akun/vault lama tetap kompatibel; tidak ada migrasi yang menghapus data atau kredensial bawaan.
 
 Password akun, perubahan password dan backup menerima **setiap string yang tidak kosong**, tanpa batas minimal sepuluh karakter atau kewajiban kombinasi. Konfirmasi harus sama persis. PIN tetap tepat enam digit angka. AES-GCM, PBKDF2 SHA-256 310.000 iterasi, rate limiting dan penyimpanan credential terenkripsi dipertahankan. Password panjang lebih aman; peringatan tidak memblokir password pendek.
 
-Versi web/UI/Android/iOS 1.0.1, Android versionCode 2 dan iOS build 2; lihat CHANGELOG.md. Mengedit transaksi dilakukan dengan mengetuk judul baris, menghapus melalui tombol baris dengan konfirmasi.
+Versi web/UI/Android/iOS 1.0.2, Android versionCode 3 dan iOS build 3; lihat CHANGELOG.md. Mengedit transaksi dilakukan dengan mengetuk judul baris, menghapus melalui tombol baris dengan konfirmasi.
 
 ## Model data dan konsistensi
 
@@ -81,7 +81,7 @@ cd android
 ./gradlew --no-daemon --max-workers=2 assembleDebug
 ```
 
-Atau `npm run android:build`. Windows menggunakan `gradlew.bat`. APK lokal: `android/app/build/outputs/apk/debug/app-debug.apk`. Install pada perangkat lewat `adb install -r .../app-debug.apk`. Package ID: `id.fahmidjawas.keuanganrumah`. Debug APK ditandatangani debug key standar dan bisa diuji tanpa secret. Release/distribusi Play Store membutuhkan keystore milik pemilik aplikasi; jangan commit keystore/password.
+Atau `npm run android:build`. Windows menggunakan `gradlew.bat`. APK lokal: `android/app/build/outputs/apk/debug/app-debug.apk`. Install pada perangkat lewat `adb install -r .../app-debug.apk`. Package ID tetap `id.fahmidjawas.keuanganrumah`. Android `versionCode` naik pada setiap versi. APK debug memakai kunci debug runner yang dapat berubah, sehingga **tidak menjamin update di atas APK debug dari runner lain**. Jalur update permanen adalah APK release dengan keystore yang sama pada setiap rilis. Empat GitHub Secrets yang diperlukan: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, `ANDROID_KEYSTORE_PASSWORD`. Workflow mendekode keystore sementara di runner, membangun release, memverifikasi tanda tangan, dan mengunggah `FINORA-android-vX.X.X-release.apk`. Jika salah satu secret tidak tersedia, langkah release dilewati dengan pesan jelas dan `FINORA-android-vX.X.X-debug.apk` tetap tersedia. APK lama hanya dapat ditimpa jika ditandatangani kunci yang sama; tanpa kunci lama, buat backup terenkripsi, uninstall, instal release pertama, lalu restore. Simpan keystore dan password pemilik di luar repo.
 
 Web assets native dihasilkan oleh `cap sync`, tidak di-commit. File ekspor Android dibuat di cache privat lalu dialog Share membuka pilihan penyimpanan pengguna. File backup yang dipilih melalui file picker dibaca lokal. Perlu uji perangkat nyata untuk perilaku file picker/share/biometrik dan berbagai versi WebView; build APK tidak membuktikan seluruh perilaku native.
 
@@ -95,7 +95,7 @@ npm run ios:sync
 npm run ios:open
 ```
 
-Pada tahap macOS, Xcode memulihkan paket SPM, lalu build/run pada simulator atau perangkat dan mengatur Signing & Capabilities untuk distribusi. Build simulator, validasi runtime iOS, signing dan IPA belum dilakukan di lingkungan Linux ini. Tidak diperlukan kredensial Apple untuk menyiapkan source sekarang.
+Workflow `.github/workflows/ios.yml` menjalankan build simulator unsigned pada `macos-latest` melalui `xcodebuild` setelah `cap sync ios`; hasil tersebut memvalidasi kompilasi, bukan IPA yang dapat dipasang di perangkat. Bundle ID tetap `id.fahmidjawas.keuanganrumah`, display name FINORA, iOS 15+, iPhone/iPad portrait/landscape. Untuk TestFlight, direct development/ad hoc install, archive dan export IPA bertanda tangan, lihat [panduan distribusi iOS](docs/ios-distribution.md). Tidak diperlukan kredensial Apple untuk build simulator unsigned.
 
 ## Layout, safe area dan navigasi native
 
@@ -107,10 +107,10 @@ Production tidak mengatur `server.url`. `cap sync` menyalin bundle lokal ke Andr
 
 ## GitHub Actions
 
-- `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **keuangan-rumah-tangga-web-v1.0.1**.
-- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back dan persistensi setelah Activity/WebView dibuat ulang; artifact **keuangan-rumah-tangga-android-v1.0.1** berisi `app-debug.apk`.
+- `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **FINORA-web-v1.0.2**.
+- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back dan persistensi setelah Activity/WebView dibuat ulang; artifact **FINORA-android-v1.0.2-debug.apk**; release signed hanya jika keempat secret tersedia.
 
-Actions → Android Debug APK → run → Artifacts. Tidak membutuhkan secret untuk debug. Workflow beroperasi dengan `contents: read`. Signing release belum dikonfigurasi.
+Actions → Android APK → run → Artifacts. Debug tidak membutuhkan secret. `.github/workflows/ios.yml` memvalidasi build simulator unsigned pada runner macOS. Semua workflow memakai `contents: read`.
 
 ## Struktur
 

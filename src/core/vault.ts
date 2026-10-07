@@ -235,7 +235,7 @@ export async function registerBiometric(
   const credential = (await navigator.credentials.create({
     publicKey: {
       challenge: crypto.getRandomValues(new Uint8Array(32)),
-      rp: { name: "Keuangan Rumah Tangga" },
+      rp: { name: "FINORA" },
       user: {
         id: crypto.getRandomValues(new Uint8Array(16)),
         name: a.username,

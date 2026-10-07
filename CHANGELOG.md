@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.2 — 2026-10-07
+
+- Branding FINORA / Keuangan Keluarga pada web, PWA, Android, iOS, splash, laporan dan Tentang Aplikasi; package/bundle ID tetap.
+- Field input membulat dengan border lembut, ikon, caret biru, dan focus ring pada wrapper; garis biru vertikal terpotong pada password hilang.
+- Login landscape tablet dua kolom terpusat; dashboard tablet lebih padat dengan pasangan grafik, evaluasi, transaksi dan target; bottom navigation tablet dibatasi lebar.
+- Workflow iOS baru memvalidasi build simulator unsigned di macOS; panduan TestFlight serta development/ad hoc dan prasyarat IPA disediakan.
+- Workflow Android membangun APK debug bernama versi dan menyiapkan APK release bertanda tangan tetap jika empat GitHub Secrets tersedia; keystore tidak disimpan di repo.
+- Versi Android 1.0.2/code 3, iOS 1.0.2/build 3; aturan password tidak kosong dan PIN enam digit dipertahankan.
+
 ## 1.0.1 — 2026-10-07
 
 - UI seluruh halaman mengikuti baseline visual final: header ringkas, kartu berwarna, bottom navigation dan tombol plus pada semua perangkat; sidebar permanen dihapus.

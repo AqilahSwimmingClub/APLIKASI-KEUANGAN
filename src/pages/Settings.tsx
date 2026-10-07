@@ -15,6 +15,7 @@ import {
   Pencil,
   Trash2,
   Plus,
+  LockKeyhole,
 } from "lucide-react";
 import type { Data, Category } from "../core/model";
 import {
@@ -179,42 +180,54 @@ export function Settings(p: Props) {
                   >
                     <label>
                       Password saat ini
-                      <input
-                        name="current"
-                        type="password"
-                        autoComplete="current-password"
-                        required
-                      />
+                      <div className="input-icon">
+                        <LockKeyhole size={18} />
+                        <input
+                          name="current"
+                          type="password"
+                          autoComplete="current-password"
+                          required
+                        />
+                      </div>
                     </label>
                     <label>
                       Password baru
-                      <input
-                        name="new"
-                        type="password"
-                        minLength={1}
-                        autoComplete="new-password"
-                        required
-                      />
+                      <div className="input-icon">
+                        <LockKeyhole size={18} />
+                        <input
+                          name="new"
+                          type="password"
+                          minLength={1}
+                          autoComplete="new-password"
+                          required
+                        />
+                      </div>
                     </label>
                     <label>
                       Konfirmasi password baru
-                      <input
-                        name="repeat"
-                        type="password"
-                        minLength={1}
-                        autoComplete="new-password"
-                        required
-                      />
+                      <div className="input-icon">
+                        <LockKeyhole size={18} />
+                        <input
+                          name="repeat"
+                          type="password"
+                          minLength={1}
+                          autoComplete="new-password"
+                          required
+                        />
+                      </div>
                     </label>
                     <label>
                       PIN baru (kosong untuk menonaktifkan)
-                      <input
-                        name="pin"
-                        type="password"
-                        inputMode="numeric"
-                        pattern="[0-9]{6}"
-                        maxLength={6}
-                      />
+                      <div className="input-icon">
+                        <LockKeyhole size={18} />
+                        <input
+                          name="pin"
+                          type="password"
+                          inputMode="numeric"
+                          pattern="[0-9]{6}"
+                          maxLength={6}
+                        />
+                      </div>
                     </label>
                     <button disabled={busy} className="primary">
                       Simpan keamanan
@@ -328,14 +341,17 @@ export function Settings(p: Props) {
                   </p>
                   <label>
                     Password backup
-                    <input
-                      ref={backupPassword}
-                      aria-label="Password backup"
-                      type="password"
-                      minLength={1}
-                      autoComplete="new-password"
-                      placeholder="Bebas selama tidak kosong"
-                    />
+                    <div className="input-icon">
+                      <LockKeyhole size={18} />
+                      <input
+                        ref={backupPassword}
+                        aria-label="Password backup"
+                        type="password"
+                        minLength={1}
+                        autoComplete="new-password"
+                        placeholder="Bebas selama tidak kosong"
+                      />
+                    </div>
                   </label>
                   <button
                     disabled={busy}
@@ -574,7 +590,8 @@ export function Settings(p: Props) {
               )}
               {section === "Tentang Aplikasi" && (
                 <>
-                  <h2>Keuangan Rumah Tangga</h2>
+                  <h2>FINORA</h2>
+                  <p>Keuangan Keluarga</p>
                   <p>Versi {APP_VERSION} • Keuangan pribadi, offline.</p>
                   <p>
                     Data dienkripsi di perangkat. Saldo berasal dari ledger

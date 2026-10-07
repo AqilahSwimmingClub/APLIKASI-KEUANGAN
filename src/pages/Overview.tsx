@@ -39,7 +39,7 @@ export async function exportPdf(data: Data, month: string) {
     doc.text(lines, 17, y);
     y += lines.length * 6 + 3;
   };
-  line("Keuangan Rumah Tangga", 20);
+  line("FINORA • Keuangan Keluarga", 20);
   line(`Laporan ${monthLabel(month)}`, 14);
   for (const [k, l] of [
     ["income", "Pemasukan"],
@@ -99,6 +99,7 @@ export function Overview({
     const m = shiftMonth(month, i - 5);
     return { month: m, ...summarize(data, m) };
   });
+  const hasTrendActivity = trend.some((row) => row.income || row.expense);
   const top = categoryTotals(data, month, "expense")[0];
   return (
     <div className={report ? "overview report-screen" : "overview"}>
@@ -211,21 +212,32 @@ export function Overview({
       <div className="dashboard-grid">
         <Panel
           title="Pemasukan vs Pengeluaran"
+          className="dashboard-income-expense"
           hidden={report && reportTab !== "Ringkasan"}
         >
-          <TrendChart rows={trend} />
+          {hasTrendActivity ? (
+            <TrendChart rows={trend} />
+          ) : (
+            <Empty>Mulai catat transaksi Anda untuk melihat grafik.</Empty>
+          )}
         </Panel>
         <Panel
           title="Pengeluaran per Kategori"
+          className="dashboard-categories"
           hidden={report && reportTab !== "Kategori"}
         >
           <CategoriesChart rows={categoryTotals(data, month, "expense")} />
         </Panel>
         <Panel
           title="Tren Keuangan • 6 Bulan"
+          className="dashboard-trend"
           hidden={report && reportTab !== "Tren"}
         >
-          <TrendChart rows={trend} />
+          {hasTrendActivity ? (
+            <TrendChart rows={trend} />
+          ) : (
+            <Empty>Belum ada tren. Mulai catat transaksi Anda.</Empty>
+          )}
         </Panel>
         {report ? (
           <Panel
@@ -237,6 +249,7 @@ export function Overview({
         ) : (
           <Panel
             title="Target Bulan Ini"
+            className="dashboard-target"
             action={
               <button
                 className="text-button"
@@ -274,6 +287,7 @@ export function Overview({
         )}
         <Panel
           title="Perbandingan dengan Bulan Lalu"
+          className="dashboard-comparison"
           hidden={report && reportTab !== "Ringkasan"}
         >
           <div className="comparison-head">
@@ -308,6 +322,7 @@ export function Overview({
         </Panel>
         <Panel
           title="Evaluasi Keuangan"
+          className="dashboard-evaluation"
           hidden={report && reportTab !== "Ringkasan"}
         >
           <div className="evaluation-label">
@@ -326,10 +341,10 @@ export function Overview({
             </div>
           )}
         </Panel>
-      </div>
       {!report && (
         <Panel
           title="Transaksi Terakhir"
+          className="dashboard-recent"
           action={
             <button
               className="text-button"
@@ -353,6 +368,7 @@ export function Overview({
           />
         </Panel>
       )}
+      </div>
       <p className="hint">
         Saldo = pemasukan − seluruh pengeluaran, termasuk alokasi tabungan dan
         investasi. Nilai investasi adalah modal tercatat, bukan harga pasar.

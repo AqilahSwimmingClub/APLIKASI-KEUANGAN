@@ -7,8 +7,8 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "Keuangan Rumah Tangga",
-        short_name: "Keuangan",
+        name: "FINORA — Keuangan Keluarga",
+        short_name: "FINORA",
         description: "Kelola • Rencanakan • Evaluasi Keuangan Keluarga Anda",
         lang: "id",
         theme_color: "#163b78",

@@ -1488,6 +1488,220 @@ dialog form > .primary {
 .asset-hero + .panel .donut > div > strong {
   font-size: 13px;
 }
+
+/* The previous global input outline was clipped by the icon/password wrappers,
+   leaving two straight blue lines at their edges in Android WebView. Put focus
+   on the complete field instead, while retaining a visible keyboard indicator. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="date"]):not([type="file"]),
+textarea {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  caret-color: #006aff;
+  border-radius: 16px;
+  background: #f8fbff;
+  border-color: #dae6f7;
+  box-shadow: 0 2px 7px #164c9808;
+  transition: border-color 200ms ease, box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+select,
+input[type="date"] {
+  -webkit-tap-highlight-color: transparent;
+  caret-color: #006aff;
+  border-radius: 16px;
+  background: #f8fbff;
+  border-color: #dae6f7;
+  box-shadow: 0 2px 7px #164c9808;
+  transition: border-color 200ms ease, box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.55);
+  box-shadow: 0 0 0 3px #2563eb14, 0 8px 24px #2563eb14;
+  background: #fff;
+}
+.input-icon,
+.password-input,
+.money-input {
+  border-radius: 16px;
+  border: 1px solid #dae6f7;
+  background: #f8fbff;
+  box-shadow: 0 2px 7px #164c9808;
+  transition: border-color 200ms ease, box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+.input-icon:focus-within,
+.password-input:focus-within,
+.money-input:focus-within {
+  border-color: rgba(37, 99, 235, 0.55);
+  box-shadow: 0 0 0 3px #2563eb14, 0 8px 24px #2563eb14;
+  background: #fff;
+}
+.input-icon input,
+.password-input input,
+.money-input input,
+.login-card .input-icon input,
+.login-card .password-input input {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  border-radius: 0;
+  margin: 0;
+}
+.input-icon input:focus,
+.password-input input:focus,
+.money-input input:focus,
+.login-card .input-icon input:focus,
+.login-card .password-input input:focus {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+.input-icon svg,
+.password-lock {
+  color: #6e8bb8;
+}
+input::selection,
+textarea::selection {
+  background: #bcd8ff;
+  color: #101c42;
+}
+@media (prefers-reduced-motion: reduce) {
+  input, select, textarea, .input-icon, .password-input, .money-input {
+    transition: none;
+  }
+}
+
+.login-heading .brand-descriptor {
+  grid-column: 2;
+  grid-row: 2;
+  margin: -7px 0 0;
+  text-align: left;
+  color: #34567f;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+.login-heading .tagline {
+  grid-row: 3;
+}
+.baseline-login .login-heading h1 {
+  letter-spacing: 1.5px;
+}
+.baseline-login .login-card {
+  background: #fff;
+  border: 1px solid #e1ebf8;
+  box-shadow: 0 12px 34px #164c9812;
+}
+.baseline-login .login-card input:not([type="checkbox"]) {
+  font-size: 16px;
+}
+.baseline-login .login-identity,
+.baseline-login .login-main {
+  min-width: 0;
+}
+html[data-keyboard="open"] .baseline-login {
+  align-content: start;
+  overflow-y: auto;
+}
+html[data-keyboard="open"] .baseline-login::after {
+  opacity: 0.18;
+}
+@media (min-width: 700px) and (orientation: landscape) {
+  .baseline-login {
+    width: min(100%, 1120px);
+    margin-inline: auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 500px);
+    gap: clamp(28px, 4vw, 56px);
+    padding-inline: calc(clamp(24px, 3vw, 48px) + var(--safe-left))
+      calc(clamp(24px, 3vw, 48px) + var(--safe-right));
+  }
+  .baseline-login .login-main {
+    width: min(100%, 500px);
+    max-width: 500px;
+  }
+  .baseline-login .finance-illustration {
+    width: min(100%, 410px);
+    max-height: 250px;
+  }
+  .baseline-login .login-identity {
+    width: min(100%, 460px);
+  }
+  .baseline-login .login-heading h1 {
+    font-size: clamp(28px, 3vw, 40px);
+  }
+  .baseline-login .login-heading .brand-descriptor {
+    font-size: 14px;
+  }
+  .baseline-login .login-card {
+    padding: clamp(17px, 2vw, 26px);
+  }
+  .baseline-login .login-methods {
+    margin: 11px 0;
+  }
+  .baseline-login .login-methods button {
+    min-height: 54px;
+  }
+  .baseline-login .login-security {
+    margin-top: 10px;
+  }
+}
+
+.overview:not(.report-screen) .dashboard-income-expense { order: 1; }
+.overview:not(.report-screen) .dashboard-categories { order: 2; }
+.overview:not(.report-screen) .dashboard-trend { order: 3; }
+.overview:not(.report-screen) .dashboard-evaluation { order: 4; }
+.overview:not(.report-screen) .dashboard-recent { order: 5; }
+.overview:not(.report-screen) .dashboard-target { order: 6; }
+.overview:not(.report-screen) .dashboard-comparison { order: 7; }
+@media (min-width: 840px) and (orientation: landscape) {
+  .overview:not(.report-screen) .dashboard-grid {
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .overview:not(.report-screen) .panel {
+    padding: 14px 16px;
+  }
+  .overview .hero {
+    padding: 12px 18px;
+    margin-bottom: 12px;
+  }
+  .overview .hero h2 {
+    font-size: clamp(24px, 2.4vw, 34px);
+    margin: 2px 0;
+  }
+  .overview .hero p {
+    margin: 0;
+  }
+  .overview .metrics {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .overview .metric-wrap {
+    padding: 10px 12px;
+  }
+  .overview .bar-chart { height: 150px; }
+  .overview .bars { height: 120px; }
+  .overview .empty { padding: 10px 8px; }
+  .bottom-nav {
+    width: min(680px, calc(100% - 32px));
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    padding-inline: 24px;
+    gap: 14px;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -7px 25px #17417816;
+  }
+}
 .asset-hero + .panel {
   margin-bottom: 16px;
 }

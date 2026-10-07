@@ -1,4 +1,4 @@
-name: Android Debug APK
+name: Android APK
 on:
   push:
     branches: [main]
@@ -58,8 +58,47 @@ jobs:
             android/app/build/reports/androidTests/connected/
             android/app/build/outputs/androidTest-results/connected/
           if-no-files-found: ignore
+      - name: Name debug APK
+        run: |
+          mkdir -p artifacts
+          cp android/app/build/outputs/apk/debug/app-debug.apk "artifacts/FINORA-android-v${{ steps.version.outputs.version }}-debug.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: keuangan-rumah-tangga-android-v${{ steps.version.outputs.version }}
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: FINORA-android-v${{ steps.version.outputs.version }}-debug.apk
+          path: artifacts/FINORA-android-v${{ steps.version.outputs.version }}-debug.apk
+          if-no-files-found: error
+      - name: Check release signing secrets
+        id: signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [[ -n "$ANDROID_KEYSTORE_BASE64" && -n "$ANDROID_KEY_ALIAS" && -n "$ANDROID_KEY_PASSWORD" && -n "$ANDROID_KEYSTORE_PASSWORD" ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+            echo 'Release signing configured; signed APK will be built.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Release signing skipped: one or more Android signing secrets are unavailable. Debug APK remains available; its ephemeral runner signature cannot be used for stable updates.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Build and verify signed release APK
+        if: steps.signing.outputs.ready == 'true'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          umask 077
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/finora-release.jks"
+          export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/finora-release.jks"
+          (cd android && ./gradlew --no-daemon --max-workers=2 assembleRelease)
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/release/app-release.apk
+          cp android/app/build/outputs/apk/release/app-release.apk "artifacts/FINORA-android-v${{ steps.version.outputs.version }}-release.apk"
+      - uses: actions/upload-artifact@v4
+        if: steps.signing.outputs.ready == 'true'
+        with:
+          name: FINORA-android-v${{ steps.version.outputs.version }}-release.apk
+          path: artifacts/FINORA-android-v${{ steps.version.outputs.version }}-release.apk
           if-no-files-found: error

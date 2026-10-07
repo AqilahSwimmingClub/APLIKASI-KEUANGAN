@@ -1,0 +1,890 @@
+LANJUTKAN PROJECT YANG SUDAH ADA DAN LAKUKAN REVISI MENYELURUH SESUAI SPESIFIKASI INI.
+
+Repository:
+AqilahSwimmingClub/APLIKASI-KEUANGAN
+
+JANGAN membuat repository baru.
+JANGAN mengganti stack.
+JANGAN menyentuh repository lain.
+JANGAN membangun ulang dari nol jika tidak diperlukan.
+JANGAN menghapus fitur yang sudah berfungsi.
+
+PERTAHANKAN STACK:
+- React
+- TypeScript
+- Vite
+- Capacitor Android
+- Capacitor iOS
+- IndexedDB / local encrypted storage
+- seluruh logic aplikasi yang sudah benar
+
+==================================================
+1. TUJUAN REVISI
+==================================================
+
+Saya ingin memperbaiki:
+
+1. tampilan input Username/Password
+2. garis biru aneh di sisi kiri/kanan input saat focus
+3. focus/selection/caret bawaan WebView yang terlihat jelek
+4. login landscape tablet/iPad agar lebih modern
+5. dashboard tablet agar lebih compact dan premium
+6. nama aplikasi agar tidak terdengar terlalu generik
+7. Android agar update APK berikutnya dapat menimpa versi lama
+8. iPhone/iPad agar siap benar-benar dibuild sebagai aplikasi iOS
+9. versioning wajib naik
+
+==================================================
+2. GANTI NAMA APLIKASI
+==================================================
+
+Nama "Keuangan Rumah Tangga" terasa terlalu generik.
+
+Ganti branding aplikasi menjadi nama yang lebih modern dan premium:
+
+NAMA APLIKASI:
+FINORA
+
+Subjudul/descriptor:
+Keuangan Keluarga
+
+Tampilan branding:
+
+FINORA
+Keuangan Keluarga
+
+Tagline tetap:
+
+Kelola • Rencanakan • Evaluasi
+Keuangan Keluarga Anda
+
+Gunakan "FINORA" sebagai:
+- app name
+- launcher label
+- splash title
+- header utama
+- Tentang Aplikasi
+
+Gunakan "Keuangan Keluarga" sebagai descriptor/subtitle.
+
+JANGAN mengubah package ID saat ini kecuali memang sangat diperlukan.
+
+Package Android tetap:
+id.fahmidjawas.keuanganrumah
+
+agar update aplikasi lama tetap memungkinkan.
+
+==================================================
+3. LOGIN — REFERENSI VISUAL
+==================================================
+
+Pertahankan arah desain visual yang sudah disetujui:
+
+- ilustrasi finansial
+- dompet
+- uang
+- koin Rupiah
+- rumah
+- grafik
+- card putih
+- warna biru modern
+- footer gelombang
+- Data Anda Aman
+- Sidik Jari
+- PIN 6 Digit
+- Password
+
+Tetapi rapikan agar lebih premium dan digital.
+
+==================================================
+4. INPUT FIELD — REDESIGN TOTAL
+==================================================
+
+Perbaiki SEMUA input:
+
+- Username
+- Password
+- Konfirmasi Password
+- PIN
+- Konfirmasi PIN
+- input form transaksi
+- input backup password
+- input keamanan akun
+
+Masalah saat ini:
+
+- muncul outline biru default
+- ada garis biru lurus di kiri/kanan input
+- focus state terasa seperti browser/web
+- selection/caret terlihat kasar
+- field belum terasa seperti aplikasi modern
+
+Saya ingin input modern, digital, premium.
+
+Gunakan:
+
+- rounded 14–18px
+- background off-white / very light blue
+- border tipis lembut
+- soft shadow
+- icon kiri modern
+- icon mata di kanan
+- spacing rapi
+- transition halus
+
+==================================================
+5. HILANGKAN GARIS BIRU ANEH
+==================================================
+
+PENTING:
+
+Pada screenshot terdapat garis biru lurus di ujung kiri dan kanan field Password saat focus.
+
+JANGAN pertahankan efek tersebut.
+
+Audit CSS/DOM/WebView.
+
+Hilangkan atau override:
+
+- default browser outline
+- default Android WebView focus ring
+- default input highlight
+- default appearance yang tidak diperlukan
+- focus border bawaan browser
+- selection visual yang menyebabkan garis vertikal aneh
+
+Gunakan CSS reset yang aman seperti:
+
+outline: none;
+-webkit-appearance: none;
+appearance: none;
+-webkit-tap-highlight-color: transparent;
+
+Tetapi tetap jaga accessibility.
+
+JANGAN menghilangkan indikasi focus sepenuhnya.
+
+Ganti focus state dengan custom style:
+
+- border biru tipis premium
+- glow halus
+- soft box-shadow
+- transition 180–220ms
+- tidak ada garis lurus biru di ujung field
+
+Contoh arah:
+
+border-color:
+rgba(37, 99, 235, 0.55)
+
+box-shadow:
+0 0 0 3px rgba(37, 99, 235, 0.08),
+0 8px 24px rgba(37, 99, 235, 0.08)
+
+Jangan harus menggunakan angka persis jika ada kombinasi visual yang lebih baik.
+
+==================================================
+6. CARET / TEXT SELECTION
+==================================================
+
+Pastikan caret tetap terlihat tetapi tidak berlebihan.
+
+Gunakan:
+caret-color dengan warna biru brand yang lembut.
+
+Jangan membuat selection handle custom yang merusak native UX.
+
+Jika garis biru tersebut berasal dari:
+- pseudo-element
+- wrapper focus
+- box-shadow
+- border nested container
+- native input style
+
+perbaiki sumbernya secara benar.
+
+Jangan hanya menutupinya secara visual tanpa memahami penyebab.
+
+==================================================
+7. LOGIN LANDSCAPE TABLET / IPAD
+==================================================
+
+Screenshot login landscape saat ini masih terasa seperti web.
+
+Perbaiki.
+
+Untuk tablet/iPad landscape:
+
+Gunakan layout 2 kolom:
+
+KIRI:
+- ilustrasi finansial
+- logo
+- FINORA
+- Keuangan Keluarga
+- tagline
+
+KANAN:
+- card login
+
+Tetapi:
+
+- ilustrasi jangan terlalu besar
+- form jangan terlalu lebar
+- card login maksimal sekitar 460–520px
+- spacing lebih compact
+- branding/footer jangan tercecer
+- fokus visual harus seimbang
+
+Gunakan container tengah dengan max-width.
+
+Jangan isi seluruh lebar layar.
+
+Login harus terlihat seperti:
+premium app onboarding / banking app
+BUKAN:
+website form.
+
+==================================================
+8. KEYBOARD STATE
+==================================================
+
+Saat keyboard muncul:
+
+- field aktif tetap terlihat
+- card tidak bergeser kacau
+- footer tidak bertabrakan
+- halaman boleh scroll
+- landscape tetap usable
+- form tidak mengecil ekstrem
+
+Android:
+windowSoftInputMode harus sesuai.
+
+iOS:
+safe area + keyboard overlay harus ditangani.
+
+==================================================
+9. LOGIN PORTRAIT
+==================================================
+
+HP portrait tetap mengikuti baseline referensi.
+
+Urutan:
+
+- ilustrasi
+- FINORA
+- Keuangan Keluarga
+- tagline
+- card input
+- Ingat Saya
+- Lupa Password
+- MASUK
+- metode login
+- Data Anda Aman
+- footer
+
+Jangan terlalu tinggi jika tidak perlu.
+
+Gunakan scroll jika layar pendek.
+
+==================================================
+10. FIRST RUN / BUAT AKUN
+==================================================
+
+Pertahankan:
+
+BUAT AKUN PEMILIK
+
+Field:
+- Nama
+- Username
+- Password
+- Konfirmasi Password
+- PIN 6 Digit
+- Konfirmasi PIN
+
+Password tetap fleksibel:
+bebas selama tidak kosong.
+
+PIN:
+tetap 6 digit angka.
+
+Modernisasi semua field dengan style input baru.
+
+==================================================
+11. PASSWORD RULES
+==================================================
+
+PERTAHANKAN:
+
+Password boleh:
+- "1"
+- "12"
+- angka saja
+- huruf saja
+- uppercase/lowercase
+- simbol
+- campuran apa pun
+
+Syarat:
+tidak boleh kosong.
+
+JANGAN paksa:
+- panjang minimum
+- uppercase
+- lowercase
+- angka
+- simbol
+
+Tetap:
+- encrypted
+- tidak plaintext
+- tidak dilog
+- tidak ditampilkan kecuali show password dipilih
+
+==================================================
+12. DASHBOARD TABLET
+==================================================
+
+Screenshot tablet landscape saat ini sudah lebih baik tetapi masih terlalu kosong.
+
+Perbaiki agar lebih premium dan compact.
+
+Header:
+
+FINORA
+Keuangan Keluarga
+
+Selector bulan/tahun compact.
+
+Hero saldo:
+
+jangan terlalu tinggi.
+Kurangi vertical padding.
+Gunakan card lebih padat.
+
+KPI:
+
+[Pemasukan]
+[Pengeluaran]
+[Tabungan]
+[Investasi]
+
+Gunakan 4 card sejajar pada landscape tablet.
+
+Di bawah:
+
+[Pemasukan vs Pengeluaran]
+[Pengeluaran per Kategori]
+
+Lalu:
+
+[Tren Keuangan]
+[Evaluasi Keuangan]
+
+Lalu:
+
+[Transaksi Terakhir]
+[Target Bulan Ini]
+
+Kurangi whitespace besar.
+
+==================================================
+13. EMPTY STATE
+==================================================
+
+Panel kosong saat tidak ada data jangan tinggi.
+
+Contoh:
+
+Belum ada data kategori.
+Mulai catat transaksi Anda.
+
+Gunakan compact state.
+
+Jangan sisakan area kosong besar.
+
+==================================================
+14. BOTTOM NAVIGATION
+==================================================
+
+Pertahankan:
+
+Dashboard
+Transaksi
+(+)
+Laporan
+Pengaturan
+
+Pada tablet:
+
+- jangan stretch terlalu lebar
+- gunakan max-width nav container
+- posisikan tengah
+- padding horizontal rapi
+- tombol + tetap bulat
+- visual lebih premium
+
+Boleh gunakan nav bar floating ringan dengan:
+- rounded top / rounded full capsule
+- subtle shadow
+- background semi-solid
+
+Tetapi jangan berlebihan.
+
+==================================================
+15. RESPONSIVE
+==================================================
+
+Harus tetap bagus untuk:
+
+Android phone:
+- portrait
+- landscape
+
+Android tablet:
+- portrait
+- landscape
+
+iPhone:
+- portrait
+- landscape jika didukung
+
+iPad:
+- portrait
+- landscape
+
+Gunakan adaptive layout.
+
+==================================================
+16. IPHONE / IPAD — TARGET NYATA
+==================================================
+
+Siapkan project iOS agar benar-benar siap untuk dibuild.
+
+Pertahankan:
+Capacitor iOS.
+
+Pastikan:
+
+npx cap sync ios
+
+berhasil.
+
+Pastikan:
+
+ios/App/App.xcworkspace
+atau struktur Xcode yang relevan tersedia.
+
+Pastikan:
+- app icon
+- splash
+- safe area
+- orientation
+- display name FINORA
+- bundle identifier valid
+
+Gunakan iOS bundle identifier yang konsisten.
+
+Jika bundle ID saat ini ada:
+jangan ubah sembarangan.
+
+==================================================
+17. BUILD IOS
+==================================================
+
+Tambahkan dokumentasi dan workflow iOS.
+
+Buat:
+
+.github/workflows/ios.yml
+
+Gunakan:
+runs-on: macos-latest
+
+Workflow minimal:
+
+- checkout
+- setup Node
+- npm ci
+- lint
+- typecheck
+- unit test
+- build web
+- npx cap sync ios
+- xcodebuild validation
+
+Jika Apple signing credential BELUM tersedia:
+
+buat build validation untuk simulator / unsigned build yang memungkinkan.
+
+JANGAN mengklaim menghasilkan installable IPA jika signing belum tersedia.
+
+==================================================
+18. IPA / IPHONE INSTALL
+==================================================
+
+Dokumentasikan jalur produksi iPhone.
+
+Untuk menghasilkan aplikasi installable:
+
+DIBUTUHKAN:
+- Apple Developer Account
+- Team ID
+- Signing Certificate
+- Provisioning Profile
+
+Setelah credential tersedia:
+workflow harus bisa dikembangkan menjadi:
+
+xcodebuild archive
+-exportArchive
+
+hingga menghasilkan:
+
+FINORA-vX.X.X.ipa
+
+Siapkan struktur workflow agar nanti signing secret dapat dimasukkan tanpa rombak besar.
+
+==================================================
+19. IOS DISTRIBUTION
+==================================================
+
+Dokumentasikan dua jalur:
+
+A. TestFlight
+B. Direct development/ad hoc install
+
+Jangan memasukkan credential palsu.
+
+Jangan commit certificate/provisioning profile.
+
+==================================================
+20. ANDROID UPDATE MASALAH
+==================================================
+
+Saat ini APK debug mungkin tidak bisa menimpa install lama karena debug keystore runner GitHub berubah.
+
+Perbaiki jalur update Android.
+
+Target:
+versi berikutnya bisa di-install DI ATAS versi lama tanpa uninstall.
+
+Syarat:
+- package ID tetap sama
+- versionCode selalu naik
+- signature tetap sama
+
+==================================================
+21. ANDROID RELEASE SIGNING
+==================================================
+
+Siapkan signing release permanen.
+
+Gunakan GitHub Secrets:
+
+ANDROID_KEYSTORE_BASE64
+ANDROID_KEY_ALIAS
+ANDROID_KEY_PASSWORD
+ANDROID_KEYSTORE_PASSWORD
+
+JANGAN commit keystore.
+
+Workflow:
+
+- decode keystore
+- build release APK
+- sign dengan keystore tetap
+- verify signature
+- upload artifact
+
+Jika secrets belum tersedia:
+
+- workflow harus fallback / skip release signing dengan pesan jelas
+- debug build tetap boleh tersedia
+- jangan klaim signed release selesai
+
+==================================================
+22. ANDROID ARTIFACT
+==================================================
+
+Setelah signing dikonfigurasi nanti:
+
+artifact:
+FINORA-android-vX.X.X-release.apk
+
+Sementara jika belum ada keystore:
+FINORA-android-vX.X.X-debug.apk
+
+==================================================
+23. VERSIONING
+==================================================
+
+Karena ini revisi besar:
+
+Jika versi sekarang:
+1.0.1
+
+naikkan menjadi:
+1.0.2
+
+Jika ternyata sudah lebih tinggi:
+naikkan PATCH berikutnya.
+
+Update:
+- package.json
+- Android versionName
+- Android versionCode
+- iOS MARKETING_VERSION
+- iOS CURRENT_PROJECT_VERSION
+- Tentang Aplikasi
+- CHANGELOG.md
+- artifact name
+
+==================================================
+24. APP NAME VERSION UI
+==================================================
+
+Tentang Aplikasi tampil:
+
+FINORA
+Keuangan Keluarga
+
+Versi 1.0.2
+
+Dirancang & Dikembangkan oleh
+FAHMI DJAWAS, S.Pd.
+
+© 2026 Semua Hak Dilindungi
+
+==================================================
+25. APP ICON
+==================================================
+
+Gunakan icon:
+
+dompet + koin Rupiah
+
+Tetap:
+- biru
+- navy
+- putih
+- modern
+
+Jangan gunakan piggy bank.
+
+Tambahkan wordmark FINORA hanya jika memang cocok untuk splash, bukan launcher.
+
+==================================================
+26. SPLASH
+==================================================
+
+Splash:
+
+[icon]
+
+FINORA
+
+Keuangan Keluarga
+
+Kelola • Rencanakan • Evaluasi
+
+==================================================
+27. TEST INPUT FOCUS
+==================================================
+
+Tambahkan visual/UI test untuk memastikan:
+
+- tidak ada outline biru kasar
+- tidak ada garis biru vertikal di kiri/kanan input
+- focus state custom aktif
+- username/password tetap usable
+- show/hide password bekerja
+- keyboard tidak merusak layout
+
+==================================================
+28. TEST RESPONSIVE
+==================================================
+
+Test minimal:
+
+360x800
+393x852
+412x915
+430x932
+
+800x360
+852x393
+915x412
+
+768x1024
+800x1280
+834x1194
+
+1024x768
+1194x834
+1280x800
+1366x1024
+
+Periksa:
+- login
+- create account
+- dashboard
+- bottom nav
+- keyboard
+- focus input
+- no overflow
+- no broken safe area
+
+==================================================
+29. JANGAN RUSAK FITUR
+==================================================
+
+Pertahankan:
+
+- auth
+- PIN
+- biometric
+- transaksi
+- kategori
+- laporan
+- evaluasi
+- tabungan
+- investasi
+- backup
+- restore
+- CSV/PDF
+- offline
+- persistence
+- encryption
+
+==================================================
+30. BUILD ANDROID
+==================================================
+
+Jalankan:
+
+npm ci
+npm run lint
+npm run typecheck
+npm test
+npm run test:e2e
+npm run build
+npx cap sync android
+
+Kemudian:
+
+cd android
+./gradlew assembleDebug
+
+Jika release secrets tersedia:
+./gradlew assembleRelease
+
+==================================================
+31. BUILD IOS
+==================================================
+
+Pada macOS GitHub Actions:
+
+npm ci
+npm run build
+npx cap sync ios
+
+Kemudian validasi xcodebuild.
+
+Jika signing belum ada:
+gunakan simulator/unsigned validation yang legal dan masuk akal.
+
+==================================================
+32. GITHUB ACTIONS
+==================================================
+
+Pastikan:
+
+CI:
+green
+
+Android:
+green
+
+iOS:
+minimal build validation green jika memungkinkan tanpa signing
+
+Jika iOS workflow membutuhkan signing untuk tahap tertentu:
+pisahkan validation dan signed distribution.
+
+==================================================
+33. CHANGELOG
+==================================================
+
+Update CHANGELOG.md.
+
+Catat:
+
+- branding FINORA
+- input field modern
+- menghilangkan focus/garis biru aneh
+- login tablet landscape dirapikan
+- dashboard tablet dipadatkan
+- bottom nav diperbaiki
+- iOS workflow ditambahkan
+- Android release signing path disiapkan
+- version bump
+
+==================================================
+34. LAPORAN AKHIR
+==================================================
+
+Setelah selesai laporkan:
+
+1. versi terbaru
+2. commit SHA
+3. nama aplikasi baru
+4. Android versionName/versionCode
+5. iOS version/build
+6. halaman yang direvisi
+7. konfirmasi garis biru input hilang
+8. konfirmasi focus state baru
+9. hasil responsive test
+10. hasil unit test
+11. hasil E2E
+12. hasil Android build
+13. status Android release signing
+14. hasil iOS sync/build validation
+15. status GitHub Actions Android
+16. status GitHub Actions iOS
+17. nama artifact Android
+18. apa yang masih dibutuhkan untuk menghasilkan IPA installable
+19. daftar secrets Android yang belum diisi jika ada
+20. daftar credential Apple yang belum tersedia jika ada
+
+==================================================
+35. ATURAN FINAL
+==================================================
+
+KERJAKAN LANGSUNG.
+
+JANGAN membuat project baru.
+
+JANGAN mengganti package ID Android.
+
+JANGAN menghapus data model.
+
+JANGAN menyimpan secret di repository.
+
+JANGAN membuat klaim IPA installable jika belum ada Apple signing.
+
+JANGAN mempertahankan outline/focus biru default yang jelek.
+
+JANGAN mempertahankan garis biru vertikal di ujung input.
+
+INPUT HARUS TERLIHAT MODERN, DIGITAL, PREMIUM.
+
+TABLET LANDSCAPE HARUS TERASA SEPERTI APLIKASI PREMIUM.
+
+IPHONE/IPAD HARUS SIAP BUILD DENGAN CAPACITOR IOS.
+
+ANDROID HARUS DISIAPKAN AGAR UPDATE VERSI BERIKUTNYA DAPAT MENIMPA VERSI LAMA DENGAN SIGNATURE YANG SAMA.
+
+SETIAP REVISI WAJIB NAIK VERSI.

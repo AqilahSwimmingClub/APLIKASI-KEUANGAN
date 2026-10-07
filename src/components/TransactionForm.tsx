@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, CalendarDays, TextCursorInput } from "lucide-react";
 import { useState } from "react";
 import type { Data, Transaction } from "../core/model";
 import { localDate, putTransaction } from "../core/ledger";
@@ -103,27 +103,33 @@ export function TransactionForm({
           </label>
           <label>
             Tanggal
-            <input
-              aria-label="Tanggal"
-              name="date"
-              type="date"
-              min="1900-01-01"
-              max="9999-12-31"
-              defaultValue={initial?.date ?? localDate()}
-              required
-            />
+            <div className="input-icon">
+              <CalendarDays size={18} />
+              <input
+                aria-label="Tanggal"
+                name="date"
+                type="date"
+                min="1900-01-01"
+                max="9999-12-31"
+                defaultValue={initial?.date ?? localDate()}
+                required
+              />
+            </div>
           </label>
         </div>
         <label>
           Nama transaksi
-          <input
-            name="title"
-            aria-label="Nama transaksi"
-            maxLength={120}
-            defaultValue={initial?.title ?? ""}
-            required
-            placeholder="Contoh: Belanja kebutuhan rumah"
-          />
+          <div className="input-icon">
+            <TextCursorInput size={18} />
+            <input
+              name="title"
+              aria-label="Nama transaksi"
+              maxLength={120}
+              defaultValue={initial?.title ?? ""}
+              required
+              placeholder="Contoh: Belanja kebutuhan rumah"
+            />
+          </div>
         </label>
         <div className="form-grid">
           <label>

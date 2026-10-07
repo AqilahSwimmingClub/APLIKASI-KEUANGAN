@@ -15,6 +15,10 @@ android/local.properties
 *.aab
 *.jks
 *.keystore
+*.p12
+*.p8
+*.mobileprovision
+*.provisionprofile
 ios/App/App/public/
 ios/App/App/capacitor.config.json
 ios/App/App/config.xml
@@ -24,4 +28,3 @@ ios/**/DerivedData/
 ios/**/xcuserdata/
 ios/**/*.xcuserstate
 *.ipa
-*.mobileprovision

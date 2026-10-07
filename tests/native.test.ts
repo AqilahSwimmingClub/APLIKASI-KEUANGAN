@@ -11,7 +11,7 @@ test("native production bundles local assets, keeps app identity and allows rota
   expect(manifest).toContain("android.intent.category.LAUNCHER");
   expect(manifest).toContain("adjustResize");
   expect(read("android/app/src/main/res/values/strings.xml")).toContain(
-    "Keuangan Rumah Tangga",
+    "FINORA",
   );
 });
 test("iOS phone/tablet orientations, compatible SPM project and original opaque icon", () => {
@@ -37,11 +37,25 @@ test("release versions agree across package, Android, iOS and UI", async () => {
   expect(read("android/app/build.gradle")).toContain(
     `versionName "${pkg.version}"`,
   );
-  expect(read("android/app/build.gradle")).toContain("versionCode 2");
+  expect(read("android/app/build.gradle")).toContain("versionCode 3");
   expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
     `MARKETING_VERSION = ${pkg.version};`,
   );
   expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
-    "CURRENT_PROJECT_VERSION = 2;",
+    "CURRENT_PROJECT_VERSION = 3;",
   );
+});
+
+test("FINORA native display names and unsigned iOS validation workflow", () => {
+  expect(config.appName).toBe("FINORA");
+  expect(read("ios/App/App/Info.plist")).toContain("<string>FINORA</string>");
+  const ios = read(".github/workflows/ios.yml");
+  expect(ios).toContain("macos-latest");
+  expect(ios).toContain("cap sync ios");
+  expect(ios).toContain("CODE_SIGNING_ALLOWED=NO");
+  expect(ios).toContain("xcodebuild");
+  const android = read(".github/workflows/android.yml");
+  for (const secret of ["ANDROID_KEYSTORE_BASE64", "ANDROID_KEY_ALIAS", "ANDROID_KEY_PASSWORD", "ANDROID_KEYSTORE_PASSWORD"])
+    expect(android).toContain(secret);
+  expect(android).toContain("FINORA-android-v");
 });
