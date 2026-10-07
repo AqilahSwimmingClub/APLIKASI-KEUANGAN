@@ -128,6 +128,10 @@ export function removeCategory(d: Data, id: string): Data {
 }
 export function validateData(input: unknown): Data {
   const d = dataSchema.parse(input);
+  if (new TextEncoder().encode(JSON.stringify(d)).byteLength > 12 * 1024 * 1024)
+    throw Error(
+      "Data terlalu besar (maksimal 12 MB sebelum enkripsi). Ekspor dan arsipkan transaksi sebelum menambah data.",
+    );
   for (const a of [d.transactions, d.categories, d.goals, d.investments])
     if (new Set(a.map((x) => x.id)).size !== a.length)
       throw Error("ID duplikat dalam backup.");

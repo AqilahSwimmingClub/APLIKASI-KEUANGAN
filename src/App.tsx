@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { registerSW } from "virtual:pwa-register";
+import { readSession, rememberSession, forgetSession } from "./core/session";
 import type { Data, Transaction } from "./core/model";
 import { emptyData, localDate, removeTransaction } from "./core/ledger";
 import {
@@ -63,8 +64,8 @@ export default function App() {
   const saving = useRef(false),
     lastActivity = useRef(Date.now());
   const logout = useCallback(() => {
-    sessionStorage.removeItem("krt-session");
     setKey("");
+    forgetSession();
     setData(undefined);
     setForm(null);
     setConfirmation(null);
@@ -78,19 +79,19 @@ export default function App() {
         const a = await loadAccount();
         if (!alive) return;
         setAccount(a);
-        const cached = sessionStorage.getItem("krt-session");
+        const cached = readSession();
         if (a && cached) {
           try {
-            const session = JSON.parse(cached);
+            const session = cached;
             if (Date.now() - session.time < 15 * 60 * 1000) {
               const d = await readData(session.key);
               if (alive) {
                 setKey(session.key);
                 setData(d);
               }
-            } else sessionStorage.removeItem("krt-session");
+            } else forgetSession();
           } catch {
-            sessionStorage.removeItem("krt-session");
+            forgetSession();
           }
         }
       } catch (e) {
@@ -199,12 +200,9 @@ export default function App() {
       a = { ...a, failures: 0, lockedUntil: 0 };
       await saveAccount(a);
     }
-    if (remember)
-      sessionStorage.setItem(
-        "krt-session",
-        JSON.stringify({ key: k, time: Date.now() }),
-      );
-    else sessionStorage.removeItem("krt-session");
+    if (remember && !rememberSession(k, Date.now()))
+      setToast("Masuk berhasil. Ingat Saya tidak tersedia pada browser ini.");
+    if (!remember) forgetSession();
     setAccount(a);
     setKey(k);
     setData(d);

@@ -145,7 +145,16 @@ export function Overview({
             </button>
             <button
               className="primary"
-              onClick={() => void exportPdf(data, month)}
+              onClick={() =>
+                void exportPdf(data, month).catch((e) =>
+                  window.dispatchEvent(
+                    new CustomEvent("krt-error", {
+                      detail:
+                        e instanceof Error ? e.message : "Ekspor PDF gagal.",
+                    }),
+                  ),
+                )
+              }
             >
               PDF laporan
             </button>

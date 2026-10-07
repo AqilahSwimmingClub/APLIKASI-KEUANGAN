@@ -164,21 +164,44 @@ const db = () =>
       db.createObjectStore("vault");
     },
   });
+let expectedAccount: string | undefined;
 export async function loadAccount(): Promise<Account | undefined> {
-  return (await db()).get("vault", "account");
+  const account = await (await db()).get("vault", "account");
+  expectedAccount = account ? JSON.stringify(account) : undefined;
+  return account;
 }
 export async function saveAccount(a: Account) {
-  await (await db()).put("vault", a, "account");
+  const database = await db();
+  const tx = database.transaction("vault", "readwrite");
+  const current = await tx.store.get("account");
+  if ((current ? JSON.stringify(current) : undefined) !== expectedAccount) {
+    tx.abort();
+    await tx.done.catch(() => undefined);
+    throw Error(
+      "Keamanan akun berubah di tab lain. Muat ulang dan masuk kembali.",
+    );
+  }
+  await tx.store.put(a, "account");
+  await tx.done;
+  expectedAccount = JSON.stringify(a);
 }
 let expectedCipher: string | undefined;
 export async function createVault(a: Account, d: Data, key: string) {
   const payload = await encryptJson(validateData(d), await rawKey(key));
   const database = await db(),
     tx = database.transaction("vault", "readwrite");
+  if (await tx.store.get("account")) {
+    tx.abort();
+    await tx.done.catch(() => undefined);
+    throw Error(
+      "Akun sudah dibuat di tab lain. Muat ulang untuk masuk. Data aktif tetap aman.",
+    );
+  }
   await tx.store.put(a, "account");
   await tx.store.put(payload, "data");
   await tx.done;
   expectedCipher = payload.cipher;
+  expectedAccount = JSON.stringify(a);
 }
 export async function readData(key: string): Promise<Data> {
   const e = await (await db()).get("vault", "data");

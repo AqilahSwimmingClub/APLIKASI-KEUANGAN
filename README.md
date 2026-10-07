@@ -58,7 +58,7 @@ WebAuthn platform authenticator dengan **PRF** tersedia melalui Pengaturan → K
 
 Ingat saya menyimpan kunci sesi di **sessionStorage**, hanya selama tab hidup dan maksimal 15 menit saat reload; keluar menghapusnya. Kunci aktif hanya berada di memori tanpa ingat saya. Aplikasi mengunci setelah 15 menit tidak aktif. Perangkat yang sudah terbuka dan skrip pada origin yang sama tetap termasuk trust boundary. Jangan menjalankan aplikasi dari origin tidak terpercaya. Android OS backup dinonaktifkan; backup manual terenkripsi tetap tersedia.
 
-Backup mencakup transaksi, seluruh kategori, target, aset dan preferensi, tanpa kredensial akun. Pilih password backup minimal 10 karakter, unduh file, simpan di lokasi aman. Restore: pilih file, isi password backup yang sama, validasi, lalu konfirmasi. Backup rusak/password salah/relasi invalid ditolak sebelum mengganti data. Restore di perangkat baru dilakukan setelah membuat akun lokal baru. Tidak ada pemulihan password melalui server. Jika password dan PIN terlupa, hanya backup dengan password yang diketahui yang dapat memulihkan data setelah penyimpanan akun dibersihkan. Browser dapat menghapus data saat clear storage/uninstall/incognito; minta persistensi lewat pengaturan dan backup berkala.
+Backup mencakup transaksi, seluruh kategori, target, aset dan preferensi, tanpa kredensial akun. Vault dibatasi 12 MiB data UTF-8 sebelum enkripsi, sehingga semua backup yang dihasilkan dapat dipulihkan di bawah batas file restore 22 MB. Penulisan yang melewati batas ditolak sebelum menyentuh data aktif. Pilih password backup minimal 10 karakter, unduh file, simpan di lokasi aman. Restore: pilih file, isi password backup yang sama, validasi, lalu konfirmasi. Backup rusak/password salah/relasi invalid ditolak sebelum mengganti data. Restore di perangkat baru dilakukan setelah membuat akun lokal baru. Tidak ada pemulihan password melalui server. Jika password dan PIN terlupa, hanya backup dengan password yang diketahui yang dapat memulihkan data setelah penyimpanan akun dibersihkan. Browser dapat menghapus data saat clear storage/uninstall/incognito; minta persistensi lewat pengaturan dan backup berkala.
 
 ## Android
 
@@ -93,7 +93,7 @@ src/styles.css     responsif dan tema
 public/            ikon orisinal
 android/           proyek native Capacitor dan Gradle wrapper terverifikasi
 .github/workflows/ CI web dan APK
- tests/            unit dan E2E (tanpa spasi pada path sebenarnya)
+tests/             unit dan E2E
 docs/              permintaan asli, desain dan rencana
 ```
 

@@ -1,4 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
+test.beforeEach(async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-10-07T12:00:00+07:00"));
+});
 async function account(p: Page) {
   await p.goto("/");
   await p.getByLabel("Username").fill("fahmi");
@@ -183,13 +186,11 @@ test("hapus dengan konfirmasi, kategori custom, filter, ekspor dan backup rusak 
     .getByRole("button", { name: "Backup & Restore", exact: true })
     .click();
   await page.getByLabel("Password backup").fill("Backup-aman-2026");
-  await page
-    .getByLabel("Pilih file backup")
-    .setInputFiles({
-      name: "rusak.json",
-      mimeType: "application/json",
-      buffer: Buffer.from("{broken"),
-    });
+  await page.getByLabel("Pilih file backup").setInputFiles({
+    name: "rusak.json",
+    mimeType: "application/json",
+    buffer: Buffer.from("{broken"),
+  });
   await page.getByRole("button", { name: "Validasi backup" }).click();
   await expect(page.getByRole("alert")).toBeVisible();
   await page.getByRole("button", { name: "Export Data", exact: true }).click();
@@ -238,4 +239,21 @@ test("PIN, ingat saya, keamanan akun dan tema", async ({ page }) => {
   await page.reload();
   await expect(page.getByTestId("balance")).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+});
+
+test("PDF gagal memberi pesan dan tetap menjaga data", async ({ page }) => {
+  await account(page);
+  await page
+    .getByRole("button", { name: "Laporan", exact: true })
+    .first()
+    .click();
+  await page.evaluate(() => {
+    URL.createObjectURL = () => {
+      throw Error("Penyimpanan ekspor tidak tersedia");
+    };
+  });
+  await page.getByRole("button", { name: "PDF laporan", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText(
+    "Penyimpanan ekspor tidak tersedia",
+  );
 });
