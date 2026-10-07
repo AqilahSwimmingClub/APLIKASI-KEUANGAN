@@ -138,6 +138,7 @@ input[type="month"] {
 .check {
   display: flex;
   align-items: center;
+  min-height: 44px;
   gap: 9px;
   font-weight: 400;
 }

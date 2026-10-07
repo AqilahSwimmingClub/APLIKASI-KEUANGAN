@@ -98,7 +98,7 @@ Production tidak mengatur `server.url`. `cap sync` menyalin bundle lokal ke Andr
 ## GitHub Actions
 
 - `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **keuangan-rumah-tangga-web**.
-- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi dan hardware Back; artifact **keuangan-rumah-tangga-android-apk** berisi `app-debug.apk`.
+- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back dan persistensi setelah Activity/WebView dibuat ulang; artifact **keuangan-rumah-tangga-android-apk** berisi `app-debug.apk`.
 
 Actions → Android Debug APK → run → Artifacts. Tidak membutuhkan secret untuk debug. Workflow beroperasi dengan `contents: read`. Signing release belum dikonfigurasi.
 

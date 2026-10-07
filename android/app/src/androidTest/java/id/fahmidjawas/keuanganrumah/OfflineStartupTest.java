@@ -34,6 +34,7 @@ public class OfflineStartupTest {
             evaluate(scenario,"document.querySelector('[name=username]').value='native-test'; document.querySelector('[name=password]').value='Native-test-2026'; document.querySelector('.login-card').requestSubmit(); true");
             until(scenario,"document.querySelector('[data-testid=balance]') !== null");
             evaluate(scenario,"[...document.querySelectorAll('.bottom-nav button,.sidebar nav button')].find(b=>b.textContent.trim()==='Transaksi').click();true");
+            until(scenario,"document.querySelector('.page-title h1').textContent === 'Transaksi'");
             evaluate(scenario,"document.querySelector('[aria-label=\"Tambah transaksi\"]').click();true");
             until(scenario,"document.querySelector('dialog[open]') !== null");
             evaluate(scenario,"document.querySelector('[name=title]').value='Draft orientasi';true");
@@ -48,6 +49,15 @@ public class OfflineStartupTest {
             scenario.onActivity(a -> a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
             until(scenario,"innerHeight>innerWidth");
             assertEquals("true",evaluate(scenario,"document.documentElement.scrollWidth <= innerWidth"));
+            evaluate(scenario,"document.querySelector('[aria-label=\"Tambah transaksi\"]').click();true");
+            until(scenario,"document.querySelector('dialog[open]') !== null");
+            evaluate(scenario,"document.querySelector('[name=title]').value='Transaksi offline tersimpan'; document.querySelector('[name=amount]').value='100000'; document.querySelector('dialog form').requestSubmit();true");
+            until(scenario,"document.querySelector('dialog[open]') === null && document.querySelector('[data-testid=balance]').textContent.includes('100.000')");
+            // Recreate the native Activity/WebView and unlock the persistent local vault.
+            scenario.recreate();
+            until(scenario,"document.querySelector('.baseline-login') !== null");
+            evaluate(scenario,"document.querySelector('[name=username]').value='native-test'; document.querySelector('[name=password]').value='Native-test-2026'; document.querySelector('.login-card').requestSubmit();true");
+            until(scenario,"document.querySelector('[data-testid=balance]')?.textContent.includes('100.000') === true");
         }
     }
 }
