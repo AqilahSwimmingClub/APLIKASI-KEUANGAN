@@ -1,8 +1,8 @@
+import { SavingsIcon } from "../components/Brand";
 import { useRef, useState } from "react";
 import {
   ShieldCheck,
   Tags,
-  PiggyBank,
   Settings2,
   Database,
   Download,
@@ -82,7 +82,7 @@ export function Settings(p: Props) {
   const menus = [
     ["Keamanan Akun", ShieldCheck],
     ["Kategori", Tags],
-    ["Target Tabungan", PiggyBank],
+    ["Target Tabungan", SavingsIcon],
     ["Pengaturan Aplikasi", Settings2],
     ["Backup & Restore", Database],
     ["Export Data", Download],
@@ -412,7 +412,7 @@ export function Settings(p: Props) {
                   Tema
                   <select
                     aria-label="Tema"
-                  value={data.settings.theme}
+                    value={data.settings.theme}
                     onChange={(e) =>
                       void run(() =>
                         onSave({

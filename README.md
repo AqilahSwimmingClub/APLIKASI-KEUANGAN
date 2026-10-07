@@ -5,7 +5,7 @@ Kelola • Rencanakan • Evaluasi Keuangan Keluarga Anda.
 **Dirancang & Dikembangkan oleh FAHMI DJAWAS, S.Pd.**  
 © 2026 Semua Hak Dilindungi
 
-Aplikasi pribadi berbahasa Indonesia, mobile-first, tanpa backend. Bisa dipasang sebagai PWA atau APK Android. Akun pertama dibuat sendiri di perangkat: tidak ada username/password produksi bawaan dan tidak ada data demo otomatis.
+Aplikasi pribadi berbahasa Indonesia, mobile-first, tanpa backend. Bisa dipasang sebagai PWA, APK Android, atau aplikasi iPhone/iPad melalui proyek Capacitor iOS. Akun pertama dibuat sendiri di perangkat: tidak ada username/password produksi bawaan dan tidak ada data demo otomatis.
 
 ## Fitur
 
@@ -42,7 +42,7 @@ npm run build
 npm run preview
 ```
 
-Jika Chromium sudah disediakan mesin, gunakan `PLAYWRIGHT_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`. Pengujian browser membuat akun dan transaksi dalam konteks browser terisolasi, bukan data produksi. Unit mencakup kalkulasi, tanggal, CRUD, kategori, backup/crypto dan persistensi. E2E mencakup akun, transaksi, laporan, tabungan, investasi, restore, export, PIN, tema, lima ukuran layar dan offline/reload.
+Jika Chromium sudah disediakan mesin, gunakan `PLAYWRIGHT_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`. Pengujian browser membuat akun dan transaksi dalam konteks browser terisolasi, bukan data produksi. Unit mencakup kalkulasi, tanggal, CRUD, kategori, backup/crypto dan persistensi. E2E mencakup akun, transaksi, laporan, tabungan, investasi, restore, export, PIN, tema, sembilan ukuran layar wajib, rotasi form, history Back dan offline/reload.
 
 ## Model data dan konsistensi
 
@@ -75,10 +75,30 @@ Atau `npm run android:build`. Windows menggunakan `gradlew.bat`. APK lokal: `and
 
 Web assets native dihasilkan oleh `cap sync`, tidak di-commit. File ekspor Android dibuat di cache privat lalu dialog Share membuka pilihan penyimpanan pengguna. File backup yang dipilih melalui file picker dibaca lokal. Perlu uji perangkat nyata untuk perilaku file picker/share/biometrik dan berbagai versi WebView; build APK tidak membuktikan seluruh perilaku native.
 
+## iPhone dan iPad
+
+Source iOS menggunakan Capacitor 8.5.2 dan Swift Package Manager, deployment target iOS 15+, keluarga perangkat iPhone/iPad, portrait dan landscape. Icon 1024×1024 tanpa transparansi dan splash orisinal disertakan. Penyiapan dan `cap sync ios` dapat dilakukan di Linux; kompilasi native membutuhkan **macOS + Xcode 26+**.
+
+```sh
+npm ci
+npm run ios:sync
+npm run ios:open
+```
+
+Pada tahap macOS, Xcode memulihkan paket SPM, lalu build/run pada simulator atau perangkat dan mengatur Signing & Capabilities untuk distribusi. Build simulator, validasi runtime iOS, signing dan IPA belum dilakukan di lingkungan Linux ini. Tidak diperlukan kredensial Apple untuk menyiapkan source sekarang.
+
+## Layout, safe area dan navigasi native
+
+Compact <600px memakai konten satu kolom dan bottom navigation; medium 600–839px memakai dua kolom dashboard; expanded ≥840px memakai sidebar dan grid yang mengikuti ruang. Landscape dengan tinggi ≤500px memakai susunan lebar dengan scrolling. Login mempertahankan ilustrasi finansial, identitas, card putih, metode login, panel keamanan dan footer. Ikon tabungan memakai dompet/koin.
+
+Safe area keempat sisi memakai `env(safe-area-inset-*)` untuk iOS dan variabel insets SystemBars Capacitor untuk Android. Keyboard native meresize viewport; dialog dapat scroll, input nominal memakai numeric keyboard, navigasi bawah disembunyikan ketika IME terbuka. Rotasi tidak mengganti state form. Android Back menutup dialog, kembali ke halaman sebelumnya, lalu meminimalkan aplikasi di Dashboard.
+
+Production tidak mengatur `server.url`. `cap sync` menyalin bundle lokal ke Android/iOS. Origin `https://localhost` yang ditampilkan oleh internal WebView adalah origin virtual Capacitor untuk aset APK, bukan koneksi ke dev server atau komputer. APK dapat membuka login dan fungsi inti dalam mode pesawat.
+
 ## GitHub Actions
 
 - `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **keuangan-rumah-tangga-web**.
-- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK; artifact **keuangan-rumah-tangga-debug-apk** berisi `app-debug.apk`.
+- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi dan hardware Back; artifact **keuangan-rumah-tangga-android-apk** berisi `app-debug.apk`.
 
 Actions → Android Debug APK → run → Artifacts. Tidak membutuhkan secret untuk debug. Workflow beroperasi dengan `contents: read`. Signing release belum dikonfigurasi.
 
@@ -92,6 +112,7 @@ src/App.tsx        sesi, navigasi, koordinasi penyimpanan dan konfirmasi
 src/styles.css     responsif dan tema
 public/            ikon orisinal
 android/           proyek native Capacitor dan Gradle wrapper terverifikasi
+ios/               source Xcode/SPM, orientasi, icon dan splash iPhone/iPad
 .github/workflows/ CI web dan APK
 tests/             unit dan E2E
 docs/              permintaan asli, desain dan rencana

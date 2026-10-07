@@ -5,7 +5,7 @@ import { monthLabel, rupiah, shiftMonth, change } from "../core/ledger";
 export function Logo() {
   return (
     <div className="logo">
-      <WalletCards size={27} />
+      <img src="/icon-192.png" alt="Dompet dan koin Rupiah" />
     </div>
   );
 }
@@ -24,21 +24,47 @@ export function Modal({
   title,
   children,
   onClose,
+  dismissible = true,
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
+  dismissible?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const closeRef = useRef(onClose);
+  const dismissRef = useRef(dismissible);
+  const marker = useRef(crypto.randomUUID());
+  const mounted = useRef(false);
+  closeRef.current = onClose;
+  dismissRef.current = dismissible;
   useEffect(() => {
+    mounted.current = true;
+    const id = marker.current;
+    if (history.state?.krtModal !== id)
+      history.pushState({ ...history.state, krtModal: id }, "");
+    const pop = (event: PopStateEvent) => {
+      if (event.state?.krtModal !== id) {
+        if (dismissRef.current) closeRef.current();
+        else history.pushState({ ...event.state, krtModal: id }, "");
+      }
+    };
+    window.addEventListener("popstate", pop);
     ref.current?.showModal();
+    return () => {
+      mounted.current = false;
+      window.removeEventListener("popstate", pop);
+      queueMicrotask(() => {
+        if (!mounted.current && history.state?.krtModal === id) history.back();
+      });
+    };
   }, []);
   return (
     <dialog
       ref={ref}
       onCancel={(e) => {
         e.preventDefault();
-        onClose();
+        if (dismissible) onClose();
       }}
     >
       <header className="modal-head">
@@ -47,6 +73,7 @@ export function Modal({
           type="button"
           className="icon-button"
           aria-label="Tutup"
+          disabled={!dismissible}
           onClick={onClose}
         >
           <X />

@@ -12,13 +12,19 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "android:sync": "npm run build && cap sync android",
-    "android:build": "npm run android:sync && cd android && ./gradlew assembleDebug"
+    "android:build": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "ios:sync": "npm run build && cap sync ios",
+    "ios:open": "cap open ios"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.0.0",
     "@capacitor/filesystem": "^8.1.4",
+    "@capacitor/ios": "^8.5.2",
+    "@capacitor/keyboard": "^8.0.6",
     "@capacitor/share": "^8.0.3",
+    "@capacitor/splash-screen": "^8.0.2",
     "idb": "^8.0.3",
     "jspdf": "^4.0.0",
     "lucide-react": "^0.468.0",

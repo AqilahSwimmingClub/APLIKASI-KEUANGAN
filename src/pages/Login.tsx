@@ -5,8 +5,10 @@ import {
   Fingerprint,
   ShieldCheck,
   LockKeyhole,
+  KeyRound,
 } from "lucide-react";
-import { Credit, Logo } from "../components/common";
+import { Credit, Logo, Modal } from "../components/common";
+import { FinanceIllustration } from "../components/Brand";
 import type { Account } from "../core/vault";
 export function Login({
   account,
@@ -22,71 +24,37 @@ export function Login({
   ) => Promise<void>;
 }) {
   const [show, setShow] = useState(false),
-    [mode, setMode] = useState<"password" | "pin" | "bio">("password"),
+    [mode, setMode] = useState<"password" | "pin">("password"),
     [error, setError] = useState(""),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [forgot, setForgot] = useState(false);
+  const selectPin = () => {
+    if (account?.pin) {
+      setMode("pin");
+      setError("");
+    } else
+      setError(
+        "PIN belum diaktifkan. Buat akun dengan PIN atau aktifkan di Keamanan Akun setelah masuk.",
+      );
+  };
   return (
-    <div className="login-page">
-      <aside className="login-story">
-        <div className="login-brand">
+    <div className="login-page baseline-login">
+      <section className="login-identity">
+        <FinanceIllustration />
+        <div className="login-heading">
           <Logo />
-          <span>
-            Keuangan
-            <br />
-            <b>Rumah Tangga</b>
-          </span>
-        </div>
-        <div>
-          <span className="eyebrow">UNTUK MASA DEPAN KELUARGA</span>
-          <h1>
-            Rencana kecil.
-            <br />
-            Masa depan
-            <br />
-            <em>lebih tenang.</em>
-          </h1>
-          <p>
-            Satu tempat untuk setiap pemasukan, pengeluaran, dan impian keluarga
-            Anda.
-          </p>
-          <div className="story-card">
-            <PiggyIllustration />
-            <div>
-              <small>LANGKAH YANG BERARTI</small>
-              <strong>
-                Kelola hari ini.
-                <br />
-                Nikmati esok hari.
-              </strong>
-            </div>
-          </div>
-        </div>
-        <span className="privacy">
-          <ShieldCheck size={17} /> Data pribadi, tersimpan di perangkat Anda.
-        </span>
-      </aside>
-      <main className="login-main">
-        <div className="login-form">
-          <Logo />
-          <h1>
-            KEUANGAN
-            <br />
-            RUMAH TANGGA
-          </h1>
+          <h1>KEUANGAN RUMAH TANGGA</h1>
           <p className="tagline">
             Kelola • Rencanakan • Evaluasi
             <br />
             Keuangan Keluarga Anda
           </p>
-          <h2>
-            {account ? "Selamat datang kembali" : "Mulai kelola keuangan Anda"}
-          </h2>
-          <p className="muted">
-            {account
-              ? "Masuk untuk melanjutkan rencana keluarga."
-              : "Buat akun lokal pribadi di perangkat ini."}
-          </p>
+        </div>
+      </section>
+      <main className="login-main">
+        <div className="login-form">
           <form
+            className="login-card"
             onSubmit={async (e) => {
               e.preventDefault();
               setBusy(true);
@@ -109,8 +77,16 @@ export function Login({
               }
             }}
           >
+            <h2>
+              {account ? "Selamat datang kembali" : "Buat akun lokal Anda"}
+            </h2>
+            <p className="muted">
+              {account
+                ? "Masuk untuk melanjutkan rencana keluarga."
+                : "Tidak ada password bawaan. Data tersimpan di perangkat ini."}
+            </p>
             <label>
-              Username
+              USERNAME
               <input
                 name="username"
                 aria-label="Username"
@@ -123,7 +99,7 @@ export function Login({
             </label>
             {mode === "password" && (
               <label>
-                Password
+                PASSWORD
                 <div className="password-input">
                   <input
                     name="password"
@@ -164,86 +140,136 @@ export function Login({
                 />
               </label>
             )}
-            <label className="check">
-              <input type="checkbox" name="remember" />
-              Ingat Saya <small>(selama tab ini terbuka)</small>
-            </label>
+            <div className="login-options">
+              <label className="check">
+                <input name="remember" type="checkbox" />
+                Ingat Saya
+              </label>
+              <button
+                className="text-button"
+                type="button"
+                onClick={() => setForgot(true)}
+              >
+                Lupa Password?
+              </button>
+            </div>
+            <small className="remember-hint">
+              Ingat Saya berlaku selama tab/sesi ini terbuka.
+            </small>
             {error && (
-              <p className="error" role="alert">
+              <p role="alert" className="error">
                 {error}
               </p>
             )}
-            <button className="primary full" disabled={busy}>
+            <button disabled={busy} className="primary full">
               {busy
                 ? "Membuka vault…"
                 : account
                   ? "MASUK"
                   : "BUAT AKUN & MASUK"}
             </button>
-            {account?.pin && (
+          </form>
+          <section className="login-methods">
+            <p>Atau masuk dengan</p>
+            <div>
               <button
-                className="text-button full"
+                className="secondary"
                 type="button"
-                onClick={() => {
-                  setMode(mode === "pin" ? "password" : "pin");
-                  setError("");
-                }}
-              >
-                <LockKeyhole size={16} />
-                {mode === "pin" ? "Gunakan password" : "Masuk dengan PIN"}
-              </button>
-            )}
-            {account?.bio && (
-              <button
-                type="button"
-                className="secondary full"
                 disabled={busy}
                 onClick={async () => {
+                  if (!account?.bio) {
+                    setError(
+                      "Sidik jari belum diaktifkan atau perangkat tidak mendukung. Gunakan password/PIN, lalu buka Keamanan Akun.",
+                    );
+                    return;
+                  }
                   setBusy(true);
+                  setError("");
                   try {
                     await onLogin(account.username, "", "", false, "bio");
-                  } catch (err) {
+                  } catch (e) {
                     setError(
-                      err instanceof Error
-                        ? err.message
-                        : "Biometrik tidak tersedia.",
+                      e instanceof Error
+                        ? e.message
+                        : "Biometrik tidak tersedia. Gunakan password/PIN.",
                     );
                   } finally {
                     setBusy(false);
                   }
                 }}
               >
-                <Fingerprint size={18} />
-                Masuk dengan biometrik
+                <Fingerprint />
+                <span>Sidik Jari</span>
               </button>
-            )}
-          </form>
-          <div className="login-security">
-            <ShieldCheck size={16} /> Vault terenkripsi • Dapat digunakan
-            offline
-          </div>
+              <button
+                className={`secondary ${mode === "pin" ? "selected" : ""}`}
+                type="button"
+                aria-label="Masuk dengan PIN"
+                onClick={selectPin}
+              >
+                <LockKeyhole />
+                <span>PIN 6 Digit</span>
+              </button>
+              <button
+                className={`secondary ${mode === "password" ? "selected" : ""}`}
+                type="button"
+                onClick={() => {
+                  setMode("password");
+                  setError("");
+                }}
+              >
+                <KeyRound />
+                <span>Password</span>
+              </button>
+            </div>
+          </section>
+          <section className="login-security">
+            <ShieldCheck />
+            <div>
+              <strong>DATA ANDA AMAN</strong>
+              <p>
+                Seluruh data keuangan tersimpan secara lokal
+                <br />
+                di perangkat Anda dan dapat dibackup.
+              </p>
+            </div>
+          </section>
           <Credit />
         </div>
       </main>
+      {forgot && (
+        <Modal title="Pemulihan akses akun" onClose={() => setForgot(false)}>
+          <p>
+            Password lokal tidak dapat dikirim ulang atau dibaca. Data aktif
+            tetap terlindungi.
+          </p>
+          {account?.pin ? (
+            <button
+              className="primary full"
+              onClick={() => {
+                selectPin();
+                setForgot(false);
+              }}
+            >
+              Gunakan PIN yang sudah diaktifkan
+            </button>
+          ) : (
+            <p className="hint">
+              Jika PIN/biometrik sudah diaktifkan, gunakan metode tersebut untuk
+              masuk. Setelah masuk, backup data sebelum membuat akun baru.
+            </p>
+          )}
+          <p className="hint">
+            Jika seluruh metode akses terlupa, pulihkan backup terenkripsi
+            dengan password backup yang Anda ketahui pada instalasi/perangkat
+            baru. Jangan hapus penyimpanan perangkat lama sebelum backup
+            tersedia.
+          </p>
+          <button className="secondary full" onClick={() => setForgot(false)}>
+            Kembali ke login
+          </button>
+        </Modal>
+      )}
     </div>
-  );
-}
-function PiggyIllustration() {
-  return (
-    <svg width="100" height="90" viewBox="0 0 100 90" aria-hidden="true">
-      <rect x="8" y="27" width="76" height="50" rx="18" fill="#7fd8bc" />
-      <path d="M22 32L26 14L44 28" fill="#7fd8bc" />
-      <rect x="77" y="40" width="16" height="20" rx="7" fill="#65c4a6" />
-      <circle cx="68" cy="40" r="3" fill="#163b78" />
-      <path d="M30 75V84M65 75V84" stroke="#7fd8bc" strokeWidth="10" />
-      <path
-        d="M34 30H52"
-        stroke="#163b78"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <circle cx="44" cy="12" r="10" fill="#ffd58d" />
-      <path d="M44 5V19" stroke="#bf8a31" strokeWidth="2" />
-    </svg>
   );
 }

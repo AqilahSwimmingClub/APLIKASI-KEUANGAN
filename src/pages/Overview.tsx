@@ -1,9 +1,9 @@
+import { SavingsIcon } from "../components/Brand";
 import {
   ArrowUpRight,
   ArrowDownLeft,
   Wallet,
   TrendingUp,
-  PiggyBank,
   Download,
 } from "lucide-react";
 import type { Data, Transaction } from "../core/model";
@@ -165,7 +165,7 @@ export function Overview({
         {[
           ["income", "Pemasukan", "green", ArrowDownLeft],
           ["expense", "Pengeluaran", "red", ArrowUpRight],
-          ["savings", "Tabungan", "blue", PiggyBank],
+          ["savings", "Tabungan", "blue", SavingsIcon],
           ["investment", "Investasi", "purple", TrendingUp],
         ].map(([key, label, color, Icon]) => {
           const k = key as "income" | "expense" | "savings" | "investment";

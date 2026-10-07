@@ -18,6 +18,14 @@ buildscript {
 apply from: "variables.gradle"
 
 allprojects {
+    configurations.configureEach {
+        // Align legacy jdk7/jdk8 transitives with the merged Kotlin stdlib.
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.jetbrains.kotlin' && details.requested.name.startsWith('kotlin-stdlib')) {
+                details.useVersion '1.8.22'
+            }
+        }
+    }
     repositories {
         google()
         mavenCentral()

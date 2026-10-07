@@ -1,3 +1,6 @@
+import { pushPage, useMobileRuntime } from "./core/navigation";
+import { StartupBrand } from "./components/Brand";
+import { SavingsIcon } from "./components/Brand";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   LayoutDashboard,
@@ -5,7 +8,6 @@ import {
   Plus,
   ChartNoAxesCombined,
   Settings as SettingsIcon,
-  PiggyBank,
   TrendingUp,
   ShieldCheck,
   Menu,
@@ -39,7 +41,7 @@ const nav = [
   ["Dashboard", LayoutDashboard],
   ["Transaksi", ArrowLeftRight],
   ["Laporan", ChartNoAxesCombined],
-  ["Tabungan", PiggyBank],
+  ["Tabungan", SavingsIcon],
   ["Investasi", TrendingUp],
   ["Pengaturan", SettingsIcon],
 ] as const;
@@ -61,6 +63,10 @@ export default function App() {
     [toast, setToast] = useState(""),
     [busy, setBusy] = useState(false),
     [menu, setMenu] = useState(false);
+  useMobileRuntime(Boolean(data && key), (next) => {
+    setPage(next);
+    setMenu(false);
+  });
   const saving = useRef(false),
     lastActivity = useRef(Date.now());
   const logout = useCallback(() => {
@@ -209,6 +215,7 @@ export default function App() {
     lastActivity.current = Date.now();
   };
   const navigate = (p: string) => {
+    if (p !== page) pushPage(p);
     setPage(p);
     setMenu(false);
     window.scrollTo({ top: 0 });
@@ -230,13 +237,7 @@ export default function App() {
         setToast("Transaksi dihapus");
       },
     );
-  if (!ready)
-    return (
-      <div className="loading">
-        <Logo />
-        <p>Membuka penyimpanan aman…</p>
-      </div>
-    );
+  if (!ready) return <StartupBrand />;
   if (!data || !account)
     return (
       <>
@@ -389,7 +390,7 @@ export default function App() {
         )}
         <div className="mobile-assets">
           <button className="secondary" onClick={() => navigate("Tabungan")}>
-            <PiggyBank size={17} />
+            <SavingsIcon size={17} />
             Tabungan
           </button>
           <button className="secondary" onClick={() => navigate("Investasi")}>
@@ -441,6 +442,7 @@ export default function App() {
       {confirmation && (
         <Modal
           title={confirmation.title}
+          dismissible={!busy}
           onClose={() => {
             if (!busy) setConfirmation(null);
           }}

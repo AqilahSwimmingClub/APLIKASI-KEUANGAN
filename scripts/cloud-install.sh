@@ -51,4 +51,5 @@ npm run lint
 npm run typecheck
 npm test
 npm run android:sync
+npx cap sync ios
 (cd android && ./gradlew --no-daemon --max-workers=2 -Dorg.gradle.java.installations.paths="$JAVA_HOME" assembleDebug)

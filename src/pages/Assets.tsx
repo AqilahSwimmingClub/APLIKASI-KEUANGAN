@@ -1,5 +1,6 @@
+import { SavingsIcon } from "../components/Brand";
 import { useState } from "react";
-import { PiggyBank, TrendingUp, Pencil, Trash2, Plus } from "lucide-react";
+import { TrendingUp, Pencil, Trash2, Plus } from "lucide-react";
 import type { Data, Goal, Investment, Transaction } from "../core/model";
 import { targetTotal, rupiah } from "../core/ledger";
 import {
@@ -55,7 +56,7 @@ export function Assets({
             aktual
           </p>
         </div>
-        {investment ? <TrendingUp size={64} /> : <PiggyBank size={64} />}
+        {investment ? <TrendingUp size={64} /> : <SavingsIcon size={64} />}
       </section>
       <div className="section-heading">
         <div>
@@ -85,7 +86,7 @@ export function Assets({
             <section className="panel asset" key={g.id}>
               <div className="asset-heading">
                 <div className="asset-icon">
-                  {investment ? <TrendingUp /> : <PiggyBank />}
+                  {investment ? <TrendingUp /> : <SavingsIcon />}
                 </div>
                 <div>
                   <h3>{g.name}</h3>

@@ -30,8 +30,33 @@ jobs:
       - run: chmod +x android/gradlew
       - run: ./gradlew --no-daemon --max-workers=2 assembleDebug
         working-directory: android
+      - name: Enable KVM for emulator
+        run: sudo chmod 666 /dev/kvm
+      - name: Install and validate offline startup, orientation and hardware Back
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          profile: Nexus 6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb shell svc wifi disable
+            adb shell svc data disable
+            adb shell settings put global airplane_mode_on 1
+            cd android && ./gradlew --no-daemon --max-workers=2 :app:connectedDebugAndroidTest
+      - name: Save native test evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-instrumentation-results
+          path: |
+            android/app/build/reports/androidTests/connected/
+            android/app/build/outputs/androidTest-results/connected/
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@v4
         with:
-          name: keuangan-rumah-tangga-debug-apk
+          name: keuangan-rumah-tangga-android-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error

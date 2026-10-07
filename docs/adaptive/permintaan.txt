@@ -1,0 +1,900 @@
+LANJUTKAN DAN PERBAIKI PROJECT YANG SUDAH ADA.
+
+Repository:
+AqilahSwimmingClub/APLIKASI-KEUANGAN
+
+JANGAN membuat repository baru.
+JANGAN menyentuh repository lain.
+JANGAN membangun ulang dari nol jika tidak diperlukan.
+PERTAHANKAN fitur yang sudah berhasil dibuat.
+
+====================================================
+TARGET PLATFORM FINAL — WAJIB
+====================================================
+
+Aplikasi "Keuangan Rumah Tangga" harus menjadi aplikasi installable yang responsive/adaptive untuk:
+
+1. Android Phone
+   - Portrait
+   - Landscape
+
+2. Android Tablet
+   - Portrait
+   - Landscape
+
+3. iPhone
+   - Portrait
+   - Landscape jika orientation/perangkat mendukung
+
+4. iPad
+   - Portrait
+   - Landscape
+
+Gunakan SATU CODEBASE utama.
+
+PERTAHANKAN stack yang sekarang:
+
+- React
+- TypeScript
+- Vite
+- Capacitor
+
+Gunakan:
+
+Capacitor Android untuk Android.
+Capacitor iOS untuk iPhone/iPad.
+
+JANGAN migrasi ke:
+- Kotlin/Jetpack Compose
+- Flutter
+- React Native
+
+Aplikasi harus dapat dipasang seperti aplikasi biasa.
+
+ANDROID:
+menghasilkan APK.
+
+iOS:
+siapkan project iOS yang dapat dibuild menggunakan Xcode/macOS pada tahap selanjutnya.
+
+Jangan mewajibkan macOS untuk menyelesaikan pekerjaan Android sekarang.
+
+====================================================
+PRINSIP RESPONSIVE — SANGAT PENTING
+====================================================
+
+JANGAN membuat UI berdasarkan satu resolusi tetap.
+
+JANGAN sekadar memperbesar tampilan HP pada tablet.
+
+JANGAN menggunakan fixed width/height yang menyebabkan layout rusak pada layar lain.
+
+Gunakan:
+- CSS responsive
+- CSS Grid
+- Flexbox
+- clamp()
+- minmax()
+- responsive typography
+- responsive spacing
+- container sizing
+- media queries/breakpoints
+- safe-area-inset
+
+Pastikan layout tidak mengalami:
+- horizontal overflow
+- teks terpotong
+- card bertumpuk
+- tombol keluar layar
+- grafik kepotong
+- bottom navigation menutupi konten.
+
+====================================================
+BREAKPOINT / ADAPTIVE LAYOUT
+====================================================
+
+Gunakan breakpoint yang masuk akal berdasarkan ruang layar, bukan berdasarkan merek perangkat.
+
+Secara konseptual:
+
+COMPACT:
+< 600px
+
+MEDIUM:
+600px – 839px
+
+EXPANDED:
+>= 840px
+
+Silakan sesuaikan secara teknis jika ada alasan kuat.
+
+====================================================
+ANDROID PHONE / IPHONE — PORTRAIT
+====================================================
+
+Gunakan mobile-first.
+
+Layout utama:
+- 1 kolom untuk konten besar
+- summary card dapat 2 kolom jika cukup
+- grafik full width
+- vertical scrolling
+- touch target minimal sekitar 44px
+- spacing nyaman
+
+Gunakan bottom navigation:
+
+Dashboard
+Transaksi
+(+)
+Laporan
+Pengaturan
+
+Tombol (+) berada di tengah dan lebih menonjol.
+
+Bottom navigation harus tetap mudah dijangkau.
+
+====================================================
+PHONE — LANDSCAPE
+====================================================
+
+JANGAN hanya memutar layout portrait.
+
+Manfaatkan lebar tambahan.
+
+Contoh:
+- summary cards menjadi beberapa kolom
+- chart dapat berdampingan jika cukup
+- transaksi memanfaatkan area horizontal
+- form dapat menggunakan 2 kolom jika nyaman
+
+Tetap jaga ukuran tombol agar mudah disentuh.
+
+Konten harus tetap dapat di-scroll jika tinggi layar kecil.
+
+====================================================
+ANDROID TABLET / IPAD — PORTRAIT
+====================================================
+
+Gunakan adaptive tablet layout.
+
+Dashboard minimal dapat menggunakan:
+- 2 kolom
+- summary cards grid
+- grafik lebih besar
+- transaksi terbaru berdampingan dengan informasi lain jika ruang cukup.
+
+Jangan membuat UI sebesar HP yang berada di tengah layar dengan area kosong berlebihan.
+
+====================================================
+ANDROID TABLET / IPAD — LANDSCAPE
+====================================================
+
+Gunakan ruang besar secara optimal.
+
+Dapat menggunakan:
+- navigation rail
+atau
+- sidebar
+
+Untuk layar expanded.
+
+Dashboard dapat menggunakan:
+- 3–4 kolom summary cards
+- beberapa panel/chart berdampingan
+- transaksi terbaru pada panel tersendiri
+- target/evaluasi pada panel tersendiri.
+
+Sidebar/navigation rail harus berubah secara otomatis berdasarkan ukuran layar.
+
+====================================================
+ORIENTATION
+====================================================
+
+JANGAN lock aplikasi hanya portrait.
+
+Android harus mendukung:
+- portrait
+- landscape
+
+Tablet harus mendukung:
+- portrait
+- landscape
+
+iPad harus mendukung:
+- portrait
+- landscape
+
+iPhone ikuti orientation yang didukung aplikasi/perangkat.
+
+Ketika orientation berubah:
+- data tidak boleh hilang
+- form tidak boleh reset
+- navigation state tidak boleh rusak
+- aplikasi tidak boleh crash
+- layout harus reflow dengan benar.
+
+====================================================
+ANDROID SAFE AREA
+====================================================
+
+Pastikan UI aman terhadap:
+
+- status bar
+- gesture navigation
+- navigation bar
+- display cutout
+- keyboard/IME
+
+Jangan sampai tombol atau navigation tertutup system UI.
+
+====================================================
+IPHONE / IPAD SAFE AREA
+====================================================
+
+WAJIB support:
+
+env(safe-area-inset-top)
+env(safe-area-inset-bottom)
+env(safe-area-inset-left)
+env(safe-area-inset-right)
+
+Pastikan aman pada perangkat dengan:
+
+- notch
+- Dynamic Island
+- Home Indicator
+
+Header tidak boleh masuk ke area notch/Dynamic Island.
+
+Bottom navigation tidak boleh bertabrakan dengan Home Indicator.
+
+====================================================
+LOGIN SCREEN — BASELINE DIKUNCI
+====================================================
+
+JANGAN REDESIGN halaman Login.
+
+Gunakan desain Login yang sebelumnya sudah saya berikan sebagai REFERENSI UTAMA.
+
+Struktur visual harus tetap:
+
+ILUSTRASI FINANSIAL BESAR DI ATAS
+
+Ilustrasi berisi konsep:
+- dompet
+- uang
+- koin
+- rumah
+- grafik finansial
+
+Kemudian:
+
+logo aplikasi
+
+KEUANGAN RUMAH TANGGA
+
+Kelola • Rencanakan • Evaluasi
+Keuangan Keluarga Anda
+
+Card putih rounded:
+
+USERNAME
+
+PASSWORD
++ show/hide password
+
+Ingat Saya
+
+Lupa Password?
+
+[ MASUK ]
+
+Kemudian:
+
+Atau masuk dengan
+
+Sidik Jari
+PIN 6 Digit
+Password
+
+Panel:
+
+DATA ANDA AMAN
+
+Seluruh data keuangan tersimpan secara lokal
+di perangkat Anda dan dapat dibackup.
+
+Footer:
+
+Dirancang & Dikembangkan oleh
+FAHMI DJAWAS, S.Pd.
+
+© 2026 Semua Hak Dilindungi
+
+Desain harus menyesuaikan layar tetapi IDENTITAS VISUAL login jangan diganti.
+
+Pada landscape/tablet, boleh mengatur ulang layout agar memanfaatkan ruang, tetapi:
+- elemen
+- warna
+- branding
+- ilustrasi
+- struktur visual
+
+harus tetap konsisten dengan baseline.
+
+====================================================
+ICON TABUNGAN — WAJIB DIGANTI
+====================================================
+
+JANGAN gunakan icon:
+PIG
+PIGGY BANK
+BABI
+
+di mana pun di aplikasi.
+
+Gunakan icon:
+
+DOMPET + KOIN
+
+atau:
+
+KOIN RUPIAH + TARGET TABUNGAN
+
+Gunakan icon finansial yang modern dan netral.
+
+Audit seluruh aplikasi dan pastikan tidak ada piggy-bank icon tersisa.
+
+====================================================
+ANDROID INSTALLABLE APP
+====================================================
+
+Android harus menjadi aplikasi yang dapat di-install.
+
+Ketika APK di-install:
+
+1. Muncul icon aplikasi pada launcher.
+2. Nama:
+   Keuangan Rumah Tangga
+3. Tap icon.
+4. Aplikasi terbuka langsung.
+5. Tidak membuka Chrome.
+6. Tidak menampilkan address bar.
+7. Tidak membutuhkan URL website.
+8. Masuk ke splash/login aplikasi.
+9. Seluruh navigasi terjadi di dalam aplikasi.
+
+Capacitor boleh menggunakan WebView internal karena itu memang arsitektur Capacitor.
+
+Tetapi aplikasi production TIDAK BOLEH bergantung pada website eksternal.
+
+====================================================
+LOCAL PRODUCTION ASSETS
+====================================================
+
+Pastikan production Android menggunakan bundled local assets.
+
+JANGAN arahkan APK production ke:
+
+localhost
+127.0.0.1
+IP komputer
+Vite dev server
+URL deployment website
+
+Build:
+
+npm run build
+
+kemudian:
+
+npx cap sync android
+
+harus memasukkan production bundle ke Android project.
+
+Aplikasi harus dapat dibuka tanpa koneksi internet.
+
+====================================================
+APP ICON
+====================================================
+
+Buat launcher icon aplikasi:
+
+KEUANGAN RUMAH TANGGA
+
+Konsep:
+
+dompet + koin Rupiah
+
+Tema:
+- biru
+- putih
+- modern
+- premium
+- clean
+
+JANGAN gunakan:
+- icon React
+- icon Vite
+- icon Capacitor
+- pig/piggy bank
+
+Implementasikan Android adaptive launcher icon dengan benar.
+
+Siapkan aset yang juga dapat digunakan untuk iOS App Icon.
+
+====================================================
+SPLASH SCREEN
+====================================================
+
+Buat splash screen konsisten dengan branding.
+
+Tampilkan:
+
+[ICON]
+
+KEUANGAN
+RUMAH TANGGA
+
+Kelola • Rencanakan • Evaluasi
+
+Setelah startup masuk ke Login atau sesi pengguna jika authentication state valid.
+
+====================================================
+DASHBOARD
+====================================================
+
+PERTAHANKAN semua fitur Dashboard.
+
+Dashboard wajib responsive.
+
+Tampilkan:
+
+Saldo Bulan Ini
+
+Pemasukan
+Pengeluaran
+Tabungan
+Investasi
+
+Grafik:
+Pemasukan vs Pengeluaran
+
+Grafik:
+Pengeluaran per Kategori
+
+Tren Keuangan
+
+Perbandingan Bulan Lalu
+
+Transaksi Terakhir
+
+Target Bulan Ini
+
+Kategori Terbesar
+
+Evaluasi Keuangan
+
+Gunakan grid responsive.
+
+====================================================
+TRANSAKSI
+====================================================
+
+Pertahankan CRUD:
+
+- tambah
+- edit
+- hapus
+- search
+- filter
+- kategori
+- tanggal
+- bulan
+- tahun
+
+Gunakan date picker yang nyaman digunakan pada mobile.
+
+Form harus responsive.
+
+PHONE PORTRAIT:
+umumnya 1 kolom.
+
+TABLET/LANDSCAPE:
+boleh 2 kolom jika meningkatkan UX.
+
+====================================================
+LAPORAN
+====================================================
+
+Pertahankan:
+
+- Pemasukan
+- Pengeluaran
+- Sisa
+- Tabungan
+- Investasi
+- perbandingan bulan
+- kategori
+- grafik
+- tren
+- evaluasi otomatis.
+
+Charts harus responsive terhadap container.
+
+Jangan gunakan chart dengan width fixed.
+
+====================================================
+TABUNGAN
+====================================================
+
+Pertahankan:
+
+- total tabungan
+- target
+- progress
+- setoran
+- riwayat
+- edit target
+
+Sekali lagi:
+
+DILARANG menggunakan icon babi.
+
+====================================================
+INVESTASI
+====================================================
+
+Pertahankan:
+
+- total investasi
+- jenis investasi
+- tambah
+- edit
+- hapus
+- riwayat
+- portfolio
+- grafik.
+
+====================================================
+PENGATURAN
+====================================================
+
+Pertahankan:
+
+FAHMI DJAWAS, S.Pd.
+Pemilik Aplikasi
+
+Menu:
+
+Keamanan Akun
+Kategori
+Target Tabungan
+Pengaturan Aplikasi
+Backup & Restore
+Export Data
+Tema Aplikasi
+Tentang Aplikasi
+Keluar
+
+Tentang:
+
+Keuangan Rumah Tangga
+Versi 1.0.0
+
+Dirancang & Dikembangkan oleh
+FAHMI DJAWAS, S.Pd.
+
+© 2026 Semua Hak Dilindungi
+
+====================================================
+OFFLINE-FIRST
+====================================================
+
+Fungsi inti harus tetap bekerja tanpa internet:
+
+- login lokal
+- dashboard
+- transaksi
+- kategori
+- laporan
+- tabungan
+- investasi
+- pengaturan
+- backup
+- restore.
+
+Data harus tetap tersimpan setelah:
+- aplikasi ditutup
+- aplikasi dibuka kembali
+- perangkat restart.
+
+====================================================
+ANDROID BACK / NAVIGATION
+====================================================
+
+Perbaiki navigation agar terasa seperti aplikasi.
+
+Contoh:
+
+Tambah Transaksi
+→ Back
+→ Transaksi
+
+Detail/Edit
+→ Back
+→ halaman sebelumnya
+
+Dashboard
+→ Back
+→ jangan menghasilkan navigation loop.
+
+Android hardware/gesture Back harus bekerja dengan benar.
+
+====================================================
+KEYBOARD
+====================================================
+
+Pastikan ketika keyboard muncul:
+
+- input tetap terlihat
+- tombol simpan dapat dijangkau
+- halaman dapat scroll
+- bottom navigation tidak merusak form.
+
+Khusus nominal gunakan numeric keyboard yang sesuai.
+
+====================================================
+iOS / CAPACITOR
+====================================================
+
+Tambahkan/siapkan Capacitor iOS.
+
+Pastikan konfigurasi source compatible dengan:
+
+npx cap add ios
+npx cap sync ios
+
+Jika environment Codex/GitHub saat ini bukan macOS dan Xcode tidak tersedia:
+
+JANGAN menganggap ini error aplikasi.
+
+Tetap siapkan:
+- konfigurasi iOS
+- source
+- icons/assets
+- safe-area
+- documentation
+
+agar nanti dapat dibuild menggunakan macOS + Xcode.
+
+JANGAN meminta Apple Developer credential sekarang.
+
+Signing iOS kita kerjakan pada tahap selanjutnya.
+
+====================================================
+JANGAN RUSAK FITUR YANG SUDAH LULUS
+====================================================
+
+Project sebelumnya sudah memiliki test/build yang berhasil.
+
+Jangan membuang fitur yang sudah bekerja.
+
+Pertahankan:
+
+- login
+- dashboard
+- CRUD transaksi
+- kategori
+- laporan
+- evaluasi
+- tabungan
+- investasi
+- pengaturan
+- backup/restore
+- CSV/PDF
+- PIN
+- biometric/fallback
+- offline
+- data persistence.
+
+====================================================
+RESPONSIVE TESTING — WAJIB
+====================================================
+
+Tambahkan/pertahankan automated viewport testing.
+
+Minimal uji:
+
+PHONE SMALL PORTRAIT
+360 × 800
+
+PHONE STANDARD PORTRAIT
+393 × 852
+
+PHONE LANDSCAPE
+852 × 393
+
+LARGE ANDROID PHONE
+412 × 915
+
+TABLET PORTRAIT
+800 × 1280
+
+TABLET LANDSCAPE
+1280 × 800
+
+IPAD PORTRAIT
+834 × 1194
+
+IPAD LANDSCAPE
+1194 × 834
+
+LARGE TABLET LANDSCAPE
+1366 × 1024
+
+Jangan hanya mengecek bahwa halaman berhasil load.
+
+Periksa juga minimal:
+
+- tidak ada horizontal overflow
+- navigation terlihat
+- tombol utama dapat dijangkau
+- form tidak terpotong
+- card tidak keluar viewport
+- chart responsive
+- login tidak rusak
+- orientation layout bekerja.
+
+====================================================
+ANDROID BUILD
+====================================================
+
+Jalankan:
+
+npm ci
+
+npm run lint
+
+npm run typecheck
+
+npm test
+
+npm run test:e2e
+
+npm run build
+
+npx cap sync android
+
+Kemudian Android:
+
+./gradlew assembleDebug
+
+Pastikan APK berhasil dibuat.
+
+====================================================
+GITHUB ACTIONS
+====================================================
+
+Pertahankan CI yang sudah ada tetapi update jika diperlukan.
+
+CI harus memvalidasi:
+
+- lint
+- typecheck
+- unit tests
+- responsive/E2E tests
+- production build
+
+ANDROID workflow:
+
+- Node
+- Java
+- npm ci
+- test
+- production build
+- Capacitor sync Android
+- Gradle
+- assembleDebug
+- upload APK
+
+Artifact:
+
+keuangan-rumah-tangga-android-apk
+
+====================================================
+VALIDASI APK
+====================================================
+
+Sebelum selesai:
+
+Pastikan APK:
+
+- dapat di-install
+- application label benar
+- package ID benar
+- launcher activity tersedia
+- icon benar
+- bundled local assets tersedia
+- tidak bergantung dev server
+- tidak membuka browser
+- dapat startup offline.
+
+Gunakan Android SDK tooling seperti aapt/apkanalyzer jika tersedia.
+
+====================================================
+GIT / GITHUB
+====================================================
+
+Setelah perubahan:
+
+1. jalankan seluruh test
+2. perbaiki error
+3. build
+4. sync Android
+5. build APK
+6. commit
+7. push origin/main
+8. jalankan/cek GitHub Actions
+9. jika gagal, baca log
+10. perbaiki
+11. push ulang
+12. ulangi sampai green
+
+JANGAN menyatakan selesai kalau masih ada error yang dapat diperbaiki.
+
+====================================================
+HASIL AKHIR
+====================================================
+
+Saya ingin SATU PROJECT Keuangan Rumah Tangga yang siap untuk:
+
+ANDROID PHONE
+✓ Portrait
+✓ Landscape
+✓ APK installable
+
+ANDROID TABLET
+✓ Portrait
+✓ Landscape
+
+IPHONE
+✓ Responsive
+✓ Safe area
+✓ source Capacitor iOS siap build
+
+IPAD
+✓ Portrait
+✓ Landscape
+✓ adaptive layout
+
+Dan seluruhnya menggunakan SATU CODEBASE utama.
+
+====================================================
+LAPORAN AKHIR CODEX
+====================================================
+
+Setelah benar-benar selesai laporkan:
+
+1. commit SHA terbaru
+2. perubahan responsive yang dilakukan
+3. hasil test semua viewport
+4. hasil unit test
+5. hasil E2E
+6. hasil production build
+7. hasil Android APK build
+8. status GitHub Actions
+9. nama/link artifact APK
+10. package/application ID Android
+11. status konfigurasi Capacitor iOS
+12. apa yang masih memerlukan macOS/Xcode untuk iOS
+13. konfirmasi bahwa Login mengikuti baseline
+14. konfirmasi seluruh icon pig/piggy-bank sudah dihapus
+15. konfirmasi Android production menggunakan bundled local assets dan bukan URL/dev server.
+
+KERJAKAN LANGSUNG.
+JANGAN MEMINTA SAYA MELAKUKAN CODING MANUAL.
+JANGAN MENGUBAH STACK.
+JANGAN MEMBUAT PROJECT BARU.
+JANGAN MENGURANGI FITUR YANG SUDAH ADA.
