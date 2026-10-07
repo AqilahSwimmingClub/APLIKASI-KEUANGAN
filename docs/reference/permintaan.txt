@@ -1,0 +1,1430 @@
+KERJAKAN LANGSUNG PROJECT YANG SUDAH ADA DAN REVISI SECARA MENYELURUH SESUAI SPESIFIKASI FINAL INI.
+
+Repository:
+AqilahSwimmingClub/APLIKASI-KEUANGAN
+
+JANGAN membuat repository baru.
+JANGAN mengganti stack.
+JANGAN membangun ulang dari nol jika tidak diperlukan.
+JANGAN menyentuh repository lain.
+JANGAN menghapus fitur yang sudah berfungsi.
+
+PERTAHANKAN STACK:
+- React
+- TypeScript
+- Vite
+- Capacitor Android
+- Capacitor iOS
+- IndexedDB / local encrypted storage
+- seluruh logic aplikasi yang sudah benar
+
+PERTAHANKAN FITUR:
+- Login
+- Buat Akun Pemilik
+- PIN 6 digit
+- Biometrik/fallback
+- Dashboard
+- Transaksi CRUD
+- Kategori
+- Laporan
+- Evaluasi Keuangan
+- Tabungan
+- Investasi
+- Pengaturan
+- Backup & Restore
+- Export CSV/PDF
+- Offline-first
+- Persistence
+- Versioning
+- GitHub Actions
+- APK Android
+
+==================================================
+1. REFERENSI VISUAL FINAL — WAJIB
+==================================================
+
+Gunakan GAMBAR REFERENSI YANG SAYA LAMPIRKAN sebagai BASELINE VISUAL FINAL.
+
+Saya ingin tampilan aplikasi mengikuti desain pada gambar tersebut.
+
+JANGAN redesign.
+JANGAN improvisasi style baru.
+JANGAN membuat dashboard website.
+JANGAN menggunakan sidebar permanen.
+JANGAN mengganti arah desain.
+
+Tiru semirip mungkin:
+
+- struktur layout
+- hierarchy
+- ukuran dan bentuk card
+- bottom navigation
+- tombol +
+- header
+- spacing
+- visual density
+- icon style
+- warna
+- grafik
+- list transaksi
+- tabs
+- form
+- progress bar
+- donut chart
+- typography
+
+Aplikasi harus terasa seperti:
+
+APLIKASI KEUANGAN MOBILE/TABLET PREMIUM
+
+BUKAN:
+- admin panel
+- website desktop
+- spreadsheet
+- dashboard kantor
+
+==================================================
+2. STYLE VISUAL
+==================================================
+
+Gunakan visual:
+
+- modern
+- clean
+- premium
+- app-like
+- biru
+- putih
+- navy
+- hijau untuk pemasukan
+- merah untuk pengeluaran
+- biru untuk tabungan
+- ungu untuk investasi
+- rounded card
+- soft shadow
+- colorful icon
+- typography clean
+- spacing compact tetapi nyaman
+
+Background:
+#F6F9FF atau setara
+
+Card:
+#FFFFFF
+
+Primary:
+biru modern
+
+Income:
+hijau
+
+Expense:
+merah
+
+Savings:
+biru
+
+Investment:
+ungu
+
+Card radius:
+sekitar 16–20px
+
+Button radius:
+sekitar 12–16px
+
+Touch target:
+minimal sekitar 44px
+
+==================================================
+3. LOGIN SCREEN
+==================================================
+
+LOGIN mengikuti desain baseline referensi.
+
+JANGAN redesign.
+
+Bagian atas:
+ilustrasi finansial besar berisi:
+
+- dompet
+- uang
+- koin Rupiah
+- rumah
+- grafik finansial
+
+Kemudian logo aplikasi.
+
+Judul:
+
+Keuangan
+Rumah Tangga
+
+Tagline:
+
+Kelola • Rencanakan • Evaluasi
+Keuangan Keluarga Anda
+
+Card login:
+
+Username
+
+Password
++ show/hide password
+
+Ingat Saya
+
+Lupa Password?
+
+Tombol:
+
+MASUK
+
+Bagian:
+
+atau masuk dengan
+
+Sidik Jari
+PIN 6 Digit
+Password
+
+Panel:
+
+DATA ANDA AMAN
+
+Seluruh data keuangan tersimpan secara lokal
+di perangkat Anda dan dapat dibackup.
+
+Footer:
+
+Dirancang & Dikembangkan oleh
+FAHMI DJAWAS, S.Pd.
+
+© 2026 Semua Hak Dilindungi
+
+==================================================
+4. FIRST RUN / BUAT AKUN PEMILIK
+==================================================
+
+Saat aplikasi pertama kali dipasang:
+
+CEK apakah akun lokal sudah ada.
+
+Jika BELUM ada akun:
+
+JANGAN langsung tampilkan Login biasa.
+
+Tampilkan halaman:
+
+BUAT AKUN PEMILIK
+
+Field:
+
+Nama
+default:
+FAHMI DJAWAS, S.Pd.
+
+Username
+
+Password
+
+Konfirmasi Password
+
+PIN 6 Digit
+
+Konfirmasi PIN 6 Digit
+
+Opsi:
+Aktifkan Biometrik nanti
+
+Button:
+
+BUAT AKUN
+
+Setelah akun berhasil dibuat:
+
+- simpan credential dengan mekanisme aman
+- password/PIN tidak boleh plaintext
+- tandai onboarding selesai
+- masuk Dashboard atau Login ulang sesuai security flow
+
+Startup berikutnya:
+tampilkan Login normal.
+
+JANGAN gunakan username/password default tersembunyi.
+
+==================================================
+5. ATURAN PASSWORD — FLEKSIBEL
+==================================================
+
+PENTING:
+
+JANGAN memaksa password minimal 10 karakter.
+
+JANGAN mewajibkan:
+
+- huruf besar
+- huruf kecil
+- angka
+- simbol
+- kombinasi tertentu
+
+Pengguna bebas memilih password sendiri.
+
+Password boleh:
+
+- angka saja
+- huruf saja
+- huruf kecil saja
+- huruf besar saja
+- campuran huruf
+- campuran angka dan huruf
+- simbol
+- kombinasi apa pun
+
+Contoh password yang HARUS diterima:
+
+1
+12
+1234
+123456
+abc
+ABC
+fahmi
+FAHMI
+Fahmi
+fahmi123
+ABC123
+@123
+Ab
+
+Syarat password:
+
+HANYA:
+password tidak boleh kosong.
+
+Konfirmasi password:
+harus sama persis.
+
+Boleh tampilkan indikator:
+
+Lemah
+Sedang
+Kuat
+
+Tetapi indikator hanya informasi.
+
+JANGAN memblokir user karena password dianggap lemah.
+
+==================================================
+6. KEAMANAN PASSWORD
+==================================================
+
+Walaupun password fleksibel:
+
+- jangan simpan plaintext
+- jangan log password
+- jangan commit credential
+- jangan tampilkan password kecuali user menekan show password
+- tetap gunakan mekanisme encryption/key derivation yang aman
+
+Menu Ubah Password juga harus mengikuti aturan fleksibel yang sama.
+
+==================================================
+7. BACKUP PASSWORD
+==================================================
+
+Password backup juga dibuat fleksibel.
+
+JANGAN paksa minimal 10 karakter.
+
+Password backup boleh apa saja selama tidak kosong.
+
+Boleh tampilkan peringatan:
+
+"Password yang lebih panjang lebih aman."
+
+Tetapi user tetap boleh melanjutkan.
+
+==================================================
+8. PIN
+==================================================
+
+PIN tetap khusus.
+
+PIN harus:
+- tepat 6 digit
+- angka saja
+
+PIN digunakan untuk quick unlock.
+
+Password tetap berbeda dengan PIN.
+
+==================================================
+9. LUPA PASSWORD
+==================================================
+
+Karena aplikasi offline/local:
+
+JANGAN membuat reset melalui email/server palsu.
+
+Flow Lupa Password harus menggunakan:
+
+- PIN jika masih valid
+atau
+- biometrik jika masih tersedia
+atau
+- restore backup jika diperlukan
+
+Jika semua metode gagal:
+
+boleh sediakan:
+
+RESET APLIKASI
+
+Tetapi:
+- tampilkan warning keras
+- jelaskan data lokal akan hilang
+- minta konfirmasi eksplisit
+
+==================================================
+10. DASHBOARD
+==================================================
+
+Dashboard mengikuti referensi.
+
+Header:
+Keuangan Rumah Tangga
+
+Selector:
+bulan / tahun
+
+Hero Card:
+
+SALDO BULAN INI
+
+Contoh:
+Rp 5.750.000
+
+Kemudian 4 KPI:
+
+Pemasukan
+Rp 10.000.000
+
+Pengeluaran
+Rp 4.250.000
+
+Tabungan
+Rp 1.500.000
+
+Investasi
+Rp 2.972.625
+
+Warna:
+
+Pemasukan = hijau
+Pengeluaran = merah
+Tabungan = biru
+Investasi = ungu
+
+Tampilkan juga:
+
+- Pemasukan vs Pengeluaran
+- Pengeluaran per Kategori
+- Tren Keuangan
+- Perbandingan dengan Bulan Lalu
+- Evaluasi Keuangan
+- Transaksi Terakhir
+- Target Bulan Ini
+- Kategori Terbesar
+
+Gunakan chart responsive.
+
+Jangan membuat card terlalu tinggi.
+
+Jangan membuat whitespace besar.
+
+==================================================
+11. TRANSAKSI
+==================================================
+
+Ikuti referensi.
+
+Header:
+
+Transaksi
+
+Tabs:
+
+Semua
+Pemasukan
+Pengeluaran
+
+Search bar.
+
+Filter icon.
+
+JANGAN tampilkan semua filter besar sekaligus.
+
+Saat Filter ditekan:
+buka modal / bottom sheet.
+
+Filter:
+
+- kategori
+- bulan
+- tahun
+- tanggal awal
+- tanggal akhir
+- urutan
+
+List transaksi dikelompokkan berdasarkan tanggal.
+
+Contoh:
+
+07 Oktober 2026
+Gaji Oktober
+Belanja Rumah
+
+06 Oktober 2026
+Bensin Motor
+Listrik
+Uang Makan
+Parkir
+
+05 Oktober 2026
+Transfer Tabungan
+
+Pemasukan:
+warna hijau
+
+Pengeluaran:
+warna merah
+
+Gunakan icon berwarna.
+
+==================================================
+12. TAMBAH / EDIT TRANSAKSI
+==================================================
+
+Ikuti referensi.
+
+Header:
+
+Tambah Transaksi
+
+Toggle:
+
+Pemasukan
+Pengeluaran
+
+Field:
+
+- Tanggal
+- Nama Transaksi
+- Kategori
+- Nominal
+- Catatan Opsional
+
+Button:
+
+SIMPAN TRANSAKSI
+
+Tanggal harus menggunakan date picker.
+
+Nominal:
+numeric keyboard.
+
+HP portrait:
+1 kolom.
+
+HP landscape/tablet:
+boleh 2 kolom jika lebih nyaman.
+
+==================================================
+13. LAPORAN
+==================================================
+
+Ikuti referensi.
+
+Header:
+
+Laporan
+
+Selector:
+bulan/tahun
+
+Tabs:
+
+Ringkasan
+Kategori
+Tren
+
+Card:
+
+- Total Pemasukan
+- Total Pengeluaran
+- Sisa
+- Tabungan
+- Investasi
+
+Tampilkan:
+
+- Pemasukan vs Pengeluaran
+- Pengeluaran per Kategori
+- Tren
+- Perbandingan bulan
+- Evaluasi
+
+Export:
+
+CSV
+PDF
+
+Jadikan action compact.
+
+Jangan toolbar besar seperti desktop.
+
+==================================================
+14. KATEGORI
+==================================================
+
+Header:
+
+Kategori
+
+Tabs:
+
+Pemasukan
+Pengeluaran
+
+Pemasukan:
+
+- Gaji
+- Honor
+- Usaha
+- Bonus
+- Lainnya
+
+Pengeluaran:
+
+- Rumah Tangga
+- Belanja
+- Makan
+- Transportasi
+- Tagihan
+- Pendidikan
+- Kesehatan
+- Hiburan
+- Cicilan
+- Lainnya
+
+Gunakan icon warna.
+
+Pengguna dapat:
+
+- tambah
+- edit
+- hapus
+
+==================================================
+15. TABUNGAN
+==================================================
+
+Ikuti referensi.
+
+Header:
+
+Tabungan
+
+Card:
+
+Total Tabungan
+Rp 1.500.000
+
+Target:
+
+Liburan Keluarga
+Rp 1.200.000 / Rp 2.000.000
+60%
+
+Dana Darurat
+Rp 1.500.000 / Rp 5.000.000
+30%
+
+Pendidikan Anak
+Rp 800.000 / Rp 3.000.000
+27%
+
+Gunakan progress bar.
+
+Di bawah:
+
+Riwayat Tabungan.
+
+PENTING:
+
+DILARANG menggunakan:
+
+- pig
+- piggy bank
+- icon babi
+
+Gunakan:
+
+DOMPET + KOIN
+
+atau:
+
+TARGET + KOIN RUPIAH
+
+Audit seluruh aplikasi dan pastikan tidak ada piggy bank.
+
+==================================================
+16. INVESTASI
+==================================================
+
+Ikuti referensi.
+
+Header:
+
+Investasi
+
+Card:
+
+Total Investasi
+Rp 2.972.625
+
+Portfolio Investasi.
+
+Gunakan donut chart.
+
+Jenis:
+
+- Reksa Dana
+- Emas
+- Saham
+- Deposito
+- Lainnya
+
+Tampilkan:
+
+- total
+- komposisi
+- riwayat
+- tambah
+- edit
+- hapus
+
+==================================================
+17. PENGATURAN
+==================================================
+
+Ikuti referensi.
+
+Header:
+
+Pengaturan
+
+Profil:
+
+FAHMI DJAWAS, S.Pd.
+Pemilik Aplikasi
+
+Menu:
+
+- Keamanan Akun
+- Kategori
+- Target Tabungan
+- Pengaturan Aplikasi
+- Backup & Restore
+- Export Data
+- Tema Aplikasi
+- Tentang Aplikasi
+- Keluar
+
+Tentang Aplikasi:
+
+Keuangan Rumah Tangga
+
+Versi x.x.x
+
+Dirancang & Dikembangkan oleh
+FAHMI DJAWAS, S.Pd.
+
+© 2026 Semua Hak Dilindungi
+
+==================================================
+18. NAVIGASI UTAMA
+==================================================
+
+WAJIB gunakan bottom navigation seperti referensi:
+
+Dashboard
+Transaksi
+(+)
+Laporan
+Pengaturan
+
+Tombol (+):
+
+- berada di tengah
+- bulat
+- biru
+- lebih besar
+- sedikit menonjol
+
+JANGAN gunakan sidebar permanen.
+
+JANGAN gunakan layout admin dashboard.
+
+Menu:
+
+- Kategori
+- Tabungan
+- Investasi
+
+dapat diakses melalui shortcut/menu terkait.
+
+==================================================
+19. RESPONSIVE — WAJIB
+==================================================
+
+Aplikasi harus responsive/adaptive untuk:
+
+ANDROID PHONE
+- portrait
+- landscape
+
+ANDROID TABLET
+- portrait
+- landscape
+
+IPHONE
+- portrait
+- landscape jika didukung
+
+IPAD
+- portrait
+- landscape
+
+Gunakan SATU CODEBASE.
+
+Jangan hardcode satu resolusi.
+
+Gunakan:
+
+- CSS Grid
+- Flexbox
+- clamp()
+- minmax()
+- media query
+- responsive typography
+- safe area
+- container based layout
+
+==================================================
+20. BREAKPOINT
+==================================================
+
+Gunakan konsep:
+
+COMPACT:
+< 600px
+
+MEDIUM:
+600px – 839px
+
+EXPANDED:
+>= 840px
+
+PENTING:
+
+Expanded TIDAK BOLEH otomatis memakai sidebar.
+
+==================================================
+21. HP PORTRAIT
+==================================================
+
+Gunakan visual paling dekat dengan referensi.
+
+- 1 kolom utama
+- KPI 2 kolom
+- chart full width
+- vertical scroll
+- bottom nav fixed
+
+==================================================
+22. HP LANDSCAPE
+==================================================
+
+Jangan ubah menjadi desktop.
+
+- KPI dapat 3–4 kolom
+- chart dapat 2 kolom
+- form dapat 2 kolom
+- bottom nav tetap
+- vertical scrolling tetap diperbolehkan
+
+==================================================
+23. TABLET PORTRAIT
+==================================================
+
+Gunakan:
+
+- top app header
+- bottom navigation
+- layout 2 kolom
+- KPI 2×2 atau 4 kolom jika cukup
+- chart lebih besar
+- transaksi/evaluasi dapat berdampingan
+
+Jangan membuat UI HP kecil di tengah layar.
+
+Jangan menyisakan whitespace besar.
+
+==================================================
+24. TABLET LANDSCAPE
+==================================================
+
+SANGAT PENTING.
+
+JANGAN gunakan sidebar kiri.
+
+Gunakan:
+
+[Header]
+
+[Saldo Bulan Ini]
+
+[Pemasukan] [Pengeluaran] [Tabungan] [Investasi]
+
+[Pemasukan vs Pengeluaran]
+[Pengeluaran per Kategori]
+
+[Tren Keuangan]
+[Evaluasi Keuangan]
+
+[Transaksi Terakhir]
+[Target Bulan Ini]
+
+Bottom navigation tetap tersedia.
+
+Tampilan harus tetap terasa seperti aplikasi tablet.
+
+BUKAN desktop website.
+
+==================================================
+25. SAFE AREA
+==================================================
+
+Support:
+
+Android:
+
+- status bar
+- gesture navigation
+- display cutout
+
+iPhone/iPad:
+
+- notch
+- Dynamic Island
+- Home Indicator
+
+Gunakan:
+
+env(safe-area-inset-top)
+env(safe-area-inset-bottom)
+env(safe-area-inset-left)
+env(safe-area-inset-right)
+
+==================================================
+26. EMPTY STATE
+==================================================
+
+JANGAN membuat panel kosong raksasa.
+
+Gunakan compact empty state.
+
+Contoh:
+
+Belum ada transaksi.
+
+Mulai catat keuangan Anda.
+
+[Tambah Transaksi]
+
+Tabungan:
+
+Belum ada target.
+
+[Tambah Target]
+
+Investasi:
+
+Belum ada investasi.
+
+[Tambah Investasi]
+
+==================================================
+27. VISUAL DENSITY
+==================================================
+
+Saya ingin:
+
+PADAT TETAPI BERSIH.
+
+Kurangi whitespace berlebihan.
+
+Gunakan:
+
+- section spacing sekitar 16–24px
+- card proporsional
+- chart proporsional
+- header compact
+
+Jangan membuat satu card memakan hampir satu layar tanpa isi.
+
+==================================================
+28. ANDROID INSTALLABLE APP
+==================================================
+
+Android harus menjadi APK installable.
+
+Saat APK dipasang:
+
+- ada icon launcher
+- nama Keuangan Rumah Tangga
+- dibuka dari icon
+- tidak membuka Chrome
+- tidak ada address bar
+- seluruh aplikasi berjalan dalam Capacitor container
+- production asset dibundel lokal
+- offline tetap bekerja
+
+Production app tidak boleh diarahkan ke:
+
+- localhost
+- IP komputer
+- Vite dev server
+- URL website eksternal
+
+==================================================
+29. APP ICON
+==================================================
+
+Gunakan launcher icon:
+
+dompet + koin Rupiah
+
+Style:
+
+- biru
+- putih
+- modern
+- clean
+- premium
+
+JANGAN gunakan:
+
+- React logo
+- Vite logo
+- Capacitor logo
+- piggy bank
+
+==================================================
+30. SPLASH SCREEN
+==================================================
+
+Splash:
+
+[icon]
+
+KEUANGAN
+RUMAH TANGGA
+
+Kelola • Rencanakan • Evaluasi
+
+Kemudian:
+
+Jika belum ada akun:
+→ Buat Akun Pemilik
+
+Jika akun sudah ada:
+→ Login
+
+Jika session valid:
+→ Dashboard
+
+==================================================
+31. OFFLINE
+==================================================
+
+Aplikasi harus tetap dapat digunakan tanpa internet untuk:
+
+- Login
+- Dashboard
+- Transaksi
+- Kategori
+- Laporan
+- Tabungan
+- Investasi
+- Pengaturan
+- Backup
+- Restore
+
+==================================================
+32. PERSISTENCE
+==================================================
+
+Data tidak boleh hilang ketika:
+
+- aplikasi ditutup
+- aplikasi dibuka kembali
+- force stop
+- perangkat restart
+
+==================================================
+33. ANDROID BACK
+==================================================
+
+Hardware/gesture back harus berjalan normal.
+
+Contoh:
+
+Tambah Transaksi
+→ Back
+→ Transaksi
+
+Edit
+→ Back
+→ halaman sebelumnya
+
+Dashboard
+→ jangan membuat navigation loop
+
+==================================================
+34. iOS
+==================================================
+
+Siapkan Capacitor iOS.
+
+Harus compatible dengan:
+
+npx cap add ios
+npx cap sync ios
+
+Jika macOS/Xcode tidak tersedia:
+
+JANGAN anggap gagal.
+
+Tetap siapkan:
+
+- konfigurasi
+- source
+- icons/assets
+- safe area
+- dokumentasi
+
+Signing iOS dikerjakan nanti.
+
+==================================================
+35. VERSIONING — WAJIB
+==================================================
+
+Setiap perbaikan WAJIB menaikkan versi.
+
+Gunakan:
+
+MAJOR.MINOR.PATCH
+
+Bug/UI/responsive fix:
+PATCH +1
+
+Contoh:
+
+1.0.0 → 1.0.1
+1.0.1 → 1.0.2
+1.0.2 → 1.0.3
+
+Fitur baru:
+MINOR +1
+
+Perubahan besar:
+MAJOR +1
+
+Sinkronkan versi ke:
+
+- package.json
+- Android versionName
+- Android versionCode
+- UI Tentang Aplikasi
+- iOS version/build jika tersedia
+- CHANGELOG.md
+- artifact name
+
+Android versionCode HARUS selalu bertambah.
+
+==================================================
+36. CHANGELOG
+==================================================
+
+Pertahankan:
+
+CHANGELOG.md
+
+Catat perubahan nyata.
+
+Contoh:
+
+## 1.0.x
+
+- Menyesuaikan UI dengan desain referensi
+- Menghapus sidebar tablet
+- Memperbaiki responsive
+- Mengubah icon tabungan
+- Memperbaiki first-run account
+- Membuat password fleksibel
+- Memperbaiki Login
+
+==================================================
+37. TEST PASSWORD
+==================================================
+
+Tambahkan test bahwa berikut diterima:
+
+"1"
+"12"
+"1234"
+"123456"
+"abc"
+"ABC"
+"Fahmi"
+"fahmi123"
+"@123"
+
+Test:
+
+password kosong
+→ ditolak
+
+konfirmasi password berbeda
+→ ditolak
+
+PIN:
+6 digit angka
+→ diterima
+
+PIN bukan 6 digit
+→ ditolak
+
+==================================================
+38. TEST RESPONSIVE
+==================================================
+
+Test minimal:
+
+320x568
+360x800
+375x812
+393x852
+412x915
+430x932
+
+568x320
+800x360
+812x375
+852x393
+915x412
+932x430
+
+600x960
+768x1024
+800x1280
+834x1194
+
+960x600
+1024x768
+1194x834
+1280x800
+1366x1024
+
+Periksa:
+
+- tidak horizontal overflow
+- card tidak terpotong
+- bottom navigation terlihat
+- tombol dapat dijangkau
+- chart responsive
+- form usable
+- safe area aman
+- landscape tetap app-like
+- tablet tidak berubah menjadi dashboard desktop
+
+==================================================
+39. JANGAN RUSAK LOGIKA
+==================================================
+
+Pertahankan logic:
+
+- auth
+- encryption
+- password
+- PIN
+- biometric
+- transaksi
+- kategori
+- laporan
+- tabungan
+- investasi
+- backup
+- restore
+- export
+- offline
+- persistence
+
+==================================================
+40. BUILD & TEST
+==================================================
+
+Jalankan:
+
+npm ci
+
+npm run lint
+
+npm run typecheck
+
+npm test
+
+npm run test:e2e
+
+npm run build
+
+npx cap sync android
+
+Kemudian:
+
+cd android
+./gradlew assembleDebug
+
+Jika error:
+
+diagnosis dan perbaiki sendiri.
+
+==================================================
+41. GITHUB ACTIONS
+==================================================
+
+CI:
+
+- npm ci
+- lint
+- typecheck
+- unit test
+- E2E
+- build
+
+Android workflow:
+
+- Node
+- Java
+- Android SDK
+- npm ci
+- test
+- build
+- Capacitor sync Android
+- Gradle assembleDebug
+- upload APK
+
+Artifact harus menggunakan versi.
+
+Contoh:
+
+keuangan-rumah-tangga-android-v1.0.x
+
+==================================================
+42. GIT
+==================================================
+
+Setelah selesai:
+
+1. naikkan versi
+2. update changelog
+3. test
+4. build
+5. sync Android
+6. build APK
+7. commit
+8. push origin/main
+9. cek GitHub Actions
+10. jika gagal, perbaiki
+11. ulangi sampai green
+12. upload APK artifact
+
+==================================================
+43. LAPORAN AKHIR
+==================================================
+
+Setelah benar-benar selesai laporkan:
+
+1. versi terbaru
+2. commit SHA
+3. halaman yang direvisi
+4. perubahan UI utama
+5. perubahan responsive
+6. perubahan autentikasi
+7. aturan password terbaru
+8. hasil test password
+9. hasil test viewport
+10. hasil unit test
+11. hasil E2E
+12. hasil production build
+13. hasil APK build
+14. status GitHub Actions
+15. nama/link artifact APK
+16. Android package ID
+17. status Capacitor iOS
+18. konfirmasi Login mengikuti referensi
+19. konfirmasi first-run membuat akun pemilik
+20. konfirmasi password bebas selama tidak kosong
+21. konfirmasi sidebar tablet tidak digunakan
+22. konfirmasi bottom navigation tetap digunakan
+23. konfirmasi icon piggy bank tidak ada
+24. konfirmasi APK memakai bundled local assets
+25. konfirmasi aplikasi tetap offline-first
+
+==================================================
+44. ATURAN FINAL
+==================================================
+
+KERJAKAN LANGSUNG.
+
+JANGAN MEMBUAT PROJECT BARU.
+
+JANGAN GANTI STACK.
+
+JANGAN REDESIGN.
+
+JANGAN IMPROVISASI STYLE BARU.
+
+JANGAN GUNAKAN SIDEBAR PERMANEN.
+
+JANGAN GUNAKAN ICON BABI.
+
+JANGAN PAKSA PASSWORD PANJANG.
+
+JANGAN PAKSA KOMBINASI PASSWORD.
+
+PASSWORD BEBAS SELAMA TIDAK KOSONG.
+
+PIN TETAP 6 DIGIT.
+
+SETIAP PERBAIKAN WAJIB NAIK VERSI.
+
+GUNAKAN GAMBAR REFERENSI YANG SAYA LAMPIRKAN
+SEBAGAI BASELINE VISUAL FINAL.
+
+JANGAN MENYATAKAN SELESAI SEBELUM TEST, BUILD, APK,
+PUSH, DAN GITHUB ACTIONS BERHASIL.

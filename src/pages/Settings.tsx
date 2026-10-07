@@ -1,3 +1,5 @@
+import { APP_VERSION } from "../core/version";
+import { FinanceIcon } from "../components/FinanceIcon";
 import { SavingsIcon } from "../components/Brand";
 import { useRef, useState } from "react";
 import {
@@ -34,6 +36,7 @@ import {
 } from "../components/common";
 import { exportPdf } from "./Overview";
 type Props = {
+  standalone?: boolean;
   data: Data;
   account: Account;
   vaultKey: string;
@@ -62,7 +65,8 @@ export function Settings(p: Props) {
     confirm,
     notify,
   } = p;
-  const [section, setSection] = useState(""),
+  const [section, setSection] = useState(p.standalone ? "Kategori" : ""),
+    [categoryType, setCategoryType] = useState<"income" | "expense">("income"),
     [cat, setCat] = useState<Category | "new" | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -90,7 +94,7 @@ export function Settings(p: Props) {
     ["Tentang Aplikasi", Info],
   ] as const;
   return (
-    <>
+    <div className={p.standalone ? "category-screen" : "settings-screen"}>
       <Panel title="Profil">
         <div className="profile">
           <div className="avatar">FD</div>
@@ -110,6 +114,7 @@ export function Settings(p: Props) {
                 onClick={() => {
                   setError("");
                   if (name === "Target Tabungan") onNavigate("Tabungan");
+                  else if (name === "Kategori") onNavigate("Kategori");
                   else setSection(section === name ? "" : name);
                 }}
               >
@@ -140,7 +145,7 @@ export function Settings(p: Props) {
               {section === "Keamanan Akun" && (
                 <>
                   <p className="hint">
-                    Password minimal 10 karakter. PIN 6 digit opsional.
+                    Password bebas selama tidak kosong. PIN tetap 6 digit.
                     Biometrik memerlukan verifikasi perangkat dan PRF; perangkat
                     tanpa dukungan menggunakan password/PIN.
                   </p>
@@ -186,7 +191,7 @@ export function Settings(p: Props) {
                       <input
                         name="new"
                         type="password"
-                        minLength={10}
+                        minLength={1}
                         autoComplete="new-password"
                         required
                       />
@@ -196,7 +201,7 @@ export function Settings(p: Props) {
                       <input
                         name="repeat"
                         type="password"
-                        minLength={10}
+                        minLength={1}
                         autoComplete="new-password"
                         required
                       />
@@ -252,14 +257,36 @@ export function Settings(p: Props) {
                     <Plus size={17} />
                     Tambah kategori
                   </button>
-                  {(["income", "expense"] as const).map((type) => (
+                  <div className="tabs category-tabs">
+                    {(["income", "expense"] as const).map((type) => (
+                      <button
+                        key={type}
+                        className={categoryType === type ? "active" : ""}
+                        onClick={() => setCategoryType(type)}
+                      >
+                        {type === "income" ? "Pemasukan" : "Pengeluaran"}
+                      </button>
+                    ))}
+                  </div>
+                  {[categoryType].map((type) => (
                     <div key={type}>
                       <h3>{type === "income" ? "Pemasukan" : "Pengeluaran"}</h3>
                       {data.categories
                         .filter((c) => c.type === type)
                         .map((c) => (
                           <div className="category-row" key={c.id}>
-                            <span>{c.name}</span>
+                            <FinanceIcon name={c.name} type={c.type} />
+                            <span>
+                              <strong>{c.name}</strong>
+                              <small>
+                                {
+                                  data.transactions.filter(
+                                    (t) => t.categoryId === c.id,
+                                  ).length
+                                }{" "}
+                                transaksi
+                              </small>
+                            </span>
                             <button
                               className="icon-button"
                               aria-label={`Edit kategori ${c.name}`}
@@ -305,9 +332,9 @@ export function Settings(p: Props) {
                       ref={backupPassword}
                       aria-label="Password backup"
                       type="password"
-                      minLength={10}
+                      minLength={1}
                       autoComplete="new-password"
-                      placeholder="Minimal 10 karakter"
+                      placeholder="Bebas selama tidak kosong"
                     />
                   </label>
                   <button
@@ -548,7 +575,7 @@ export function Settings(p: Props) {
               {section === "Tentang Aplikasi" && (
                 <>
                   <h2>Keuangan Rumah Tangga</h2>
-                  <p>Versi 1.0.0 • Keuangan pribadi, offline.</p>
+                  <p>Versi {APP_VERSION} • Keuangan pribadi, offline.</p>
                   <p>
                     Data dienkripsi di perangkat. Saldo berasal dari ledger
                     transaksi, termasuk alokasi tabungan dan investasi. Nilai
@@ -608,6 +635,7 @@ export function Settings(p: Props) {
                     { id, name, type },
                   ],
                 });
+                setCategoryType(type);
                 setCat(null);
               });
             }}
@@ -642,6 +670,6 @@ export function Settings(p: Props) {
           </form>
         </Modal>
       )}
-    </>
+    </div>
   );
 }

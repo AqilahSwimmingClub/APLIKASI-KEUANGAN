@@ -6,8 +6,12 @@ async function account(p: Page) {
   await p.goto("/");
   await p.getByLabel("Username").fill("fahmi");
   await p.getByLabel("Password", { exact: true }).fill("Password-ku-2026");
-  await p.getByLabel("PIN 6 digit").fill("123456");
-  await p.getByRole("button", { name: "BUAT AKUN & MASUK" }).click();
+  await p
+    .getByLabel("Konfirmasi Password", { exact: true })
+    .fill("Password-ku-2026");
+  await p.getByLabel("PIN 6 digit", { exact: true }).fill("123456");
+  await p.getByLabel("Konfirmasi PIN 6 digit", { exact: true }).fill("123456");
+  await p.getByRole("button", { name: "BUAT AKUN", exact: true }).click();
   await expect(p.getByText("SALDO BULAN INI")).toBeVisible();
 }
 async function add(p: Page, title: string, amount: string, type = "Pemasukan") {
@@ -81,6 +85,7 @@ test("akun, transaksi CRUD, perbandingan, kategori, tabungan, investasi, backup 
     .getByRole("button", { name: "Pengaturan", exact: true })
     .first()
     .click();
+  await page.getByRole("button", { name: "Pengaturan", exact: true }).click();
   await page
     .getByRole("button", { name: "Backup & Restore", exact: true })
     .click();
@@ -174,6 +179,7 @@ test("hapus dengan konfirmasi, kategori custom, filter, ekspor dan backup rusak 
   await expect(
     page.getByText("Kebutuhan keluarga", { exact: true }),
   ).toHaveCount(0);
+  await page.getByRole("button", { name: "Pemasukan", exact: true }).click();
   await page
     .getByRole("button", { name: "Hapus kategori Gaji", exact: true })
     .click();
@@ -182,6 +188,7 @@ test("hapus dengan konfirmasi, kategori custom, filter, ekspor dan backup rusak 
     "masih digunakan",
   );
   await page.getByRole("button", { name: "Batal", exact: true }).click();
+  await page.getByRole("button", { name: "Pengaturan", exact: true }).click();
   await page
     .getByRole("button", { name: "Backup & Restore", exact: true })
     .click();

@@ -17,7 +17,7 @@ Aplikasi pribadi berbahasa Indonesia, mobile-first, tanpa backend. Bisa dipasang
 - Backup JSON AES-GCM versioned, validasi relasi dan schema sebelum restore atomik; konfirmasi sebelum mengganti data aktif.
 - CSV kompatibel Excel (UTF-8 BOM, separator `;`, escaping formula) dan PDF bulanan. Android menggunakan Filesystem + Share untuk menyimpan/membagikan file.
 - Tema terang/gelap/perangkat, profil, target bulanan, demo opt-in Oktober 2026 dan pembersihan demo terpisah dari reset penuh.
-- Sidebar desktop, grid tablet, bottom navigation/FAB mobile, portrait dan landscape, PWA offline.
+- Header aplikasi dan bottom navigation/FAB pada semua ukuran, grid tablet tanpa sidebar, portrait dan landscape, PWA offline.
 
 ## Teknologi
 
@@ -42,7 +42,17 @@ npm run build
 npm run preview
 ```
 
-Jika Chromium sudah disediakan mesin, gunakan `PLAYWRIGHT_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`. Pengujian browser membuat akun dan transaksi dalam konteks browser terisolasi, bukan data produksi. Unit mencakup kalkulasi, tanggal, CRUD, kategori, backup/crypto dan persistensi. E2E mencakup akun, transaksi, laporan, tabungan, investasi, restore, export, PIN, tema, sembilan ukuran layar wajib, rotasi form, history Back dan offline/reload.
+Jika Chromium sudah disediakan mesin, gunakan `PLAYWRIGHT_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`. Pengujian browser membuat akun dan transaksi dalam konteks browser terisolasi, bukan data produksi. Unit mencakup kalkulasi, tanggal, CRUD, kategori, backup/crypto dan persistensi. E2E mencakup akun, transaksi, laporan, tabungan, investasi, restore, export, PIN, tema, 21 ukuran layar wajib, rotasi form, history Back dan offline/reload.
+
+## Baseline visual dan akun pemilik (1.0.1)
+
+UI mengikuti gambar referensi final: ilustrasi finansial 3D yang dibundel, branding dua baris, login putih, footer gelombang biru, kartu saldo cyan/biru, KPI warna hijau/merah/biru/ungu, daftar tanggal, filter sheet, tabs laporan, target/progress, donut portfolio dan settings compact.
+
+Instalasi pertama menampilkan **BUAT AKUN PEMILIK** dengan nama (default FAHMI DJAWAS, S.Pd.), username, password+konfirmasi, PIN+konfirmasi, dan opsi biometrik nanti. Setelah akun ada, startup menampilkan login normal atau Dashboard jika sesi valid. Akun/vault lama tetap kompatibel; tidak ada migrasi yang menghapus data atau kredensial bawaan.
+
+Password akun, perubahan password dan backup menerima **setiap string yang tidak kosong**, tanpa batas minimal sepuluh karakter atau kewajiban kombinasi. Konfirmasi harus sama persis. PIN tetap tepat enam digit angka. AES-GCM, PBKDF2 SHA-256 310.000 iterasi, rate limiting dan penyimpanan credential terenkripsi dipertahankan. Password panjang lebih aman; peringatan tidak memblokir password pendek.
+
+Versi web/UI/Android/iOS 1.0.1, Android versionCode 2 dan iOS build 2; lihat CHANGELOG.md. Mengedit transaksi dilakukan dengan mengetuk judul baris, menghapus melalui tombol baris dengan konfirmasi.
 
 ## Model data dan konsistensi
 
@@ -58,7 +68,7 @@ WebAuthn platform authenticator dengan **PRF** tersedia melalui Pengaturan → K
 
 Ingat saya menyimpan kunci sesi di **sessionStorage**, hanya selama tab hidup dan maksimal 15 menit saat reload; keluar menghapusnya. Kunci aktif hanya berada di memori tanpa ingat saya. Aplikasi mengunci setelah 15 menit tidak aktif. Perangkat yang sudah terbuka dan skrip pada origin yang sama tetap termasuk trust boundary. Jangan menjalankan aplikasi dari origin tidak terpercaya. Android OS backup dinonaktifkan; backup manual terenkripsi tetap tersedia.
 
-Backup mencakup transaksi, seluruh kategori, target, aset dan preferensi, tanpa kredensial akun. Vault dibatasi 12 MiB data UTF-8 sebelum enkripsi, sehingga semua backup yang dihasilkan dapat dipulihkan di bawah batas file restore 22 MB. Penulisan yang melewati batas ditolak sebelum menyentuh data aktif. Pilih password backup minimal 10 karakter, unduh file, simpan di lokasi aman. Restore: pilih file, isi password backup yang sama, validasi, lalu konfirmasi. Backup rusak/password salah/relasi invalid ditolak sebelum mengganti data. Restore di perangkat baru dilakukan setelah membuat akun lokal baru. Tidak ada pemulihan password melalui server. Jika password dan PIN terlupa, hanya backup dengan password yang diketahui yang dapat memulihkan data setelah penyimpanan akun dibersihkan. Browser dapat menghapus data saat clear storage/uninstall/incognito; minta persistensi lewat pengaturan dan backup berkala.
+Backup mencakup transaksi, seluruh kategori, target, aset dan preferensi, tanpa kredensial akun. Vault dibatasi 12 MiB data UTF-8 sebelum enkripsi, sehingga semua backup yang dihasilkan dapat dipulihkan di bawah batas file restore 22 MB. Penulisan yang melewati batas ditolak sebelum menyentuh data aktif. Pilih password backup tidak kosong, unduh file, simpan di lokasi aman. Restore: pilih file, isi password backup yang sama, validasi, lalu konfirmasi. Backup rusak/password salah/relasi invalid ditolak sebelum mengganti data. Restore di perangkat baru dilakukan setelah membuat akun lokal baru. Tidak ada pemulihan password melalui server. Jika password dan PIN terlupa, hanya backup dengan password yang diketahui yang dapat memulihkan data setelah penyimpanan akun dibersihkan. Browser dapat menghapus data saat clear storage/uninstall/incognito; minta persistensi lewat pengaturan dan backup berkala.
 
 ## Android
 
@@ -89,7 +99,7 @@ Pada tahap macOS, Xcode memulihkan paket SPM, lalu build/run pada simulator atau
 
 ## Layout, safe area dan navigasi native
 
-Compact <600px memakai konten satu kolom dan bottom navigation; medium 600–839px memakai dua kolom dashboard; expanded ≥840px memakai sidebar dan grid yang mengikuti ruang. Landscape dengan tinggi ≤500px memakai susunan lebar dengan scrolling. Login mempertahankan ilustrasi finansial, identitas, card putih, metode login, panel keamanan dan footer. Ikon tabungan memakai dompet/koin.
+Compact <600px memakai konten satu kolom dan KPI 2×2; medium 600–839px dan expanded ≥840px memakai grid yang mengikuti ruang. Bottom navigation tetap pada semua ukuran, tanpa sidebar permanen. Landscape dengan tinggi ≤500px memakai susunan lebar dengan scrolling. Login mempertahankan ilustrasi finansial, identitas, card putih, metode login, panel keamanan dan footer. Ikon tabungan memakai dompet/koin.
 
 Safe area keempat sisi memakai `env(safe-area-inset-*)` untuk iOS dan variabel insets SystemBars Capacitor untuk Android. Keyboard native meresize viewport; dialog dapat scroll, input nominal memakai numeric keyboard, navigasi bawah disembunyikan ketika IME terbuka. Rotasi tidak mengganti state form. Android Back menutup dialog, kembali ke halaman sebelumnya, lalu meminimalkan aplikasi di Dashboard.
 
@@ -97,8 +107,8 @@ Production tidak mengatur `server.url`. `cap sync` menyalin bundle lokal ke Andr
 
 ## GitHub Actions
 
-- `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **keuangan-rumah-tangga-web**.
-- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back dan persistensi setelah Activity/WebView dibuat ulang; artifact **keuangan-rumah-tangga-android-apk** berisi `app-debug.apk`.
+- `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **keuangan-rumah-tangga-web-v1.0.1**.
+- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back dan persistensi setelah Activity/WebView dibuat ulang; artifact **keuangan-rumah-tangga-android-v1.0.1** berisi `app-debug.apk`.
 
 Actions → Android Debug APK → run → Artifacts. Tidak membutuhkan secret untuk debug. Workflow beroperasi dengan `contents: read`. Signing release belum dikonfigurasi.
 

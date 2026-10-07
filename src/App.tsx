@@ -9,9 +9,9 @@ import {
   ChartNoAxesCombined,
   Settings as SettingsIcon,
   TrendingUp,
-  ShieldCheck,
-  Menu,
-  X,
+  Bell,
+  ArrowLeft,
+  Tags,
 } from "lucide-react";
 import { registerSW } from "virtual:pwa-register";
 import { readSession, rememberSession, forgetSession } from "./core/session";
@@ -29,8 +29,9 @@ import {
   readData,
   saveData,
 } from "./core/vault";
-import { Credit, Logo, Modal, MonthPicker } from "./components/common";
+import { Modal, MonthPicker } from "./components/common";
 import { TransactionForm } from "./components/TransactionForm";
+import { OwnerSetup } from "./pages/OwnerSetup";
 import { Login } from "./pages/Login";
 import { Overview } from "./pages/Overview";
 import { Transactions } from "./pages/Transactions";
@@ -61,11 +62,9 @@ export default function App() {
     [confirmation, setConfirmation] = useState<Confirmation | null>(null),
     [error, setError] = useState(""),
     [toast, setToast] = useState(""),
-    [busy, setBusy] = useState(false),
-    [menu, setMenu] = useState(false);
+    [busy, setBusy] = useState(false);
   useMobileRuntime(Boolean(data && key), (next) => {
     setPage(next);
-    setMenu(false);
   });
   const saving = useRef(false),
     lastActivity = useRef(Date.now());
@@ -76,7 +75,6 @@ export default function App() {
     setForm(null);
     setConfirmation(null);
     setPage("Dashboard");
-    setMenu(false);
   }, []);
   useEffect(() => {
     let alive = true;
@@ -169,6 +167,7 @@ export default function App() {
     pin: string,
     remember: boolean,
     mode: "password" | "pin" | "bio",
+    ownerName = "FAHMI DJAWAS, S.Pd.",
   ) => {
     let k: string, d: Data, a: Account;
     if (!account) {
@@ -176,6 +175,7 @@ export default function App() {
       k = created.key;
       a = created.record;
       d = emptyData();
+      d.settings.name = ownerName.trim() || "FAHMI DJAWAS, S.Pd.";
       await createVault(a, d, k);
       await navigator.storage?.persist?.().catch(() => false);
     } else {
@@ -217,7 +217,7 @@ export default function App() {
   const navigate = (p: string) => {
     if (p !== page) pushPage(p);
     setPage(p);
-    setMenu(false);
+
     window.scrollTo({ top: 0 });
   };
   const confirm = (
@@ -246,7 +246,15 @@ export default function App() {
             {error}
           </p>
         )}
-        <Login account={account} onLogin={onLogin} />
+        {account ? (
+          <Login account={account} onLogin={onLogin} />
+        ) : (
+          <OwnerSetup
+            onCreate={(name, user, password, pin) =>
+              onLogin(user, password, pin, false, "password", name)
+            }
+          />
+        )}
       </>
     );
   const props = {
@@ -257,106 +265,58 @@ export default function App() {
   };
   return (
     <div className="app-shell">
-      <aside className={`sidebar ${menu ? "open" : ""}`}>
-        <div className="brand">
-          <Logo />
-          <span>
-            Keuangan
-            <br />
-            <strong>Rumah Tangga</strong>
-          </span>
-          <button
-            className="icon-button mobile-only"
-            aria-label="Tutup menu"
-            onClick={() => setMenu(false)}
-          >
-            <X />
-          </button>
-        </div>
-        <div className="nav-label">RUANG KEUANGAN ANDA</div>
-        <nav>
-          {nav.map(([name, Icon]) => (
-            <button
-              key={name}
-              className={page === name ? "active" : ""}
-              onClick={() => navigate(name)}
-            >
-              <Icon size={21} />
-              {name}
-              {page === name && <span className="nav-dot" />}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-bottom">
-          <div className="safe-note">
-            <ShieldCheck size={18} />
-            <span>
-              Pribadi &amp; offline<small>Data terenkripsi di perangkat</small>
-            </span>
-          </div>
-          <Credit />
-        </div>
-      </aside>
-      {menu && (
-        <button
-          className="menu-backdrop"
-          aria-label="Tutup navigasi"
-          onClick={() => setMenu(false)}
-        />
-      )}
       <main className="main-content">
         <header className="topbar">
           <div className="page-title">
-            <button
-              className="icon-button mobile-only"
-              aria-label="Buka menu"
-              onClick={() => setMenu(true)}
-            >
-              <Menu />
-            </button>
+            {["Tabungan", "Investasi", "Kategori"].includes(page) && (
+              <button
+                className="icon-button"
+                aria-label="Kembali"
+                onClick={() =>
+                  history.state?.krtDepth > 0
+                    ? history.back()
+                    : navigate("Dashboard")
+                }
+              >
+                <ArrowLeft />
+              </button>
+            )}
             <div>
-              <small>KEUANGAN RUMAH TANGGA</small>
-              <h1>{page}</h1>
+              <h1>{page === "Dashboard" ? "Keuangan Rumah Tangga" : page}</h1>
+              <p className="header-subtitle">
+                {page === "Transaksi"
+                  ? "Kelola semua pemasukan & pengeluaran"
+                  : page === "Laporan"
+                    ? "Analisis keuangan Anda"
+                    : page === "Tabungan"
+                      ? "Kelola tabungan dan target Anda"
+                      : page === "Investasi"
+                        ? "Pantau investasi Anda"
+                        : page === "Kategori"
+                          ? "Atur kategori transaksi"
+                          : page === "Pengaturan"
+                            ? "Atur aplikasi sesuai kebutuhan"
+                            : ""}
+              </p>
             </div>
           </div>
-          <div className="topbar-right">
-            <span className="local-badge">
-              <span />
-              Lokal &amp; aman
-            </span>
-            <div className="avatar small">
-              {data.settings.name
-                .split(" ")
-                .filter(Boolean)
-                .slice(0, 2)
-                .map((w) => w[0])
-                .join("")}
-            </div>
-          </div>
+          <button
+            className="icon-button"
+            aria-label="Informasi lokal"
+            onClick={() =>
+              setToast(
+                "Data Anda tersimpan lokal. Backup berkala melalui Pengaturan.",
+              )
+            }
+          >
+            <Bell size={21} />
+          </button>
         </header>
-        <div className="welcome">
-          <div>
-            <h2>
-              {page === "Dashboard"
-                ? `Selamat datang, ${data.settings.name.split(",")[0]} 👋`
-                : page === "Laporan"
-                  ? "Lihat gambaran keuangan keluarga."
-                  : page === "Transaksi"
-                    ? "Setiap catatan membuat perbedaan."
-                    : page === "Pengaturan"
-                      ? "Sesuaikan ruang keuangan Anda."
-                      : "Wujudkan rencana keluarga Anda."}
-            </h2>
-            <p>
-              {page === "Dashboard"
-                ? "Langkah kecil hari ini, ketenangan untuk esok hari."
-                : "Kelola • Rencanakan • Evaluasi"}
-            </p>
-          </div>
-          {["Dashboard", "Laporan", "Transaksi"].includes(page) && (
+        {["Dashboard", "Laporan"].includes(page) && (
+          <div className="period-row">
             <MonthPicker month={month} setMonth={setMonth} />
-          )}
-        </div>
+          </div>
+        )}
         {["Dashboard", "Laporan"].includes(page) && (
           <Overview
             {...props}
@@ -374,8 +334,10 @@ export default function App() {
             confirm={confirm}
           />
         )}{" "}
-        {page === "Pengaturan" && (
+        {["Pengaturan", "Kategori"].includes(page) && (
           <Settings
+            key={page}
+            standalone={page === "Kategori"}
             data={data}
             account={account}
             vaultKey={key}
@@ -388,25 +350,23 @@ export default function App() {
             notify={setToast}
           />
         )}
-        <div className="mobile-assets">
-          <button className="secondary" onClick={() => navigate("Tabungan")}>
-            <SavingsIcon size={17} />
-            Tabungan
-          </button>
-          <button className="secondary" onClick={() => navigate("Investasi")}>
-            <TrendingUp size={17} />
-            Investasi
-          </button>
-        </div>
+        {!["Pengaturan", "Kategori"].includes(page) && (
+          <div className="mobile-assets app-shortcuts">
+            <button className="secondary" onClick={() => navigate("Kategori")}>
+              <Tags size={18} />
+              Kategori
+            </button>
+            <button className="secondary" onClick={() => navigate("Tabungan")}>
+              <SavingsIcon size={17} />
+              Tabungan
+            </button>
+            <button className="secondary" onClick={() => navigate("Investasi")}>
+              <TrendingUp size={17} />
+              Investasi
+            </button>
+          </div>
+        )}
       </main>
-      <button
-        className="desktop-add primary"
-        aria-label="Tambah transaksi"
-        onClick={() => setForm({ date: `${month}-01` })}
-      >
-        <Plus size={20} />
-        Tambah transaksi
-      </button>
       <nav className="bottom-nav">
         {nav
           .filter(([name]) => !["Tabungan", "Investasi"].includes(name))

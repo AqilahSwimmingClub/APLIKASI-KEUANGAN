@@ -1,3 +1,4 @@
+import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import type { Data, Transaction } from "../core/model";
 import { localDate, putTransaction } from "../core/ledger";
@@ -64,8 +65,28 @@ export function TransactionForm({
           }
         }}
       >
+        <div className="tabs type-toggle">
+          {(["income", "expense"] as const).map((kind) => (
+            <button
+              key={kind}
+              type="button"
+              className={`${kind} ${type === kind ? "active" : ""}`}
+              onClick={() => {
+                setType(kind);
+                if (kind === "income") setAllocation("regular");
+              }}
+            >
+              {kind === "income" ? (
+                <ArrowDownLeft size={18} />
+              ) : (
+                <ArrowUpRight size={18} />
+              )}{" "}
+              {kind === "income" ? "Pemasukan" : "Pengeluaran"}
+            </button>
+          ))}
+        </div>
         <div className="form-grid">
-          <label>
+          <label className="type-select">
             Jenis
             <select
               aria-label="Jenis"

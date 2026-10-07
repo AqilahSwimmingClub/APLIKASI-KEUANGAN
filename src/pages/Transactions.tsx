@@ -1,20 +1,17 @@
+import { FinanceIcon } from "../components/FinanceIcon";
 import { useState } from "react";
-import {
-  Pencil,
-  Trash2,
-  Search,
-  ArrowDownLeft,
-  ArrowUpRight,
-} from "lucide-react";
+import { Trash2, Search, SlidersHorizontal } from "lucide-react";
 import type { Data, Transaction } from "../core/model";
 import { rupiah } from "../core/ledger";
-import { Empty, Panel } from "../components/common";
+import { Empty, Panel, Modal } from "../components/common";
 export function TransactionList({
   data,
   rows,
   onEdit,
   onDelete,
+  grouped = false,
 }: {
+  grouped?: boolean;
   data: Data;
   rows: Transaction[];
   onEdit: (t: Transaction) => void;
@@ -31,31 +28,32 @@ export function TransactionList({
       {rows.map((t) => (
         <div className="transaction" key={t.id}>
           <div className={`tx-icon ${t.type}`}>
-            {t.type === "income" ? <ArrowDownLeft /> : <ArrowUpRight />}
+            <FinanceIcon
+              name={data.categories.find((c) => c.id === t.categoryId)?.name}
+              type={t.type}
+              kind={t.allocation}
+            />
           </div>
-          <div className="tx-name">
+          <button
+            className="tx-name"
+            aria-label={`Edit ${t.title}`}
+            onClick={() => onEdit(t)}
+          >
             <strong>{t.title}</strong>
             <small>
               {data.categories.find((c) => c.id === t.categoryId)?.name} ·{" "}
-              {t.date}
+              {!grouped && t.date}
               {t.allocation !== "regular"
                 ? ` · ${t.allocation === "savings" ? "Tabungan" : "Investasi"}`
                 : ""}
             </small>
             {t.note && <small>{t.note}</small>}
-          </div>
+          </button>
           <b className={t.type === "income" ? "positive" : "negative"}>
             {t.type === "income" ? "+" : "−"}
             {rupiah(t.amount)}
           </b>
           <div className="tx-actions">
-            <button
-              className="icon-button"
-              aria-label={`Edit ${t.title}`}
-              onClick={() => onEdit(t)}
-            >
-              <Pencil size={16} />
-            </button>
             <button
               className="icon-button danger"
               aria-label={`Hapus ${t.title}`}
@@ -86,7 +84,8 @@ export function Transactions({
     [period, setPeriod] = useState(month),
     [sort, setSort] = useState("new"),
     [from, setFrom] = useState(""),
-    [to, setTo] = useState("");
+    [to, setTo] = useState(""),
+    [filterOpen, setFilterOpen] = useState(false);
   const rows = data.transactions
     .filter(
       (t) =>
@@ -106,7 +105,7 @@ export function Transactions({
     );
   const dates = [...new Set(rows.map((t) => t.date))];
   return (
-    <>
+    <div className="transactions-screen">
       <div className="tabs">
         {[
           ["all", "Semua"],
@@ -122,83 +121,108 @@ export function Transactions({
           </button>
         ))}
       </div>
+      <div className="transaction-toolbar">
+        {" "}
+        <label className="search">
+          <Search size={18} />
+          <input
+            aria-label="Cari transaksi"
+            placeholder="Cari transaksi…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </label>
+        <button
+          className="icon-button filter-button"
+          aria-label="Filter transaksi"
+          onClick={() => setFilterOpen(true)}
+        >
+          <SlidersHorizontal size={21} />
+        </button>
+      </div>
       <Panel title="Catatan transaksi">
-        <div className="filters">
-          <label className="search">
-            <Search size={18} />
-            <input
-              aria-label="Cari transaksi"
-              placeholder="Cari transaksi…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </label>
-          <label>
-            Bulan & tahun
-            <input
-              type="month"
-              aria-label="Filter bulan dan tahun"
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-            />
-          </label>
-          <label>
-            Kategori
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+        {filterOpen && (
+          <Modal title="Filter transaksi" onClose={() => setFilterOpen(false)}>
+            {" "}
+            <div className="filters">
+              <label>
+                Bulan & tahun
+                <input
+                  type="month"
+                  aria-label="Filter bulan dan tahun"
+                  value={period}
+                  onChange={(e) => setPeriod(e.target.value)}
+                />
+              </label>
+              <label>
+                Kategori
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  <option value="">Semua kategori</option>
+                  {data.categories.map((c) => (
+                    <option value={c.id} key={c.id}>
+                      {c.name} ({c.type === "income" ? "Masuk" : "Keluar"})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Urutan
+                <select value={sort} onChange={(e) => setSort(e.target.value)}>
+                  <option value="new">Terbaru</option>
+                  <option value="old">Terlama</option>
+                </select>
+              </label>
+              <label>
+                Dari tanggal
+                <input
+                  type="date"
+                  value={from}
+                  onChange={(e) => setFrom(e.target.value)}
+                />
+              </label>
+              <label>
+                Sampai tanggal
+                <input
+                  type="date"
+                  value={to}
+                  onChange={(e) => setTo(e.target.value)}
+                />
+              </label>
+              <button
+                className="secondary"
+                onClick={() => {
+                  setPeriod("");
+                  setCategory("");
+                  setFrom("");
+                  setTo("");
+                  setSearch("");
+                  setType("all");
+                }}
+              >
+                Semua periode
+              </button>
+            </div>
+            <button
+              className="primary full"
+              onClick={() => setFilterOpen(false)}
             >
-              <option value="">Semua kategori</option>
-              {data.categories.map((c) => (
-                <option value={c.id} key={c.id}>
-                  {c.name} ({c.type === "income" ? "Masuk" : "Keluar"})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Urutan
-            <select value={sort} onChange={(e) => setSort(e.target.value)}>
-              <option value="new">Terbaru</option>
-              <option value="old">Terlama</option>
-            </select>
-          </label>
-          <label>
-            Dari tanggal
-            <input
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
-          </label>
-          <label>
-            Sampai tanggal
-            <input
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
-          </label>
-          <button
-            className="secondary"
-            onClick={() => {
-              setPeriod("");
-              setCategory("");
-              setFrom("");
-              setTo("");
-              setSearch("");
-              setType("all");
-            }}
-          >
-            Semua periode
-          </button>
-        </div>
+              Terapkan filter
+            </button>
+          </Modal>
+        )}
         <p className="hint">{rows.length} transaksi ditemukan</p>
         {dates.length ? (
           dates.map((date) => (
             <div key={date}>
               <h3 className="date-group">
-                {new Intl.DateTimeFormat("id-ID", { dateStyle: "full" }).format(
+                {new Intl.DateTimeFormat("id-ID", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                }).format(
                   new Date(
                     ...(date
                       .split("-")
@@ -211,6 +235,7 @@ export function Transactions({
                 )}
               </h3>
               <TransactionList
+                grouped
                 data={data}
                 rows={rows.filter((t) => t.date === date)}
                 onEdit={onEdit}
@@ -222,6 +247,6 @@ export function Transactions({
           <Empty>Tidak ada transaksi yang sesuai filter.</Empty>
         )}
       </Panel>
-    </>
+    </div>
   );
 }

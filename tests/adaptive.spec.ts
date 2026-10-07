@@ -1,20 +1,36 @@
 import { test, expect, type Page } from "@playwright/test";
 const sizes = [
+  [320, 568],
   [360, 800],
+  [375, 812],
   [393, 852],
-  [852, 393],
   [412, 915],
+  [430, 932],
+  [568, 320],
+  [800, 360],
+  [812, 375],
+  [852, 393],
+  [915, 412],
+  [932, 430],
+  [600, 960],
+  [768, 1024],
   [800, 1280],
-  [1280, 800],
   [834, 1194],
+  [960, 600],
+  [1024, 768],
   [1194, 834],
+  [1280, 800],
   [1366, 1024],
 ];
 async function signup(p: Page) {
   await p.getByLabel("Username").fill("fahmi");
   await p.getByLabel("Password", { exact: true }).fill("Password-ku-2026");
-  await p.getByLabel("PIN 6 digit").fill("123456");
-  await p.getByRole("button", { name: "BUAT AKUN & MASUK" }).click();
+  await p
+    .getByLabel("Konfirmasi Password", { exact: true })
+    .fill("Password-ku-2026");
+  await p.getByLabel("PIN 6 digit", { exact: true }).fill("123456");
+  await p.getByLabel("Konfirmasi PIN 6 digit", { exact: true }).fill("123456");
+  await p.getByRole("button", { name: "BUAT AKUN", exact: true }).click();
   await expect(p.getByTestId("balance")).toBeVisible();
 }
 for (const [width, height] of sizes)
@@ -24,6 +40,8 @@ for (const [width, height] of sizes)
     await page.clock.setFixedTime(new Date("2026-10-07T12:00:00+07:00"));
     await page.setViewportSize({ width, height });
     await page.goto("/");
+    await signup(page);
+    await page.reload();
     await expect(
       page.getByRole("img", { name: "Ilustrasi keuangan keluarga" }),
     ).toBeVisible();
@@ -41,7 +59,9 @@ for (const [width, height] of sizes)
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-    await signup(page);
+    await page.getByLabel("Password", { exact: true }).fill("Password-ku-2026");
+    await page.getByRole("button", { name: "MASUK", exact: true }).click();
+    await expect(page.getByTestId("balance")).toBeVisible();
     // Exercise chart geometry with real ledger data, not just empty placeholders.
     await page
       .getByRole("button", { name: "Tambah transaksi", exact: true })
@@ -54,8 +74,8 @@ for (const [width, height] of sizes)
     await expect(
       page.getByRole("img", { name: "Komposisi per kategori" }),
     ).toBeVisible();
-    const wide = width >= 840 && height > 500;
-    await expect(page.locator(wide ? ".sidebar" : ".bottom-nav")).toBeVisible();
+    await expect(page.locator("aside")).toHaveCount(0);
+    await expect(page.locator(".bottom-nav")).toBeVisible();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -101,6 +121,89 @@ for (const [width, height] of sizes)
     expect((b?.x ?? 0) + (b?.width ?? 0)).toBeLessThanOrEqual(height);
     await page.getByRole("button", { name: "Tutup", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.setViewportSize({ width, height });
+    const assertScreen = async () => {
+      await expect(page.locator(".bottom-nav")).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      for (const selector of [
+        ".panel",
+        ".asset-hero",
+        ".asset",
+        ".report-balance",
+        ".tabs",
+        ".category-chart",
+        ".transaction",
+        ".profile",
+      ]) {
+        const elements = page.locator(selector + ":visible");
+        for (let i = 0; i < (await elements.count()); i++) {
+          const box = await elements.nth(i).boundingBox();
+          expect(box!.x).toBeGreaterThanOrEqual(0);
+          expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
+        }
+      }
+    };
+    for (const target of [
+      "Transaksi",
+      "Kategori",
+      "Tabungan",
+      "Investasi",
+      "Laporan",
+      "Pengaturan",
+    ]) {
+      await page
+        .getByRole("button", { name: "Dashboard", exact: true })
+        .click();
+      await page
+        .getByRole("button", { name: target, exact: true })
+        .first()
+        .click();
+      if (target === "Tabungan") {
+        await page
+          .getByRole("button", { name: "Tambah target", exact: true })
+          .click();
+        await page.getByLabel("Nama target").fill("Liburan Keluarga");
+        await page.getByLabel("Target (Rp)").fill("2000000");
+        await page.getByRole("button", { name: "Simpan target" }).click();
+        await expect(page.getByRole("dialog")).toHaveCount(0);
+        await page
+          .getByRole("button", { name: "Setor Liburan Keluarga" })
+          .click();
+        await page.getByLabel("Nominal (Rp)").fill("50000");
+        await page.getByRole("button", { name: "SIMPAN TRANSAKSI" }).click();
+        await expect(page.getByRole("dialog")).toHaveCount(0);
+      }
+      if (target === "Investasi") {
+        await page
+          .getByRole("button", { name: "Tambah investasi", exact: true })
+          .click();
+        await page.getByLabel("Nama investasi").fill("Reksa Dana Keluarga");
+        await page.getByRole("button", { name: "Simpan investasi" }).click();
+        await expect(page.getByRole("dialog")).toHaveCount(0);
+        await page
+          .getByRole("button", { name: "Tambah dana Reksa Dana Keluarga" })
+          .click();
+        await page.getByLabel("Nominal (Rp)").fill("25000");
+        await page.getByRole("button", { name: "SIMPAN TRANSAKSI" }).click();
+        await expect(page.getByRole("dialog")).toHaveCount(0);
+        await expect(
+          page.getByRole("img", { name: "Komposisi per kategori" }),
+        ).toBeVisible();
+      }
+      if (target === "Laporan")
+        for (const tab of ["Ringkasan", "Kategori", "Tren"]) {
+          await page
+            .locator(".report-tabs")
+            .getByRole("button", { name: tab, exact: true })
+            .click();
+          await assertScreen();
+        }
+      await assertScreen();
+    }
   });
 test("Back closes form and returns to previous page without resetting data", async ({
   page,

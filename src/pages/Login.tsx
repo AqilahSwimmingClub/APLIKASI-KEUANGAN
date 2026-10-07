@@ -1,5 +1,7 @@
 import { useState } from "react";
 import {
+  UserRound,
+  Lock,
   Eye,
   EyeOff,
   Fingerprint,
@@ -43,7 +45,11 @@ export function Login({
         <FinanceIllustration />
         <div className="login-heading">
           <Logo />
-          <h1>KEUANGAN RUMAH TANGGA</h1>
+          <h1>
+            Keuangan
+            <br />
+            Rumah Tangga
+          </h1>
           <p className="tagline">
             Kelola • Rencanakan • Evaluasi
             <br />
@@ -87,29 +93,33 @@ export function Login({
             </p>
             <label>
               USERNAME
-              <input
-                name="username"
-                aria-label="Username"
-                autoComplete="username"
-                maxLength={120}
-                required
-                defaultValue={account?.username}
-                placeholder="Username Anda"
-              />
+              <div className="input-icon">
+                <UserRound size={18} />
+                <input
+                  name="username"
+                  aria-label="Username"
+                  autoComplete="username"
+                  maxLength={120}
+                  required
+                  defaultValue={account?.username}
+                  placeholder="Username"
+                />
+              </div>
             </label>
             {mode === "password" && (
               <label>
                 PASSWORD
                 <div className="password-input">
+                  <Lock size={18} className="password-lock" />
                   <input
                     name="password"
                     aria-label="Password"
                     type={show ? "text" : "password"}
                     autoComplete={account ? "current-password" : "new-password"}
                     required
-                    minLength={account ? 1 : 10}
+                    minLength={1}
                     placeholder={
-                      account ? "Masukkan password" : "Minimal 10 karakter"
+                      account ? "Masukkan password" : "Masukkan password"
                     }
                   />
                   <button

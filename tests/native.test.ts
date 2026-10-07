@@ -29,3 +29,19 @@ test("iOS phone/tablet orientations, compatible SPM project and original opaque 
   expect(png.readUInt32BE(16)).toBe(1024);
   expect(png[25]).toBe(2);
 });
+
+test("release versions agree across package, Android, iOS and UI", async () => {
+  const pkg = JSON.parse(read("package.json"));
+  const { APP_VERSION } = await import("../src/core/version");
+  expect(APP_VERSION).toBe(pkg.version);
+  expect(read("android/app/build.gradle")).toContain(
+    `versionName "${pkg.version}"`,
+  );
+  expect(read("android/app/build.gradle")).toContain("versionCode 2");
+  expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
+    `MARKETING_VERSION = ${pkg.version};`,
+  );
+  expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
+    "CURRENT_PROJECT_VERSION = 2;",
+  );
+});

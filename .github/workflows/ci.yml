@@ -15,6 +15,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Read application version
+        id: version
+        run: echo "version=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
@@ -24,7 +27,7 @@ jobs:
       - run: npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: keuangan-rumah-tangga-web
+          name: keuangan-rumah-tangga-web-v${{ steps.version.outputs.version }}
           path: dist
       - uses: actions/upload-artifact@v4
         if: failure()

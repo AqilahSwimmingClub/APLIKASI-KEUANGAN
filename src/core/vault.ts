@@ -87,7 +87,7 @@ async function decryptJson(input: unknown, key: CryptoKey): Promise<unknown> {
   }
 }
 export async function seal(d: Data, password: string): Promise<Envelope> {
-  if (password.length < 10) throw Error("Password backup minimal 10 karakter.");
+  if (password.length === 0) throw Error("Password backup tidak boleh kosong.");
   const salt = crypto.getRandomValues(new Uint8Array(16));
   return encryptJson(validateData(d), await derive(password, salt), b64(salt));
 }
@@ -110,8 +110,8 @@ export async function createAccount(
   password: string,
   pin?: string,
 ) {
-  if (!username.trim() || password.length < 10)
-    throw Error("Username wajib; password minimal 10 karakter.");
+  if (!username.trim() || password.length === 0)
+    throw Error("Username dan password tidak boleh kosong.");
   if (pin && !/^\d{6}$/.test(pin)) throw Error("PIN harus 6 digit.");
   const key = b64(crypto.getRandomValues(new Uint8Array(32)));
   const wrap = async (p: string) => {
@@ -144,7 +144,7 @@ export async function rewrap(
   password: string,
   pin?: string,
 ) {
-  if (password.length < 10) throw Error("Password minimal 10 karakter.");
+  if (password.length === 0) throw Error("Password tidak boleh kosong.");
   if (pin && !/^\d{6}$/.test(pin)) throw Error("PIN harus 6 digit.");
   const wrap = async (p: string) => {
     const salt = crypto.getRandomValues(new Uint8Array(16));

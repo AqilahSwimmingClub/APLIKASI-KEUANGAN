@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { SavingsIcon } from "../components/Brand";
 import {
   ArrowUpRight,
@@ -91,6 +92,7 @@ export function Overview({
   onDelete: (t: Transaction) => void;
   onNavigate: (p: string) => void;
 }) {
+  const [reportTab, setReportTab] = useState("Ringkasan");
   const s = summarize(data, month),
     p = summarize(data, previousMonth(month));
   const trend = Array.from({ length: 6 }, (_, i) => {
@@ -99,13 +101,28 @@ export function Overview({
   });
   const top = categoryTotals(data, month, "expense")[0];
   return (
-    <>
+    <div className={report ? "overview report-screen" : "overview"}>
+      {report && (
+        <div className="tabs report-tabs">
+          {["Ringkasan", "Kategori", "Tren"].map((tab) => (
+            <button
+              key={tab}
+              className={reportTab === tab ? "active" : ""}
+              onClick={() => setReportTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      )}
       {!report ? (
         <section className="hero">
           <div>
             <span className="eyebrow">SALDO BULAN INI</span>
             <h2 data-testid="balance">{rupiah(s.balance)}</h2>
-            <p>Ruang untuk mewujudkan rencana keluarga.</p>
+            <p className="balance-comparison">
+              Selisih {rupiah(s.balance - p.balance)} dari bulan lalu
+            </p>
             <div className="hero-bottom">
               <span>
                 <Wallet size={16} /> {monthLabel(month)}
@@ -161,6 +178,12 @@ export function Overview({
           </div>
         </div>
       )}
+      {report && (
+        <div className="report-balance">
+          <small>Sisa</small>
+          <strong>{rupiah(s.balance)}</strong>
+        </div>
+      )}
       <div className="metrics">
         {[
           ["income", "Pemasukan", "green", ArrowDownLeft],
@@ -172,7 +195,9 @@ export function Overview({
           const C = Icon as typeof Wallet;
           return (
             <div key={k} className="metric-wrap">
-              <C size={20} />
+              <span className={`finance-icon ${color}`}>
+                <C size={22} />
+              </span>
               <Metric
                 label={label as string}
                 value={s[k]}
@@ -184,22 +209,29 @@ export function Overview({
         })}
       </div>
       <div className="dashboard-grid">
-        <Panel title="Pemasukan vs Pengeluaran">
-          <TrendChart
-            rows={[
-              { month: previousMonth(month), ...p },
-              { month, ...s },
-            ]}
-          />
+        <Panel
+          title="Pemasukan vs Pengeluaran"
+          hidden={report && reportTab !== "Ringkasan"}
+        >
+          <TrendChart rows={trend} />
         </Panel>
-        <Panel title="Pengeluaran per Kategori">
+        <Panel
+          title="Pengeluaran per Kategori"
+          hidden={report && reportTab !== "Kategori"}
+        >
           <CategoriesChart rows={categoryTotals(data, month, "expense")} />
         </Panel>
-        <Panel title="Tren Keuangan • 6 Bulan">
+        <Panel
+          title="Tren Keuangan • 6 Bulan"
+          hidden={report && reportTab !== "Tren"}
+        >
           <TrendChart rows={trend} />
         </Panel>
         {report ? (
-          <Panel title="Pemasukan per Kategori">
+          <Panel
+            title="Pemasukan per Kategori"
+            hidden={report && reportTab !== "Kategori"}
+          >
             <CategoriesChart rows={categoryTotals(data, month, "income")} />
           </Panel>
         ) : (
@@ -240,7 +272,10 @@ export function Overview({
               )}
           </Panel>
         )}
-        <Panel title="Perbandingan dengan Bulan Lalu">
+        <Panel
+          title="Perbandingan dengan Bulan Lalu"
+          hidden={report && reportTab !== "Ringkasan"}
+        >
           <div className="comparison-head">
             <span>{monthLabel(previousMonth(month))}</span>
             <b>→</b>
@@ -271,7 +306,10 @@ export function Overview({
             );
           })}
         </Panel>
-        <Panel title="Evaluasi Keuangan">
+        <Panel
+          title="Evaluasi Keuangan"
+          hidden={report && reportTab !== "Ringkasan"}
+        >
           <div className="evaluation-label">
             <span>✦</span> Insight dari catatan Anda
           </div>
@@ -319,6 +357,6 @@ export function Overview({
         Saldo = pemasukan − seluruh pengeluaran, termasuk alokasi tabungan dan
         investasi. Nilai investasi adalah modal tercatat, bukan harga pasar.
       </p>
-    </>
+    </div>
   );
 }

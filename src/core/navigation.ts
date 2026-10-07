@@ -10,6 +10,7 @@ export const pages = [
   "Tabungan",
   "Investasi",
   "Pengaturan",
+  "Kategori",
 ];
 export function pushPage(page: string) {
   history.pushState(

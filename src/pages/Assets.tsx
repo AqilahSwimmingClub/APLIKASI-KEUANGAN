@@ -48,16 +48,30 @@ export function Assets({
       <section className={`asset-hero ${investment ? "violet" : ""}`}>
         <div>
           <span className="eyebrow">
-            {investment ? "PORTFOLIO KELUARGA" : "RENCANA MASA DEPAN"}
+            {investment ? "Total Investasi" : "Total Tabungan"}
           </span>
           <h2>{rupiah(total)}</h2>
           <p>
-            Total {investment ? "modal investasi" : "tabungan"} dari transaksi
-            aktual
+            {investment ? "Modal investasi" : "Tabungan"} dari transaksi aktual
           </p>
         </div>
         {investment ? <TrendingUp size={64} /> : <SavingsIcon size={64} />}
       </section>
+      {investment && (
+        <Panel title="Portfolio Investasi">
+          <CategoriesChart
+            centerLabel={rupiah(total)}
+            rows={["Reksa Dana", "Emas", "Saham", "Deposito", "Lainnya"]
+              .map((kind) => ({
+                name: kind,
+                amount: data.investments
+                  .filter((i) => i.kind === kind)
+                  .reduce((sum, i) => sum + targetTotal(data, i.id), 0),
+              }))
+              .filter((row) => row.amount > 0)}
+          />
+        </Panel>
+      )}
       <div className="section-heading">
         <div>
           <h2>{investment ? "Aset investasi" : "Target tabungan"}</h2>
@@ -183,15 +197,19 @@ export function Assets({
             : "Belum ada target. Mulai dengan Dana Darurat atau rencana keluarga."}
         </Empty>
       )}
-      {investment && (
-        <Panel title="Komposisi Portfolio">
-          <CategoriesChart
-            rows={items
-              .map((i) => ({ name: i.name, amount: targetTotal(data, i.id) }))
-              .filter((i) => i.amount > 0)}
-          />
-        </Panel>
-      )}
+      <Panel title={investment ? "Riwayat Investasi" : "Riwayat Tabungan"}>
+        <TransactionList
+          data={data}
+          rows={data.transactions
+            .filter(
+              (t) => t.allocation === (investment ? "investment" : "savings"),
+            )
+            .sort((a, b) => b.date.localeCompare(a.date))
+            .slice(0, 8)}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      </Panel>
       {history && (
         <Modal
           title={`Riwayat ${items.find((i) => i.id === history)?.name ?? ""}`}

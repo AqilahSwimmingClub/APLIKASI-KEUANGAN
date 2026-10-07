@@ -23,6 +23,9 @@ jobs:
           cmdline-tools-version: 13114758
           packages: platform-tools
       - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Read application version
+        id: version
+        run: echo "version=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
       - run: npm ci
       - run: npm run lint && npm run typecheck && npm test
       - run: npm run android:sync
@@ -57,6 +60,6 @@ jobs:
           if-no-files-found: ignore
       - uses: actions/upload-artifact@v4
         with:
-          name: keuangan-rumah-tangga-android-apk
+          name: keuangan-rumah-tangga-android-v${{ steps.version.outputs.version }}
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error

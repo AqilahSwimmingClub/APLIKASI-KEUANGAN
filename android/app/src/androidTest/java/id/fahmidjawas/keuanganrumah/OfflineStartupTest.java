@@ -31,7 +31,7 @@ public class OfflineStartupTest {
             until(scenario,"document.querySelector('.baseline-login') !== null");
             assertEquals("\"https://localhost/\"",evaluate(scenario,"location.href"));
             assertEquals("true",evaluate(scenario,"document.body.innerText.includes('DATA ANDA AMAN')"));
-            evaluate(scenario,"document.querySelector('[name=username]').value='native-test'; document.querySelector('[name=password]').value='Native-test-2026'; document.querySelector('.login-card').requestSubmit(); true");
+            evaluate(scenario,"document.querySelector('[name=username]').value='native-test'; document.querySelector('[name=password]').value='1'; document.querySelector('[name=confirmPassword]').value='1'; document.querySelector('[name=pin]').value='123456'; document.querySelector('[name=confirmPin]').value='123456'; document.querySelector('.login-card').requestSubmit(); true");
             until(scenario,"document.querySelector('[data-testid=balance]') !== null");
             evaluate(scenario,"[...document.querySelectorAll('.bottom-nav button,.sidebar nav button')].find(b=>b.textContent.trim()==='Transaksi').click();true");
             until(scenario,"document.querySelector('.page-title h1').textContent === 'Transaksi'");
@@ -56,7 +56,7 @@ public class OfflineStartupTest {
             // Recreate the native Activity/WebView and unlock the persistent local vault.
             scenario.recreate();
             until(scenario,"document.querySelector('.baseline-login') !== null");
-            evaluate(scenario,"document.querySelector('[name=username]').value='native-test'; document.querySelector('[name=password]').value='Native-test-2026'; document.querySelector('.login-card').requestSubmit();true");
+            evaluate(scenario,"document.querySelector('[name=username]').value='native-test'; document.querySelector('[name=password]').value='1'; document.querySelector('.login-card').requestSubmit();true");
             until(scenario,"document.querySelector('[data-testid=balance]')?.textContent.includes('100.000') === true");
         }
     }

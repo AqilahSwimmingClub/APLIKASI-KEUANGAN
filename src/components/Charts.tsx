@@ -11,7 +11,9 @@ const colors = [
 ];
 export function CategoriesChart({
   rows,
+  centerLabel,
 }: {
+  centerLabel?: string;
   rows: { name: string; amount: number }[];
 }) {
   const total = rows.reduce((s, r) => s + r.amount, 0);
@@ -54,8 +56,8 @@ export function CategoriesChart({
           })}
         </svg>
         <div>
-          <strong>{rows.length}</strong>
-          <small>kategori</small>
+          <strong>{centerLabel ?? rows.length}</strong>
+          <small>{centerLabel ? "modal" : "kategori"}</small>
         </div>
       </div>
       <div className="legend">
