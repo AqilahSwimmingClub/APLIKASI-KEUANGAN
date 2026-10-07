@@ -1,31 +1,297 @@
-import { openDB } from 'idb';
-import { z } from 'zod';
-import { validateData } from './ledger';
-import type { Data } from './model';
-const enc=new TextEncoder(),dec=new TextDecoder();
-const b64=(b:Uint8Array)=>{let s='';for(const x of b)s+=String.fromCharCode(x);return btoa(s);};
-const bytes=(s:string)=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-const asBuffer=(b:Uint8Array)=>b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength) as ArrayBuffer;
-export const envelopeSchema=z.object({format:z.literal('KRT-ENCRYPTED'),version:z.literal(1),salt:z.string().max(100),iv:z.string().max(100),cipher:z.string().max(30000000),iterations:z.literal(310000)});
-export type Envelope=z.infer<typeof envelopeSchema>;
-async function derive(password:string,salt:Uint8Array){const k=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:asBuffer(salt),iterations:310000,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
-const rawKey=(s:string)=>crypto.subtle.importKey('raw',asBuffer(bytes(s)),{name:'AES-GCM'},false,['encrypt','decrypt']);
-async function encryptJson(input:unknown,key:CryptoKey,salt=b64(crypto.getRandomValues(new Uint8Array(16)))):Promise<Envelope>{const iv=crypto.getRandomValues(new Uint8Array(12));const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(JSON.stringify(input)));return {format:'KRT-ENCRYPTED',version:1,salt,iv:b64(iv),cipher:b64(new Uint8Array(cipher)),iterations:310000};}
-async function decryptJson(input:unknown,key:CryptoKey):Promise<unknown>{const e=envelopeSchema.parse(input);try{return JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:asBuffer(bytes(e.iv))},key,asBuffer(bytes(e.cipher)))));}catch{throw Error('Password/PIN salah atau data terenkripsi rusak.');}}
-export async function seal(d:Data,password:string):Promise<Envelope>{if(password.length<10)throw Error('Password backup minimal 10 karakter.');const salt=crypto.getRandomValues(new Uint8Array(16));return encryptJson(validateData(d),await derive(password,salt),b64(salt));}
-export async function unseal(e:unknown,password:string):Promise<Data>{const env=envelopeSchema.parse(e);return validateData(await decryptJson(env,await derive(password,bytes(env.salt))));}
-export type Account={username:string,password:Envelope,pin?:Envelope,bio?:{id:string,salt:string,wrapped:Envelope},failures:number,lockedUntil:number};
-export async function createAccount(username:string,password:string,pin?:string){if(!username.trim()||password.length<10)throw Error('Username wajib; password minimal 10 karakter.');if(pin&&!/^\d{6}$/.test(pin))throw Error('PIN harus 6 digit.');const key=b64(crypto.getRandomValues(new Uint8Array(32)));const wrap=async(p:string)=>{const salt=crypto.getRandomValues(new Uint8Array(16));return encryptJson({key},await derive(p,salt),b64(salt));};return {key,record:{username:username.trim(),password:await wrap(password),pin:pin?await wrap(pin):undefined,failures:0,lockedUntil:0} as Account};}
-async function unlock(e:Envelope,p:string){const result=await decryptJson(e,await derive(p,bytes(e.salt)));return z.object({key:z.string()}).parse(result).key;}
-export const unlockAccount=(a:Account,p:string)=>unlock(a.password,p);
-export const unlockPin=(a:Account,p:string)=>{if(!a.pin)throw Error('PIN belum diaktifkan.');return unlock(a.pin,p);};
-export async function rewrap(a:Account,key:string,password:string,pin?:string){if(password.length<10)throw Error('Password minimal 10 karakter.');if(pin&&!/^\d{6}$/.test(pin))throw Error('PIN harus 6 digit.');const wrap=async(p:string)=>{const salt=crypto.getRandomValues(new Uint8Array(16));return encryptJson({key},await derive(p,salt),b64(salt));};return {...a,password:await wrap(password),pin:pin?await wrap(pin):undefined,failures:0,lockedUntil:0};}
-const db=()=>openDB('krt-secure',1,{upgrade(db){db.createObjectStore('vault');}});
-export async function loadAccount():Promise<Account|undefined>{return (await db()).get('vault','account');}
-export async function saveAccount(a:Account){await (await db()).put('vault',a,'account');}
-export async function createVault(a:Account,d:Data,key:string){const payload=await encryptJson(validateData(d),await rawKey(key));const database=await db(),tx=database.transaction('vault','readwrite');await tx.store.put(a,'account');await tx.store.put(payload,'data');await tx.done;}
-export async function readData(key:string):Promise<Data>{const e=await (await db()).get('vault','data');return validateData(await decryptJson(e,await rawKey(key)));}
-export async function saveData(d:Data,key:string){const e=await encryptJson(validateData(d),await rawKey(key));await (await db()).put('vault',e,'data');}
-export async function registerBiometric(a:Account,key:string):Promise<Account>{if(!window.PublicKeyCredential)throw Error('Biometrik tidak didukung. Gunakan password/PIN.');const salt=crypto.getRandomValues(new Uint8Array(32));const credential=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'Keuangan Rumah Tangga'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:a.username,displayName:a.username},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},extensions:{prf:{eval:{first:asBuffer(salt)}}} as AuthenticationExtensionsClientInputs}}) as PublicKeyCredential|null;
- if(!credential)throw Error('Autentikasi dibatalkan.');const ext=credential.getClientExtensionResults() as {prf?:{results?:{first:ArrayBuffer}}};let first=ext.prf?.results?.first;if(!first){const get=await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{id:credential.rawId,type:'public-key'}],userVerification:'required',extensions:{prf:{eval:{first:asBuffer(salt)}}} as AuthenticationExtensionsClientInputs}}) as PublicKeyCredential|null;first=(get?.getClientExtensionResults() as {prf?:{results?:{first:ArrayBuffer}}})?.prf?.results?.first;}if(!first)throw Error('Perangkat belum mendukung pembukaan vault dengan biometrik (PRF). Password/PIN tetap tersedia.');const k=await crypto.subtle.importKey('raw',first,'AES-GCM',false,['encrypt','decrypt']);return {...a,bio:{id:b64(new Uint8Array(credential.rawId)),salt:b64(salt),wrapped:await encryptJson({key},k)}};}
-export async function unlockBiometric(a:Account){if(!a.bio)throw Error('Biometrik belum diaktifkan.');const c=await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:asBuffer(bytes(a.bio.id))}],userVerification:'required',extensions:{prf:{eval:{first:asBuffer(bytes(a.bio.salt))}}} as AuthenticationExtensionsClientInputs}}) as PublicKeyCredential|null;const first=(c?.getClientExtensionResults() as {prf?:{results?:{first:ArrayBuffer}}})?.prf?.results?.first;if(!first)throw Error('Biometrik tidak tersedia. Gunakan password/PIN.');const k=await crypto.subtle.importKey('raw',first,'AES-GCM',false,['decrypt']);return z.object({key:z.string()}).parse(await decryptJson(a.bio.wrapped,k)).key;}
+import { openDB } from "idb";
+import { z } from "zod";
+import { validateData } from "./ledger";
+import type { Data } from "./model";
+const enc = new TextEncoder(),
+  dec = new TextDecoder();
+const b64 = (b: Uint8Array) => {
+  let s = "";
+  for (const x of b) s += String.fromCharCode(x);
+  return btoa(s);
+};
+const bytes = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const asBuffer = (b: Uint8Array) =>
+  b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer;
+export const envelopeSchema = z.object({
+  format: z.literal("KRT-ENCRYPTED"),
+  version: z.literal(1),
+  salt: z.string().max(100),
+  iv: z.string().max(100),
+  cipher: z.string().max(30000000),
+  iterations: z.literal(310000),
+});
+export type Envelope = z.infer<typeof envelopeSchema>;
+async function derive(password: string, salt: Uint8Array) {
+  const k = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveKey"],
+  );
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: asBuffer(salt),
+      iterations: 310000,
+      hash: "SHA-256",
+    },
+    k,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"],
+  );
+}
+const rawKey = (s: string) =>
+  crypto.subtle.importKey(
+    "raw",
+    asBuffer(bytes(s)),
+    { name: "AES-GCM" },
+    false,
+    ["encrypt", "decrypt"],
+  );
+async function encryptJson(
+  input: unknown,
+  key: CryptoKey,
+  salt = b64(crypto.getRandomValues(new Uint8Array(16))),
+): Promise<Envelope> {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const cipher = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    enc.encode(JSON.stringify(input)),
+  );
+  return {
+    format: "KRT-ENCRYPTED",
+    version: 1,
+    salt,
+    iv: b64(iv),
+    cipher: b64(new Uint8Array(cipher)),
+    iterations: 310000,
+  };
+}
+async function decryptJson(input: unknown, key: CryptoKey): Promise<unknown> {
+  const e = envelopeSchema.parse(input);
+  try {
+    return JSON.parse(
+      dec.decode(
+        await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: asBuffer(bytes(e.iv)) },
+          key,
+          asBuffer(bytes(e.cipher)),
+        ),
+      ),
+    );
+  } catch {
+    throw Error("Password/PIN salah atau data terenkripsi rusak.");
+  }
+}
+export async function seal(d: Data, password: string): Promise<Envelope> {
+  if (password.length < 10) throw Error("Password backup minimal 10 karakter.");
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  return encryptJson(validateData(d), await derive(password, salt), b64(salt));
+}
+export async function unseal(e: unknown, password: string): Promise<Data> {
+  const env = envelopeSchema.parse(e);
+  return validateData(
+    await decryptJson(env, await derive(password, bytes(env.salt))),
+  );
+}
+export type Account = {
+  username: string;
+  password: Envelope;
+  pin?: Envelope;
+  bio?: { id: string; salt: string; wrapped: Envelope };
+  failures: number;
+  lockedUntil: number;
+};
+export async function createAccount(
+  username: string,
+  password: string,
+  pin?: string,
+) {
+  if (!username.trim() || password.length < 10)
+    throw Error("Username wajib; password minimal 10 karakter.");
+  if (pin && !/^\d{6}$/.test(pin)) throw Error("PIN harus 6 digit.");
+  const key = b64(crypto.getRandomValues(new Uint8Array(32)));
+  const wrap = async (p: string) => {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    return encryptJson({ key }, await derive(p, salt), b64(salt));
+  };
+  return {
+    key,
+    record: {
+      username: username.trim(),
+      password: await wrap(password),
+      pin: pin ? await wrap(pin) : undefined,
+      failures: 0,
+      lockedUntil: 0,
+    } as Account,
+  };
+}
+async function unlock(e: Envelope, p: string) {
+  const result = await decryptJson(e, await derive(p, bytes(e.salt)));
+  return z.object({ key: z.string() }).parse(result).key;
+}
+export const unlockAccount = (a: Account, p: string) => unlock(a.password, p);
+export const unlockPin = (a: Account, p: string) => {
+  if (!a.pin) throw Error("PIN belum diaktifkan.");
+  return unlock(a.pin, p);
+};
+export async function rewrap(
+  a: Account,
+  key: string,
+  password: string,
+  pin?: string,
+) {
+  if (password.length < 10) throw Error("Password minimal 10 karakter.");
+  if (pin && !/^\d{6}$/.test(pin)) throw Error("PIN harus 6 digit.");
+  const wrap = async (p: string) => {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    return encryptJson({ key }, await derive(p, salt), b64(salt));
+  };
+  return {
+    ...a,
+    password: await wrap(password),
+    pin: pin ? await wrap(pin) : undefined,
+    failures: 0,
+    lockedUntil: 0,
+  };
+}
+const db = () =>
+  openDB("krt-secure", 1, {
+    upgrade(db) {
+      db.createObjectStore("vault");
+    },
+  });
+export async function loadAccount(): Promise<Account | undefined> {
+  return (await db()).get("vault", "account");
+}
+export async function saveAccount(a: Account) {
+  await (await db()).put("vault", a, "account");
+}
+let expectedCipher: string | undefined;
+export async function createVault(a: Account, d: Data, key: string) {
+  const payload = await encryptJson(validateData(d), await rawKey(key));
+  const database = await db(),
+    tx = database.transaction("vault", "readwrite");
+  await tx.store.put(a, "account");
+  await tx.store.put(payload, "data");
+  await tx.done;
+  expectedCipher = payload.cipher;
+}
+export async function readData(key: string): Promise<Data> {
+  const e = await (await db()).get("vault", "data");
+  const d = validateData(await decryptJson(e, await rawKey(key)));
+  expectedCipher = e.cipher;
+  return d;
+}
+export async function saveData(d: Data, key: string) {
+  const e = await encryptJson(validateData(d), await rawKey(key));
+  const database = await db();
+  const tx = database.transaction("vault", "readwrite");
+  const current = await tx.store.get("data");
+  if (current?.cipher !== expectedCipher) {
+    tx.abort();
+    await tx.done.catch(() => undefined);
+    throw Error(
+      "Data berubah di tab lain. Muat ulang dan masuk kembali sebelum mengedit.",
+    );
+  }
+  await tx.store.put(e, "data");
+  await tx.done;
+  expectedCipher = e.cipher;
+}
+export async function registerBiometric(
+  a: Account,
+  key: string,
+): Promise<Account> {
+  if (!window.PublicKeyCredential)
+    throw Error("Biometrik tidak didukung. Gunakan password/PIN.");
+  const salt = crypto.getRandomValues(new Uint8Array(32));
+  const credential = (await navigator.credentials.create({
+    publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      rp: { name: "Keuangan Rumah Tangga" },
+      user: {
+        id: crypto.getRandomValues(new Uint8Array(16)),
+        name: a.username,
+        displayName: a.username,
+      },
+      pubKeyCredParams: [
+        { type: "public-key", alg: -7 },
+        { type: "public-key", alg: -257 },
+      ],
+      authenticatorSelection: {
+        authenticatorAttachment: "platform",
+        userVerification: "required",
+      },
+      extensions: {
+        prf: { eval: { first: asBuffer(salt) } },
+      } as AuthenticationExtensionsClientInputs,
+    },
+  })) as PublicKeyCredential | null;
+  if (!credential) throw Error("Autentikasi dibatalkan.");
+  const ext = credential.getClientExtensionResults() as {
+    prf?: { results?: { first: ArrayBuffer } };
+  };
+  let first = ext.prf?.results?.first;
+  if (!first) {
+    const get = (await navigator.credentials.get({
+      publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        allowCredentials: [{ id: credential.rawId, type: "public-key" }],
+        userVerification: "required",
+        extensions: {
+          prf: { eval: { first: asBuffer(salt) } },
+        } as AuthenticationExtensionsClientInputs,
+      },
+    })) as PublicKeyCredential | null;
+    first = (
+      get?.getClientExtensionResults() as {
+        prf?: { results?: { first: ArrayBuffer } };
+      }
+    )?.prf?.results?.first;
+  }
+  if (!first)
+    throw Error(
+      "Perangkat belum mendukung pembukaan vault dengan biometrik (PRF). Password/PIN tetap tersedia.",
+    );
+  const k = await crypto.subtle.importKey("raw", first, "AES-GCM", false, [
+    "encrypt",
+    "decrypt",
+  ]);
+  return {
+    ...a,
+    bio: {
+      id: b64(new Uint8Array(credential.rawId)),
+      salt: b64(salt),
+      wrapped: await encryptJson({ key }, k),
+    },
+  };
+}
+export async function unlockBiometric(a: Account) {
+  if (!a.bio) throw Error("Biometrik belum diaktifkan.");
+  const c = (await navigator.credentials.get({
+    publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{ type: "public-key", id: asBuffer(bytes(a.bio.id)) }],
+      userVerification: "required",
+      extensions: {
+        prf: { eval: { first: asBuffer(bytes(a.bio.salt)) } },
+      } as AuthenticationExtensionsClientInputs,
+    },
+  })) as PublicKeyCredential | null;
+  const first = (
+    c?.getClientExtensionResults() as {
+      prf?: { results?: { first: ArrayBuffer } };
+    }
+  )?.prf?.results?.first;
+  if (!first) throw Error("Biometrik tidak tersedia. Gunakan password/PIN.");
+  const k = await crypto.subtle.importKey("raw", first, "AES-GCM", false, [
+    "decrypt",
+  ]);
+  return z
+    .object({ key: z.string() })
+    .parse(await decryptJson(a.bio.wrapped, k)).key;
+}
