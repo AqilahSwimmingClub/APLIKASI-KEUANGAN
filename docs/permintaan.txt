@@ -1,0 +1,677 @@
+KERJAKAN LANGSUNG PROYEK INI SAMPAI SELESAI.
+
+Repository:
+AqilahSwimmingClub/APLIKASI-KEUANGAN
+
+Repository saat ini masih kosong. Jangan meminta saya mengunggah source code awal.
+Anda harus membuat aplikasi dari nol langsung di repository ini.
+
+NAMA APLIKASI:
+Keuangan Rumah Tangga
+
+TUJUAN:
+Aplikasi pengelolaan keuangan rumah tangga pribadi untuk mencatat seluruh pemasukan dan pengeluaran, mengetahui saldo, tabungan, investasi, laporan, serta membandingkan kondisi keuangan bulan berjalan dengan bulan sebelumnya.
+
+PRINSIP UTAMA:
+- Mobile-first.
+- Full responsive.
+- Harus nyaman pada HP portrait/landscape, tablet portrait/landscape, dan desktop.
+- Android adalah target utama.
+- UI modern, bersih, premium, ringan.
+- Bahasa antarmuka: Indonesia.
+- Mata uang: Rupiah (Rp).
+- Data transaksi menjadi SINGLE SOURCE OF TRUTH.
+- Perubahan transaksi harus otomatis memperbarui seluruh Dashboard dan Laporan.
+- Jangan membuat data keuangan yang harus dimasukkan ulang di beberapa halaman.
+- Jangan menyentuh repository aplikasi ASC atau repository lain.
+- Kerjakan hanya repository APLIKASI-KEUANGAN.
+
+==================================================
+1. TEKNOLOGI
+==================================================
+
+Bangun sebagai aplikasi web/PWA responsive yang juga dapat dibuild menjadi aplikasi Android menggunakan Capacitor.
+
+Pilih stack modern dan stabil yang cocok untuk:
+- React
+- TypeScript
+- Vite
+- Capacitor Android
+- penyimpanan lokal yang aman dan persisten
+- chart yang ringan
+- PWA
+
+Jangan bergantung pada server/cloud untuk fungsi inti aplikasi.
+
+Aplikasi harus tetap dapat digunakan OFFLINE.
+
+Arsitektur harus disiapkan agar penyimpanan/database dapat dikembangkan di kemudian hari tanpa merombak seluruh aplikasi.
+
+==================================================
+2. LOGIN
+==================================================
+
+Buat halaman login sesuai konsep UI berikut:
+
+Logo/ilustrasi Keuangan Rumah Tangga.
+
+Judul:
+KEUANGAN RUMAH TANGGA
+
+Tagline:
+Kelola • Rencanakan • Evaluasi
+Keuangan Keluarga Anda
+
+Form:
+- Username
+- Password
+- tampilkan/sembunyikan password
+- Ingat Saya
+- tombol MASUK
+
+Siapkan struktur keamanan untuk:
+- password
+- PIN 6 digit
+- biometrik/sidik jari pada perangkat yang mendukung
+
+Jika kemampuan tertentu membutuhkan plugin native, implementasikan dengan fallback yang aman.
+
+Footer WAJIB:
+
+Dirancang & Dikembangkan oleh
+FAHMI DJAWAS, S.Pd.
+
+© 2026 Semua Hak Dilindungi
+
+Jangan menghilangkan identitas tersebut.
+
+==================================================
+3. DASHBOARD
+==================================================
+
+Dashboard mengikuti desain mobile finance modern yang sudah direncanakan.
+
+Bagian atas:
+- Nama aplikasi
+- pilihan bulan
+- pilihan tahun
+- tombol bulan sebelumnya/berikutnya
+
+Hero card:
+SALDO BULAN INI
+
+Saldo dihitung otomatis:
+Pemasukan - Pengeluaran
+
+Kartu ringkasan:
+- Pemasukan
+- Pengeluaran
+- Tabungan
+- Investasi
+
+Masing-masing menampilkan:
+- nominal bulan terpilih
+- nilai bulan sebelumnya
+- persentase kenaikan/penurunan
+- indikator naik/turun
+
+Dashboard harus mempunyai:
+
+A. Grafik Pemasukan vs Pengeluaran
+B. Pengeluaran per Kategori
+C. Tren Keuangan beberapa bulan
+D. Perbandingan dengan Bulan Lalu
+E. Transaksi Terakhir
+F. Target Bulan Ini
+G. Kategori Pengeluaran Terbesar
+
+Dashboard harus berubah otomatis ketika bulan/tahun dipilih.
+
+==================================================
+4. TRANSAKSI
+==================================================
+
+Buat halaman TRANSAKSI.
+
+Fitur:
+- Semua
+- Pemasukan
+- Pengeluaran
+- pencarian
+- filter
+- filter tanggal
+- filter bulan
+- filter tahun
+- filter kategori
+- urutkan terbaru/terlama
+- edit transaksi
+- hapus transaksi
+- konfirmasi sebelum hapus
+
+Tampilkan transaksi dikelompokkan berdasarkan tanggal.
+
+Floating Action Button (+) untuk menambahkan transaksi.
+
+==================================================
+5. TAMBAH / EDIT TRANSAKSI
+==================================================
+
+Field:
+
+JENIS:
+- Pemasukan
+- Pengeluaran
+
+TANGGAL:
+WAJIB menggunakan date picker seperti aplikasi Android.
+Pengguna harus dapat memilih:
+- tanggal
+- bulan
+- tahun
+
+Jangan meminta pengguna mengetik tanggal secara manual.
+
+NAMA TRANSAKSI
+
+KATEGORI
+
+NOMINAL
+- format Rupiah
+- input angka yang nyaman pada HP
+
+CATATAN
+- opsional
+
+Tombol:
+SIMPAN TRANSAKSI
+
+Setelah transaksi disimpan:
+- Dashboard berubah otomatis
+- saldo berubah otomatis
+- laporan berubah otomatis
+- kategori berubah otomatis
+- perbandingan bulan berubah otomatis
+- evaluasi berubah otomatis
+
+==================================================
+6. KATEGORI
+==================================================
+
+Pisahkan:
+
+PEMASUKAN:
+- Gaji
+- Honor
+- Usaha
+- Bonus
+- Lainnya
+
+PENGELUARAN:
+- Rumah Tangga
+- Belanja
+- Makan
+- Transportasi
+- Tagihan
+- Pendidikan
+- Kesehatan
+- Hiburan
+- Cicilan
+- Lainnya
+
+Pengguna dapat:
+- tambah
+- edit
+- hapus
+
+Jangan izinkan penghapusan kategori yang masih digunakan tanpa konfirmasi/perlakuan data yang aman.
+
+==================================================
+7. LAPORAN
+==================================================
+
+Buat halaman laporan dengan:
+
+- Bulan
+- Tahun
+- Total Pemasukan
+- Total Pengeluaran
+- Sisa
+- Tabungan
+- Investasi
+
+Grafik:
+- Pengeluaran per kategori
+- Pemasukan per kategori
+- tren bulanan
+- pemasukan vs pengeluaran
+
+Perbandingan:
+bulan terpilih VS bulan sebelumnya.
+
+Hitung:
+- selisih nominal
+- persentase kenaikan/penurunan
+
+==================================================
+8. EVALUASI KEUANGAN
+==================================================
+
+Buat evaluasi otomatis berbasis data.
+
+Contoh:
+
+"Pemasukan bulan ini naik 11,1% dibanding bulan sebelumnya."
+
+"Pengeluaran bulan ini meningkat 21,4%."
+
+"Pengeluaran meningkat lebih cepat dibandingkan pemasukan."
+
+Tampilkan kategori yang mengalami pengeluaran terbesar.
+
+Evaluasi harus dihitung dari data nyata pengguna, BUKAN teks statis.
+
+==================================================
+9. TABUNGAN
+==================================================
+
+Buat menu Tabungan.
+
+Fitur:
+- total tabungan
+- target tabungan
+- tambah target
+
+Contoh:
+Liburan Keluarga
+Rp1.200.000 / Rp2.000.000
+60%
+
+Dana Darurat
+Rp1.500.000 / Rp5.000.000
+30%
+
+Pendidikan Anak
+Rp800.000 / Rp3.000.000
+
+Tampilkan progress bar.
+
+Sediakan:
+- tambah setoran
+- edit target
+- riwayat tabungan
+
+Pastikan transaksi/setoran terintegrasi secara konsisten dengan laporan keuangan dan tidak menyebabkan double-counting.
+
+==================================================
+10. INVESTASI
+==================================================
+
+Buat halaman investasi.
+
+Jenis awal:
+- Reksa Dana
+- Emas
+- Saham
+- Deposito
+- Lainnya
+
+Fitur:
+- total investasi
+- tambah investasi
+- edit
+- hapus
+- riwayat
+- komposisi portfolio
+- grafik
+
+==================================================
+11. PENGATURAN
+==================================================
+
+Buat:
+
+Profil:
+FAHMI DJAWAS, S.Pd.
+Pemilik Aplikasi
+
+Menu:
+- Keamanan Akun
+- Kategori
+- Target Tabungan
+- Pengaturan Aplikasi
+- Backup & Restore
+- Export Data
+- Tema Aplikasi
+- Tentang Aplikasi
+- Keluar
+
+Tentang aplikasi:
+
+Keuangan Rumah Tangga
+
+Dirancang & Dikembangkan oleh
+FAHMI DJAWAS, S.Pd.
+
+© 2026 Semua Hak Dilindungi
+
+==================================================
+12. BACKUP & RESTORE
+==================================================
+
+Implementasikan backup data lokal.
+
+Backup harus mencakup seluruh:
+- transaksi
+- kategori custom
+- tabungan
+- target
+- investasi
+- preferensi yang relevan
+
+Gunakan format backup yang tervalidasi dan versioned.
+
+Restore harus:
+- validasi file
+- memberi konfirmasi
+- menangani file rusak
+- tidak merusak data aktif jika restore gagal
+
+==================================================
+13. EXPORT
+==================================================
+
+Siapkan export:
+- CSV/Excel-compatible
+- PDF laporan
+
+Minimal transaksi dan laporan bulanan dapat diekspor.
+
+==================================================
+14. RESPONSIVE UI
+==================================================
+
+WAJIB responsive.
+
+HP PORTRAIT:
+- mobile-first
+- satu kolom untuk konten besar
+- card menyesuaikan lebar
+- scroll vertikal
+- bottom navigation sticky
+- floating (+) di tengah
+
+BOTTOM NAVIGATION HP:
+Dashboard | Transaksi | (+) | Laporan | Pengaturan
+
+HP LANDSCAPE:
+susunan menyesuaikan ruang.
+
+TABLET:
+gunakan 2 atau lebih kolom jika ruang memungkinkan.
+
+DESKTOP:
+gunakan sidebar kiri seperti dashboard finance desktop.
+Konten menggunakan grid responsive.
+
+Jangan hanya memperbesar tampilan HP untuk desktop.
+
+Gunakan breakpoint yang masuk akal.
+
+==================================================
+15. DESAIN
+==================================================
+
+Gunakan konsep:
+- putih
+- biru
+- navy
+- hijau untuk pemasukan
+- merah untuk pengeluaran
+- ungu untuk investasi
+- rounded cards
+- soft shadow
+- modern finance dashboard
+- typography jelas
+- touch target minimal sekitar 44px
+- kontras teks baik
+- loading/empty/error state yang baik
+
+Jangan membuat UI generik seadanya.
+
+Dashboard harus terlihat seperti aplikasi finansial modern/premium.
+
+==================================================
+16. FORMAT RUPIAH
+==================================================
+
+Semua nominal gunakan locale Indonesia.
+
+Contoh:
+
+Rp 10.000.000
+Rp 350.000
+Rp 5.750.000
+
+Perhitungan internal jangan menyimpan angka sebagai string berformat Rupiah.
+
+==================================================
+17. DATABASE / DATA
+==================================================
+
+Gunakan ID unik.
+
+Model minimal:
+
+User
+Category
+Transaction
+SavingsGoal
+SavingsEntry
+Investment
+Settings
+
+Transaction minimal:
+- id
+- type
+- date
+- title
+- categoryId
+- amount
+- note
+- createdAt
+- updatedAt
+
+Semua perhitungan laporan harus berasal dari database/transaksi aktual.
+
+Tangani zona waktu/tanggal lokal dengan benar agar transaksi tidak berpindah hari/bulan akibat konversi UTC.
+
+==================================================
+18. DEMO DATA
+==================================================
+
+Untuk development boleh sediakan seed/demo data seperti:
+
+Oktober 2026:
+Gaji Oktober +Rp10.000.000
+Belanja Rumah -Rp350.000
+Bensin Motor -Rp100.000
+Listrik -Rp250.000
+Uang Makan -Rp75.000
+
+Namun DEMO DATA harus dapat dibersihkan/reset dan jangan menjadi data permanen pengguna production.
+
+==================================================
+19. PWA + ANDROID
+==================================================
+
+Konfigurasikan:
+- manifest
+- icons placeholder yang legal/orisinal
+- service worker/PWA
+- Capacitor
+- Android project
+
+Gunakan application/package ID yang unik dan sesuai nama aplikasi.
+
+Pastikan build web dan Android dapat dilakukan melalui command yang terdokumentasi.
+
+==================================================
+20. TEST
+==================================================
+
+Buat automated tests untuk bagian kritis:
+
+- kalkulasi saldo
+- pemasukan bulanan
+- pengeluaran bulanan
+- bulan sebelumnya
+- persentase perubahan
+- filter bulan/tahun
+- kategori
+- tambah/edit/hapus transaksi
+- backup validation
+- restore
+- format Rupiah
+- date handling
+
+Tambahkan lint/typecheck/build validation.
+
+Jangan menganggap pekerjaan selesai hanya karena UI tampil.
+
+==================================================
+21. GITHUB ACTIONS
+==================================================
+
+WAJIB buat workflow GitHub Actions di:
+
+.github/workflows/
+
+Minimal:
+
+CI:
+- checkout
+- setup Node
+- install dependencies
+- lint
+- typecheck
+- test
+- build
+
+ANDROID:
+- setup Java
+- setup Node
+- npm ci
+- build web
+- Capacitor sync Android
+- Gradle build APK
+
+Upload APK sebagai GitHub Actions artifact.
+
+Workflow harus dapat dijalankan manual melalui:
+workflow_dispatch
+
+dan otomatis pada push yang sesuai.
+
+Jangan memasukkan secret/credential palsu ke repository.
+
+Jika release signing belum tersedia:
+build debug APK terlebih dahulu sehingga saya tetap memperoleh APK yang dapat diuji.
+
+==================================================
+22. README
+==================================================
+
+Buat README yang menjelaskan:
+
+- nama aplikasi
+- fitur
+- teknologi
+- setup
+- development
+- test
+- build
+- Android
+- GitHub Actions
+- backup
+- struktur project
+
+==================================================
+23. GIT / GITHUB
+==================================================
+
+Karena repository masih kosong:
+
+1. Inisialisasi seluruh project.
+2. Buat branch main jika belum ada.
+3. Tambahkan .gitignore yang benar.
+4. Jangan commit node_modules, build cache, APK lokal, secret, atau file sensitif.
+5. Jalankan seluruh test/build.
+6. Perbaiki error sampai lolos.
+7. Commit hasil.
+8. Push ke origin/main.
+9. Jalankan/validasi GitHub Actions bila akses memungkinkan.
+10. Jika workflow gagal karena kode/configuration, perbaiki dan push lagi.
+11. Jangan berhenti setelah sekadar membuat source code jika masih ada error yang dapat diperbaiki.
+
+==================================================
+24. BATASAN PENTING
+==================================================
+
+JANGAN:
+- mengubah repository ASC
+- menggunakan repository lain sebagai tempat aplikasi ini
+- menghapus fitur hanya agar build lolos
+- membuat tombol palsu yang tidak bekerja
+- menggunakan data hardcoded untuk laporan production
+- mengklaim test berhasil jika belum dijalankan
+- menyimpan password plaintext
+- memasukkan API key/secrets ke source code
+- menambahkan backend/cloud berbayar tanpa kebutuhan
+
+==================================================
+25. HASIL AKHIR YANG SAYA INGINKAN
+==================================================
+
+Saya ingin menerima aplikasi yang benar-benar dapat digunakan.
+
+Sebelum menyatakan selesai, pastikan:
+
+✓ Login berfungsi
+✓ Dashboard berfungsi
+✓ transaksi CRUD berfungsi
+✓ date picker berfungsi
+✓ kategori berfungsi
+✓ laporan berfungsi
+✓ perbandingan bulan berfungsi
+✓ evaluasi otomatis berfungsi
+✓ tabungan berfungsi
+✓ investasi berfungsi
+✓ pengaturan berfungsi
+✓ backup/restore berfungsi
+✓ responsive HP/tablet/desktop
+✓ PWA build berhasil
+✓ Android build berhasil
+✓ automated tests berhasil
+✓ GitHub Actions tersedia
+✓ APK menjadi artifact jika workflow berhasil
+✓ source code sudah berada di origin/main
+
+KERJAKAN SECARA MANDIRI.
+
+Jangan berhenti untuk meminta persetujuan pada setiap file atau perubahan kecil.
+Ambil keputusan teknis yang masuk akal sendiri.
+
+Jika menemukan error, diagnosis dan perbaiki sendiri.
+
+Pertahankan scope aplikasi sesuai spesifikasi ini.
+
+Setelah selesai, laporkan secara ringkas:
+1. apa yang dibuat
+2. stack yang digunakan
+3. hasil test
+4. hasil build
+5. commit SHA terakhir
+6. status push origin/main
+7. status GitHub Actions
+8. lokasi/nama artifact APK
+9. hal yang memang masih membutuhkan credential/secret dari saya, jika ada.

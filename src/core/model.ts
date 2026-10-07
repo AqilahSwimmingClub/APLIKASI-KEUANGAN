@@ -1,0 +1,7 @@
+import { z } from 'zod';
+export const validDate = (s: string) => { if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false; const [y,m,d]=s.split('-').map(Number); const dt=new Date(y,m-1,d); return y>=1900 && y<=9999 && dt.getFullYear()===y && dt.getMonth()===m-1 && dt.getDate()===d; };
+const id=z.string().min(1).max(100), name=z.string().trim().min(1).max(120), money=z.number().int().positive().max(1e14);
+export const categorySchema=z.object({id,name,type:z.enum(['income','expense'])});
+export const transactionSchema=z.object({id,type:z.enum(['income','expense']),date:z.string().refine(validDate),title:name,categoryId:id,amount:money,note:z.string().max(2000),createdAt:z.string(),updatedAt:z.string(),allocation:z.enum(['regular','savings','investment']),targetId:id.optional(),demo:z.boolean().optional()});
+export const dataSchema=z.object({version:z.literal(1),categories:z.array(categorySchema).max(1000),transactions:z.array(transactionSchema).max(100000),goals:z.array(z.object({id,name,target:money,month:z.string().regex(/^\d{4}-\d{2}$/)})).max(1000),investments:z.array(z.object({id,name,kind:z.enum(['Reksa Dana','Emas','Saham','Deposito','Lainnya'])})).max(1000),settings:z.object({theme:z.enum(['light','dark','system']),name:z.string().max(120),monthlyTarget:z.number().int().nonnegative().max(1e14)})});
+export type Data=z.infer<typeof dataSchema>; export type Transaction=z.infer<typeof transactionSchema>; export type Category=z.infer<typeof categorySchema>; export type Goal=Data['goals'][number]; export type Investment=Data['investments'][number];
