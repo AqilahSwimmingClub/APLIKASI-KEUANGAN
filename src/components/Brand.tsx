@@ -36,7 +36,7 @@ export function FinanceIllustration() {
 export function StartupBrand() {
   return (
     <div className="startup-brand">
-      <img src="/icon-192.png" alt="Dompet dan koin Rupiah" />
+      <img src="/icon-192.png" alt="Logo AZ A-Zuha Finance" />
       <h1>
         A-Zuha Finance
       </h1>

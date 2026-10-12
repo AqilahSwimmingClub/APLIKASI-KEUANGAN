@@ -10,6 +10,10 @@
   --shadow: 0 3px 12px #164c9810;
   color: #101c42;
   background: var(--bg);
+  --field-bg: #f8fbff;
+  --field-focus-bg: #fff;
+  --field-border: #dae6f7;
+  --field-placeholder: #5c6f8d;
 }
 :root[data-theme="dark"] {
   --bg: #111b2b;
@@ -17,6 +21,16 @@
   --text: #e9effa;
   --line: #304057;
   color: var(--text);
+  --field-bg: #223552;
+  --field-focus-bg: #293e5e;
+  --field-border: #456084;
+  --field-placeholder: #c0cee2;
+}
+.baseline-login {
+  --field-bg: #f8fbff;
+  --field-focus-bg: #fff;
+  --field-border: #dae6f7;
+  --field-placeholder: #5c6f8d;
 }
 [hidden] {
   display: none !important;
@@ -1499,8 +1513,8 @@ textarea {
   -webkit-tap-highlight-color: transparent;
   caret-color: #006aff;
   border-radius: 16px;
-  background: #f8fbff;
-  border-color: #dae6f7;
+  background: var(--field-bg);
+  border-color: var(--field-border);
   box-shadow: 0 2px 7px #164c9808;
   transition: border-color 200ms ease, box-shadow 200ms ease,
     background-color 200ms ease;
@@ -1510,8 +1524,8 @@ input[type="date"] {
   -webkit-tap-highlight-color: transparent;
   caret-color: #006aff;
   border-radius: 16px;
-  background: #f8fbff;
-  border-color: #dae6f7;
+  background: var(--field-bg);
+  border-color: var(--field-border);
   box-shadow: 0 2px 7px #164c9808;
   transition: border-color 200ms ease, box-shadow 200ms ease,
     background-color 200ms ease;
@@ -1522,14 +1536,14 @@ textarea:focus {
   outline: none;
   border-color: rgba(37, 99, 235, 0.55);
   box-shadow: 0 0 0 3px #2563eb14, 0 8px 24px #2563eb14;
-  background: #fff;
+  background: var(--field-focus-bg);
 }
 .input-icon,
 .password-input,
 .money-input {
   border-radius: 16px;
-  border: 1px solid #dae6f7;
-  background: #f8fbff;
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
   box-shadow: 0 2px 7px #164c9808;
   transition: border-color 200ms ease, box-shadow 200ms ease,
     background-color 200ms ease;
@@ -1539,7 +1553,26 @@ textarea:focus {
 .money-input:focus-within {
   border-color: rgba(37, 99, 235, 0.55);
   box-shadow: 0 0 0 3px #2563eb14, 0 8px 24px #2563eb14;
-  background: #fff;
+  background: var(--field-focus-bg);
+}
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  color: var(--text);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--field-placeholder);
+  opacity: 1;
+}
+select option {
+  color: var(--text);
+  background: var(--surface);
+}
+.baseline-login input:not([type="checkbox"]),
+.baseline-login select,
+.baseline-login textarea {
+  color: #21314d;
 }
 .input-icon input,
 .password-input input,

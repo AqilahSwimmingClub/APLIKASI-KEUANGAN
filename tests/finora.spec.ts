@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 
 async function createOwner(page: import("@playwright/test").Page) {
   await page.goto("/");
@@ -18,6 +20,13 @@ test("A-Zuha Finance owner, login focus and password reveal", async ({ page }) =
   await expect(page.getByText("Keuangan Keluarga", { exact: true })).toBeVisible();
   await createOwner(page);
   await page.reload();
+  const logo = page.getByAltText("Logo AZ A-Zuha Finance");
+  await expect(logo).toBeVisible();
+  await expect(logo).toHaveJSProperty("naturalWidth", 192);
+  const bundledIcon = await page.request.get("/icon-192.png");
+  expect(bundledIcon.ok()).toBe(true);
+  const digest = (data: Buffer) => createHash("sha256").update(data).digest("hex");
+  expect(digest(await bundledIcon.body())).toBe(digest(readFileSync("public/icon-192.png")));
   const field = page.getByLabel("Password", { exact: true });
   await field.focus();
   const style = await field.evaluate((el) => {

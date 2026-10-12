@@ -42,9 +42,9 @@ export async function exportPdf(data: Data, month: string) {
   line("A-Zuha Finance • Keuangan Keluarga", 20);
   line(`Laporan ${monthLabel(month)}`, 14);
   for (const [k, l] of [
-    ["income", "Pemasukan"],
-    ["expense", "Pengeluaran"],
-    ["balance", "Sisa"],
+    ["income", "Total Pemasukan"],
+    ["expense", "Total Pengeluaran"],
+    ["balance", "Saldo"],
     ["savings", "Tabungan"],
     ["investment", "Investasi"],
   ] as const)

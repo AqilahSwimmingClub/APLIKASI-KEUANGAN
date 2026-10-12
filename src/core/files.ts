@@ -7,12 +7,17 @@ export async function saveFile(content: BlobPart, name: string, type: string) {
     const b = new Uint8Array(await blob.arrayBuffer());
     let s = "";
     for (const byte of b) s += String.fromCharCode(byte);
-    const file = await Filesystem.writeFile({
+    const options = {
       path: `exports/${Date.now()}-${name}`,
       data: btoa(s),
-      directory: Directory.Cache,
       recursive: true,
-    });
+    };
+    let file;
+    try {
+      file = await Filesystem.writeFile({ ...options, directory: Directory.Documents });
+    } catch {
+      file = await Filesystem.writeFile({ ...options, directory: Directory.Cache });
+    }
     await Share.share({
       title: name,
       url: file.uri,

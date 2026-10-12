@@ -29,6 +29,8 @@ jobs:
       - run: npm ci
       - run: npm run lint && npm run typecheck && npm test
       - run: npm run android:sync
+      - name: Verify AZ artwork in Capacitor assets
+        run: cmp public/icon-192.png android/app/src/main/assets/public/icon-192.png
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x android/gradlew
       - run: ./gradlew --no-daemon --max-workers=2 assembleDebug
@@ -48,7 +50,17 @@ jobs:
             adb shell svc wifi disable
             adb shell svc data disable
             adb shell settings put global airplane_mode_on 1
-            cd android && ./gradlew --no-daemon --max-workers=2 :app:connectedDebugAndroidTest
+            (cd android && ./gradlew --no-daemon --max-workers=2 :app:connectedDebugAndroidTest)
+            mkdir -p artifacts/screenshots
+            adb shell input keyevent KEYCODE_HOME
+            adb shell am force-stop id.fahmidjawas.keuanganrumah
+            adb shell am start -n id.fahmidjawas.keuanganrumah/.MainActivity
+            adb exec-out screencap -p > artifacts/screenshots/startup.png
+            sleep 2
+            adb exec-out screencap -p > artifacts/screenshots/login.png
+            adb shell am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:id.fahmidjawas.keuanganrumah
+            sleep 1
+            adb exec-out screencap -p > artifacts/screenshots/installed-icon.png
       - name: Save native test evidence
         uses: actions/upload-artifact@v4
         if: always()
@@ -57,6 +69,12 @@ jobs:
           path: |
             android/app/build/reports/androidTests/connected/
             android/app/build/outputs/androidTest-results/connected/
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: A-Zuha-Finance-v${{ steps.version.outputs.version }}-android-screenshots
+          path: artifacts/screenshots/
           if-no-files-found: ignore
       - name: Name debug APK
         run: |
@@ -90,11 +108,19 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
+          if [[ ! -s resources/azuha-logo-original.png ]] || [[ "$(file --mime-type --brief resources/azuha-logo-original.png)" != image/png ]]; then
+            echo 'Signed APK blocked: original AZ logo PNG is missing or invalid.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
           umask 077
           printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/azuha-release.jks"
+          test -s "$RUNNER_TEMP/azuha-release.jks"
+          test "$ANDROID_KEY_ALIAS" = 'a-zuha-finance'
+          keytool -list -keystore "$RUNNER_TEMP/azuha-release.jks" -storepass:env ANDROID_KEYSTORE_PASSWORD -alias "$ANDROID_KEY_ALIAS" > /dev/null
           export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/azuha-release.jks"
           (cd android && ./gradlew --no-daemon --max-workers=2 assembleRelease)
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/release/app-release.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs android/app/build/outputs/apk/release/app-release.apk | tee "$RUNNER_TEMP/azuha-signature.txt"
+          grep 'Signer #1 certificate SHA-256 digest:' "$RUNNER_TEMP/azuha-signature.txt" >> "$GITHUB_STEP_SUMMARY"
           cp android/app/build/outputs/apk/release/app-release.apk "artifacts/A-Zuha-Finance-v${{ steps.version.outputs.version }}-release.apk"
       - uses: actions/upload-artifact@v4
         if: steps.signing.outputs.ready == 'true'

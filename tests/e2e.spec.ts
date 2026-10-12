@@ -1,4 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
+import { readFile } from "node:fs/promises";
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-10-07T12:00:00+07:00"));
 });
@@ -208,7 +210,16 @@ test("hapus dengan konfirmasi, kategori custom, filter, ekspor dan backup rusak 
   expect((await pending).suggestedFilename()).toBe("semua-transaksi.csv");
   pending = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export PDF laporan" }).click();
-  expect((await pending).suggestedFilename()).toBe("laporan-2026-10.pdf");
+  const pdfDownload = await pending;
+  expect(pdfDownload.suggestedFilename()).toBe("laporan-2026-10.pdf");
+  const pdfBytes = await readFile((await pdfDownload.path())!);
+  const pdf = await getDocument({ data: new Uint8Array(pdfBytes), useSystemFonts: true }).promise;
+  expect(pdf.numPages).toBeGreaterThan(0);
+  const firstPage = await pdf.getPage(1);
+  const text = (await firstPage.getTextContent()).items.map((item) => "str" in item ? item.str : "").join(" ");
+  expect(text).toContain("A-Zuha Finance");
+  expect(text).toContain("Total Pemasukan: Rp 2.000.000");
+  await pdf.destroy();
   await page
     .getByRole("button", { name: "Dashboard", exact: true })
     .first()
@@ -263,4 +274,49 @@ test("PDF gagal memberi pesan dan tetap menjaga data", async ({ page }) => {
   await expect(page.getByRole("status")).toContainText(
     "Penyimpanan ekspor tidak tersedia",
   );
+});
+
+test("teks tanggal, nominal, dropdown dan placeholder terbaca pada kedua tema", async ({ page }) => {
+  await account(page);
+  await page.getByRole("button", { name: "Tambah transaksi", exact: true }).first().click();
+  const fields = [
+    page.getByLabel("Tanggal", { exact: true }),
+    page.getByLabel("Nominal (Rp)"),
+    page.getByLabel("Jenis", { exact: true }),
+    page.getByLabel("Nama transaksi"),
+  ];
+  await fields[0].fill("2026-10-07");
+  await fields[1].fill("150000");
+  await fields[3].fill("Belanja uji");
+  for (const theme of ["light", "dark"]) {
+    await page.locator("html").evaluate((node, value) => node.setAttribute("data-theme", value), theme);
+    await page.waitForTimeout(250);
+    for (const field of fields) {
+      const colors = await field.evaluate((node) => {
+        const style = getComputedStyle(node);
+        const wrapper = node.closest(".input-icon, .money-input");
+        return {
+          text: style.color,
+          background: getComputedStyle(wrapper ?? node).backgroundColor,
+          placeholder: getComputedStyle(node, "::placeholder").color,
+          scheme: style.colorScheme,
+        };
+      });
+      const luminance = (rgb: string) => {
+        const channels = rgb.match(/[\d.]+/g)?.slice(0, 3).map(Number) ?? [0, 0, 0];
+        const values = channels.map((c) => {
+          const s = c / 255;
+          return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        });
+        return values[0] * 0.2126 + values[1] * 0.7152 + values[2] * 0.0722;
+      };
+      const bg = luminance(colors.background);
+      for (const color of [colors.text, colors.placeholder]) {
+        const fg = luminance(color);
+        const ratio = (Math.max(bg, fg) + 0.05) / (Math.min(bg, fg) + 0.05);
+        expect(ratio, `${theme} ${await field.getAttribute("aria-label")} ${color} on ${colors.background}`).toBeGreaterThan(4.5);
+      }
+      expect(colors.scheme).toBe(theme);
+    }
+  }
 });

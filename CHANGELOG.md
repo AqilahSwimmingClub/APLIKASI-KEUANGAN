@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.5 — 2026-10-12
+
+- Ikon, splash, dan identitas visual diperbarui dari logo AZ asli milik pemilik aplikasi.
+- Kontras teks tanggal, nominal, dropdown, dan placeholder diperbaiki pada tema terang dan gelap tanpa mengubah desain login.
+- PDF laporan diuji dengan parser untuk bulan kosong, nominal, dan banyak transaksi lintas halaman; ringkasan mencantumkan total pemasukan, pengeluaran, dan saldo.
+- Android `versionCode` 6 dan iOS build 6. Workflow release memvalidasi keystore permanen dan alias sebelum build serta mencatat fingerprint sertifikat APK.
+
 ## 1.0.4 — 2026-10-12
 
 - Nama tampilan produk menjadi A-Zuha Finance pada web, PWA, Android, iOS, dan laporan; package/bundle ID serta format vault tetap.

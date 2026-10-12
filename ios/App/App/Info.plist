@@ -10,6 +10,10 @@
         <string>A-Zuha Finance</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Gunakan Face ID untuk membuka data keuangan Anda.</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

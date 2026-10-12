@@ -1,7 +1,30 @@
 import { test, expect } from "vitest";
 import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { PNG } from "pngjs";
 import config from "../capacitor.config";
 const read = (p: string) => readFileSync(p, "utf8");
+test("original AZ artwork produces visible launcher, web and iOS icons", () => {
+  const original = readFileSync("resources/azuha-logo-original.png");
+  expect(createHash("sha256").update(original).digest("hex")).toBe(
+    "97640c00c569fad9bfb7d9bcc3032f3dda9a3e945f7cdbbfbce9d0037b7840ba",
+  );
+  for (const path of [
+    "resources/app-icon-1024.png",
+    "public/icon-192.png",
+    "public/icon-512.png",
+    "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+    "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+    "ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png",
+  ]) {
+    const image = PNG.sync.read(readFileSync(path));
+    let blue = 0;
+    for (let i = 0; i < image.data.length; i += 4) {
+      if (image.data[i + 2] - image.data[i] > 20 && image.data[i + 3] > 200) blue++;
+    }
+    expect(blue / (image.width * image.height), path).toBeGreaterThan(0.07);
+  }
+});
 test("native production bundles local assets, keeps app identity and allows rotation", () => {
   expect(config.appId).toBe("id.fahmidjawas.keuanganrumah");
   expect(config.webDir).toBe("dist");
@@ -37,12 +60,12 @@ test("release versions agree across package, Android, iOS and UI", async () => {
   expect(read("android/app/build.gradle")).toContain(
     `versionName "${pkg.version}"`,
   );
-  expect(read("android/app/build.gradle")).toContain("versionCode 5");
+  expect(read("android/app/build.gradle")).toContain("versionCode 6");
   expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
     `MARKETING_VERSION = ${pkg.version};`,
   );
   expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
-    "CURRENT_PROJECT_VERSION = 5;",
+    "CURRENT_PROJECT_VERSION = 6;",
   );
 });
 

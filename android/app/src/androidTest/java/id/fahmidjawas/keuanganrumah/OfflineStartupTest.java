@@ -2,6 +2,7 @@ package id.fahmidjawas.keuanganrumah;
 
 import static org.junit.Assert.*;
 import android.content.pm.ActivityInfo;
+import android.os.Environment;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.espresso.Espresso;
@@ -10,6 +11,9 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 
 /** Runs on an emulator with Wi-Fi and cellular disabled before starting instrumentation. */
 @RunWith(AndroidJUnit4.class)
@@ -73,6 +77,26 @@ public class OfflineStartupTest {
             until(scenario,"document.querySelector('[data-testid=balance]')?.textContent.includes('125.000') === true");
             evaluate(scenario,"[...document.querySelectorAll('.app-shortcuts button')].find(b=>b.textContent.trim()==='Tabungan').click();true");
             until(scenario,"document.querySelector('.asset-hero')?.textContent.includes('25.000') === true");
+            AtomicReference<File> cacheExportDir = new AtomicReference<>();
+            scenario.onActivity(a -> cacheExportDir.set(new File(a.getCacheDir(), "exports")));
+            File documentsExportDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "exports");
+            evaluate(scenario,"[...document.querySelectorAll('.bottom-nav button')].find(b=>b.textContent.trim()==='Laporan').click();true");
+            until(scenario,"document.querySelector('.report-banner .primary')?.textContent.includes('PDF laporan') === true");
+            evaluate(scenario,"document.querySelector('.report-banner .primary').click();true");
+            File pdf = null;
+            long deadline = System.currentTimeMillis() + 30000;
+            while (System.currentTimeMillis() < deadline) {
+                File[] files = documentsExportDir.listFiles((dir, name) -> name.endsWith(".pdf"));
+                if (files == null || files.length == 0) files = cacheExportDir.get().listFiles((dir, name) -> name.endsWith(".pdf"));
+                if (files != null && files.length > 0 && files[0].length() > 100) { pdf = files[0]; break; }
+                Thread.sleep(250);
+            }
+            assertNotNull("PDF written by the installed offline Android app", pdf);
+            byte[] header = new byte[5];
+            try (FileInputStream stream = new FileInputStream(pdf)) {
+                assertEquals(5, stream.read(header));
+            }
+            assertEquals("%PDF-", new String(header, StandardCharsets.US_ASCII));
         }
     }
 }

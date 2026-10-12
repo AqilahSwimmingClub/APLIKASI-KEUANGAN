@@ -27,15 +27,12 @@ jobs:
           test "$GITHUB_REF_NAME" = main
           VERSION=$(node -p 'require("./package.json").version')
           test -f "docs/releases/v$VERSION.md"
+          if [[ ! -s resources/azuha-logo-original.png ]] || [[ "$(file --mime-type --brief resources/azuha-logo-original.png)" != image/png ]]; then
+            echo 'Release blocked: original AZ logo PNG is missing or invalid.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
           echo "number=$VERSION" >> "$GITHUB_OUTPUT"
-      - run: npm ci
-      - run: npm run lint && npm run typecheck && npm test
-      - run: npm run build
-      - run: npx cap sync android
-      - uses: gradle/actions/setup-gradle@v4
-      - run: chmod +x android/gradlew
-      - name: Check release signing secrets
-        id: signing
+      - name: Preflight permanent Android signing key
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -46,19 +43,31 @@ jobs:
             echo 'Signed release blocked: Android signing secrets are incomplete.' >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
+          test "$ANDROID_KEY_ALIAS" = 'a-zuha-finance'
+          umask 077
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/azuha-release.jks"
+          test -s "$RUNNER_TEMP/azuha-release.jks"
+          keytool -list -keystore "$RUNNER_TEMP/azuha-release.jks" -storepass:env ANDROID_KEYSTORE_PASSWORD -alias "$ANDROID_KEY_ALIAS" > /dev/null
+          echo 'Permanent Android keystore and alias validated.' >> "$GITHUB_STEP_SUMMARY"
+      - run: npm ci
+      - run: npm run lint && npm run typecheck && npm test
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Verify AZ artwork in release assets
+        run: cmp public/icon-192.png android/app/src/main/assets/public/icon-192.png
+      - uses: gradle/actions/setup-gradle@v4
+      - run: chmod +x android/gradlew
       - name: Build and verify signed release APK
         id: signed
         env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          umask 077
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/azuha-release.jks"
           export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/azuha-release.jks"
           (cd android && ./gradlew --no-daemon --max-workers=2 assembleRelease)
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs android/app/build/outputs/apk/release/app-release.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs android/app/build/outputs/apk/release/app-release.apk | tee "$RUNNER_TEMP/azuha-signature.txt"
+          grep 'Signer #1 certificate SHA-256 digest:' "$RUNNER_TEMP/azuha-signature.txt" >> "$GITHUB_STEP_SUMMARY"
           mkdir -p artifacts
           cp android/app/build/outputs/apk/release/app-release.apk "artifacts/A-Zuha-Finance-v${{ steps.version.outputs.number }}-release.apk"
           echo "asset=artifacts/A-Zuha-Finance-v${{ steps.version.outputs.number }}-release.apk" >> "$GITHUB_OUTPUT"

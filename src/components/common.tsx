@@ -5,7 +5,7 @@ import { monthLabel, rupiah, shiftMonth, change } from "../core/ledger";
 export function Logo() {
   return (
     <div className="logo">
-      <img src="/icon-192.png" alt="Dompet dan koin Rupiah" />
+      <img src="/icon-192.png" alt="Logo AZ A-Zuha Finance" />
     </div>
   );
 }

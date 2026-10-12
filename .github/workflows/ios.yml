@@ -24,6 +24,8 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx cap sync ios
+      - name: Verify AZ artwork in simulator assets
+        run: cmp public/icon-192.png ios/App/App/public/icon-192.png
       - name: Validate unsigned iPhone/iPad simulator build
         run: |
           xcodebuild \

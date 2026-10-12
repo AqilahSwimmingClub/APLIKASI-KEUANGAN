@@ -15,7 +15,7 @@ Aplikasi pribadi berbahasa Indonesia, mobile-first, tanpa backend. Bisa dipasang
 - Kategori pemasukan/pengeluaran custom. Kategori terpakai dilindungi.
 - Target/setoran/riwayat tabungan dan aset/dana/riwayat/komposisi investasi.
 - Backup JSON AES-GCM versioned, validasi relasi dan schema sebelum restore atomik; konfirmasi sebelum mengganti data aktif.
-- CSV kompatibel Excel (UTF-8 BOM, separator `;`, escaping formula) dan PDF bulanan. Android menggunakan Filesystem + Share untuk menyimpan/membagikan file.
+- CSV kompatibel Excel (UTF-8 BOM, separator `;`, escaping formula) dan PDF bulanan. Android/iOS menyimpan ekspor di Documents lalu membuka share sheet; bila Documents tidak tersedia, ekspor sementara dari cache tetap dapat dibagikan. Pada iOS, folder Documents dapat dibuka melalui Files.
 - Tema terang/gelap/perangkat, profil, target bulanan, demo opt-in Oktober 2026 dan pembersihan demo terpisah dari reset penuh.
 - Header aplikasi dan bottom navigation/FAB pada semua ukuran, grid tablet tanpa sidebar, portrait dan landscape, PWA offline.
 
@@ -44,7 +44,7 @@ npm run preview
 
 Jika Chromium sudah disediakan mesin, gunakan `PLAYWRIGHT_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`. Pengujian browser membuat akun dan transaksi dalam konteks browser terisolasi, bukan data produksi. Unit mencakup kalkulasi, tanggal, CRUD, kategori, backup/crypto dan persistensi. E2E mencakup akun, transaksi, laporan, tabungan, investasi, restore, export, PIN, tema, 21 ukuran layar wajib, rotasi form, history Back dan offline/reload.
 
-## A-Zuha Finance dan akun pemilik (1.0.4)
+## A-Zuha Finance dan akun pemilik (1.0.5)
 
 UI mengikuti gambar referensi final: ilustrasi finansial 3D yang dibundel, branding A-Zuha Finance dan descriptor Keuangan Keluarga, login putih, footer gelombang biru, kartu saldo cyan/biru, KPI warna hijau/merah/biru/ungu, daftar tanggal, filter sheet, tabs laporan, target/progress, donut portfolio dan settings compact.
 
@@ -52,7 +52,7 @@ Instalasi pertama menampilkan **BUAT AKUN PEMILIK** dengan nama (default FAHMI D
 
 Password akun, perubahan password dan backup menerima **setiap string yang tidak kosong**, tanpa batas minimal sepuluh karakter atau kewajiban kombinasi. Konfirmasi harus sama persis. PIN tetap tepat enam digit angka. AES-GCM, PBKDF2 SHA-256 310.000 iterasi, rate limiting dan penyimpanan credential terenkripsi dipertahankan. Password panjang lebih aman; peringatan tidak memblokir password pendek.
 
-Versi web/UI/Android/iOS 1.0.4, Android versionCode 5 dan iOS build 5; lihat CHANGELOG.md. Mengedit transaksi dilakukan dengan mengetuk judul baris, menghapus melalui tombol baris dengan konfirmasi.
+Versi web/UI/Android/iOS 1.0.5, Android versionCode 6 dan iOS build 6; lihat CHANGELOG.md. Mengedit transaksi dilakukan dengan mengetuk judul baris, menghapus melalui tombol baris dengan konfirmasi.
 
 ## Model data dan konsistensi
 
@@ -109,8 +109,8 @@ Production tidak mengatur `server.url`. `cap sync` menyalin bundle lokal ke Andr
 
 ## GitHub Actions
 
-- `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **A-Zuha-Finance-web-v1.0.4**.
-- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back serta persistensi transaksi dan setoran setelah Activity/WebView dibuat ulang; artifact **A-Zuha-Finance-v1.0.4-debug.apk**; release signed hanya jika keempat secret tersedia.
+- `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **A-Zuha-Finance-web-v1.0.5**.
+- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back serta persistensi transaksi dan setoran setelah Activity/WebView dibuat ulang; artifact **A-Zuha-Finance-v1.0.5-debug.apk**; release signed hanya jika keempat secret tersedia.
 
 Actions → Android APK → run → Artifacts. Debug tidak membutuhkan secret. `.github/workflows/ios.yml` memvalidasi build simulator unsigned pada runner macOS dan menyimpan ZIP aplikasi simulator; ZIP tersebut bukan IPA untuk pemasangan iPhone/iPad. Workflow CI dan Android memakai `contents: read`; job iOS signed IPA memakai `contents: write` hanya agar dapat menambahkan IPA ke Release versi yang sudah ada.
 
