@@ -112,7 +112,9 @@ Production tidak mengatur `server.url`. `cap sync` menyalin bundle lokal ke Andr
 - `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **FINORA-web-v1.0.3**.
 - `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back serta persistensi transaksi dan setoran setelah Activity/WebView dibuat ulang; artifact **FINORA-android-v1.0.3-debug.apk**; release signed hanya jika keempat secret tersedia.
 
-Actions → Android APK → run → Artifacts. Debug tidak membutuhkan secret. `.github/workflows/ios.yml` memvalidasi build simulator unsigned pada runner macOS dan menyimpan ZIP aplikasi simulator; ZIP tersebut bukan IPA untuk pemasangan iPhone/iPad. Semua workflow memakai `contents: read`.
+Actions → Android APK → run → Artifacts. Debug tidak membutuhkan secret. `.github/workflows/ios.yml` memvalidasi build simulator unsigned pada runner macOS dan menyimpan ZIP aplikasi simulator; ZIP tersebut bukan IPA untuk pemasangan iPhone/iPad. Workflow CI, Android, dan iOS memakai `contents: read`.
+
+Workflow manual `.github/workflows/release.yml` membangun dan memverifikasi APK pada runner GitHub, lalu menerbitkan tag/Release dengan asset APK. Workflow ini memakai `contents: write` hanya untuk langkah publikasi; jika keystore release belum tersedia, asset diberi nama debug. Jalur ini juga bekerja ketika proxy lingkungan pengembangan membatasi host unggah asset GitHub.
 
 ## Struktur
 
