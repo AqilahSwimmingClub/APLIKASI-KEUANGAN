@@ -45,7 +45,7 @@ export function Login({
         <FinanceIllustration />
         <div className="login-heading">
           <Logo />
-          <h1>FINORA</h1>
+          <h1>A-Zuha Finance</h1>
           <p className="brand-descriptor">Keuangan Keluarga</p>
           <p className="tagline">
             Kelola • Rencanakan • Evaluasi

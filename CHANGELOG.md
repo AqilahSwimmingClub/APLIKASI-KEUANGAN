@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.4 — 2026-10-12
+
+- Nama tampilan produk menjadi A-Zuha Finance pada web, PWA, Android, iOS, dan laporan; package/bundle ID serta format vault tetap.
+- Android `versionCode` 5 dan iOS build 5. Login portrait lebih padat dan ring fokus input wrapper dibersihkan.
+- Android BiometricPrompt dengan kunci Android Keystore dan iOS Keychain dengan perlindungan biometrik membuka kunci vault setelah pendaftaran. Password/PIN tetap tersedia.
+- Workflow publikasi menuntut APK release bertanda tangan dan tidak menerbitkan APK debug sebagai update resmi. Asset logo resmi dan kunci signing lama masih diperlukan sebelum distribusi final.
+
 ## 1.0.3 — 2026-10-12
 
 - Setoran Tabungan langsung tersedia dari tombol utama halaman Tabungan dan FAB; formulir khusus memakai tanggal, target, nominal, dan catatan.

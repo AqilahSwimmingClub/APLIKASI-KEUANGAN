@@ -284,7 +284,7 @@ export default function App() {
               </button>
             )}
             <div>
-              <h1>{page === "Dashboard" ? "FINORA" : page}</h1>
+              <h1>{page === "Dashboard" ? "A-Zuha Finance" : page}</h1>
               <p className="header-subtitle">
                 {page === "Transaksi"
                   ? "Kelola semua pemasukan & pengeluaran"

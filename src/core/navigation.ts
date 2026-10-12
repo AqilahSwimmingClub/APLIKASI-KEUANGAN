@@ -52,8 +52,8 @@ export function useMobileRuntime(
       if (visible)
         requestAnimationFrame(() => {
           (document.activeElement as HTMLElement)?.scrollIntoView({
-            block: "center",
-            behavior: "smooth",
+            block: "nearest",
+            behavior: "instant",
           });
         });
     };
@@ -83,6 +83,7 @@ export function useMobileRuntime(
       keyboard(false);
     };
     viewport?.addEventListener("resize", resize);
+    resize();
     window.addEventListener("orientationchange", reset);
     const blur = () => keyboard(false);
     window.addEventListener("focusout", blur);

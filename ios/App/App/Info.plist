@@ -7,7 +7,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>FINORA</string>
+        <string>A-Zuha Finance</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Gunakan Face ID untuk membuka data keuangan Anda.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

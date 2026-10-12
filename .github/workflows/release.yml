@@ -1,4 +1,4 @@
-name: Publish FINORA Release
+name: Publish A-Zuha Finance Release
 on:
   workflow_dispatch:
 permissions:
@@ -34,14 +34,6 @@ jobs:
       - run: npx cap sync android
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x android/gradlew
-      - name: Build and verify debug APK
-        run: |
-          (cd android && ./gradlew --no-daemon --max-workers=2 assembleDebug)
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/debug/app-debug.apk
-          mkdir -p artifacts
-          cp android/app/build/outputs/apk/debug/app-debug.apk "artifacts/FINORA-v${{ steps.version.outputs.number }}-debug.apk"
-          echo "asset=artifacts/FINORA-v${{ steps.version.outputs.number }}-debug.apk" >> "$GITHUB_OUTPUT"
-        id: debug
       - name: Check release signing secrets
         id: signing
         env:
@@ -50,14 +42,12 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          if [[ -n "$ANDROID_KEYSTORE_BASE64" && -n "$ANDROID_KEY_ALIAS" && -n "$ANDROID_KEY_PASSWORD" && -n "$ANDROID_KEYSTORE_PASSWORD" ]]; then
-            echo 'ready=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'ready=false' >> "$GITHUB_OUTPUT"
+          if [[ -z "$ANDROID_KEYSTORE_BASE64" || -z "$ANDROID_KEY_ALIAS" || -z "$ANDROID_KEY_PASSWORD" || -z "$ANDROID_KEYSTORE_PASSWORD" ]]; then
+            echo 'Signed release blocked: Android signing secrets are incomplete.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
           fi
       - name: Build and verify signed release APK
         id: signed
-        if: steps.signing.outputs.ready == 'true'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -65,18 +55,17 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           umask 077
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/finora-release.jks"
-          export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/finora-release.jks"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/azuha-release.jks"
+          export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/azuha-release.jks"
           (cd android && ./gradlew --no-daemon --max-workers=2 assembleRelease)
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/release/app-release.apk
-          cp android/app/build/outputs/apk/release/app-release.apk "artifacts/FINORA-v${{ steps.version.outputs.number }}-release.apk"
-          echo "asset=artifacts/FINORA-v${{ steps.version.outputs.number }}-release.apk" >> "$GITHUB_OUTPUT"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs android/app/build/outputs/apk/release/app-release.apk
+          mkdir -p artifacts
+          cp android/app/build/outputs/apk/release/app-release.apk "artifacts/A-Zuha-Finance-v${{ steps.version.outputs.number }}-release.apk"
+          echo "asset=artifacts/A-Zuha-Finance-v${{ steps.version.outputs.number }}-release.apk" >> "$GITHUB_OUTPUT"
       - name: Publish tag and APK
         env:
           GH_TOKEN: ${{ github.token }}
           SIGNED_ASSET: ${{ steps.signed.outputs.asset }}
-          DEBUG_ASSET: ${{ steps.debug.outputs.asset }}
           VERSION: ${{ steps.version.outputs.number }}
         run: |
-          ASSET="${SIGNED_ASSET:-$DEBUG_ASSET}"
-          gh release create "v$VERSION" "$ASSET" --target "$GITHUB_SHA" --title "FINORA v$VERSION" --notes-file "docs/releases/v$VERSION.md"
+          gh release create "v$VERSION" "$SIGNED_ASSET" --target "$GITHUB_SHA" --title "A-Zuha Finance v$VERSION" --notes-file "docs/releases/v$VERSION.md"

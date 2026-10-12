@@ -61,11 +61,11 @@ jobs:
       - name: Name debug APK
         run: |
           mkdir -p artifacts
-          cp android/app/build/outputs/apk/debug/app-debug.apk "artifacts/FINORA-android-v${{ steps.version.outputs.version }}-debug.apk"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "artifacts/A-Zuha-Finance-v${{ steps.version.outputs.version }}-debug.apk"
       - uses: actions/upload-artifact@v4
         with:
-          name: FINORA-android-v${{ steps.version.outputs.version }}-debug.apk
-          path: artifacts/FINORA-android-v${{ steps.version.outputs.version }}-debug.apk
+          name: A-Zuha-Finance-v${{ steps.version.outputs.version }}-debug.apk
+          path: artifacts/A-Zuha-Finance-v${{ steps.version.outputs.version }}-debug.apk
           if-no-files-found: error
       - name: Check release signing secrets
         id: signing
@@ -91,14 +91,14 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           umask 077
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/finora-release.jks"
-          export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/finora-release.jks"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/azuha-release.jks"
+          export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/azuha-release.jks"
           (cd android && ./gradlew --no-daemon --max-workers=2 assembleRelease)
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/release/app-release.apk
-          cp android/app/build/outputs/apk/release/app-release.apk "artifacts/FINORA-android-v${{ steps.version.outputs.version }}-release.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "artifacts/A-Zuha-Finance-v${{ steps.version.outputs.version }}-release.apk"
       - uses: actions/upload-artifact@v4
         if: steps.signing.outputs.ready == 'true'
         with:
-          name: FINORA-android-v${{ steps.version.outputs.version }}-release.apk
-          path: artifacts/FINORA-android-v${{ steps.version.outputs.version }}-release.apk
+          name: A-Zuha-Finance-v${{ steps.version.outputs.version }}-release.apk
+          path: artifacts/A-Zuha-Finance-v${{ steps.version.outputs.version }}-release.apk
           if-no-files-found: error

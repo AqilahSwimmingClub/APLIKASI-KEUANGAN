@@ -2,7 +2,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 import { KeyboardResize } from "@capacitor/keyboard";
 const config: CapacitorConfig = {
   appId: "id.fahmidjawas.keuanganrumah",
-  appName: "FINORA",
+  appName: "A-Zuha Finance",
   webDir: "dist",
   server: { androidScheme: "https" },
   android: { allowMixedContent: false },

@@ -25,6 +25,7 @@ import {
   rewrap,
   unlockAccount,
   registerBiometric,
+  removeBiometric,
 } from "../core/vault";
 import { removeCategory, exportCsv, demoData, emptyData } from "../core/ledger";
 import {
@@ -254,7 +255,7 @@ export function Settings(p: Props) {
                       className="text-button"
                       onClick={() =>
                         void run(async () => {
-                          await onAccount({ ...account, bio: undefined });
+                          await onAccount(await removeBiometric(account));
                           notify("Biometrik dinonaktifkan");
                         })
                       }
@@ -590,7 +591,7 @@ export function Settings(p: Props) {
               )}
               {section === "Tentang Aplikasi" && (
                 <>
-                  <h2>FINORA</h2>
+                  <h2>A-Zuha Finance</h2>
                   <p>Keuangan Keluarga</p>
                   <p>Versi {APP_VERSION} • Keuangan pribadi, offline.</p>
                   <p>

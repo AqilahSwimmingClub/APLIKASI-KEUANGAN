@@ -39,7 +39,7 @@ export async function exportPdf(data: Data, month: string) {
     doc.text(lines, 17, y);
     y += lines.length * 6 + 3;
   };
-  line("FINORA • Keuangan Keluarga", 20);
+  line("A-Zuha Finance • Keuangan Keluarga", 20);
   line(`Laporan ${monthLabel(month)}`, 14);
   for (const [k, l] of [
     ["income", "Pemasukan"],

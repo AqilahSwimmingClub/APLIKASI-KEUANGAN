@@ -1,6 +1,6 @@
-# FINORA untuk iPhone dan iPad
+# A-Zuha Finance untuk iPhone dan iPad
 
-Proyek native ada di `ios/App/App.xcodeproj` dengan workspace internal Xcode `ios/App/App.xcodeproj/project.xcworkspace`. Aplikasi menggunakan Capacitor 8/SPM, target iOS 15+, bundle ID `id.fahmidjawas.keuanganrumah`, display name `FINORA`, orientasi iPhone/iPad, app icon 1024×1024, dan splash FINORA. `npm run ios:sync` menyalin bundle web lokal ke proyek native.
+Proyek native ada di `ios/App/App.xcodeproj` dengan workspace internal Xcode `ios/App/App.xcodeproj/project.xcworkspace`. Aplikasi menggunakan Capacitor 8/SPM, target iOS 15+, bundle ID `id.fahmidjawas.keuanganrumah`, display name `A-Zuha Finance`, orientasi iPhone/iPad, app icon 1024×1024, dan splash A-Zuha Finance. `npm run ios:sync` menyalin bundle web lokal ke proyek native.
 
 ## Validasi tanpa Apple signing
 
@@ -24,8 +24,8 @@ Diperlukan Apple Developer Account, Team ID, signing certificate beserta private
 Contoh kerangka perintah setelah keychain dan profile valid tersedia:
 
 ```sh
-xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/FINORA.xcarchive" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" archive
-xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/FINORA.xcarchive" -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/finora-export"
+xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/A-Zuha-Finance.xcarchive" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" archive
+xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/A-Zuha-Finance.xcarchive" -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/azuha-export"
 ```
 
-`ExportOptions.plist` harus berisi metode distribusi, Team ID, serta mapping profile yang benar. Setelah signing tersedia, beri nama hasil `FINORA-v1.0.2.ipa` untuk versi ini. Workflow simulator saat ini sengaja tidak memasukkan kredensial atau langkah distribusi.
+`ExportOptions.plist` harus berisi metode distribusi, Team ID, serta mapping profile yang benar. Setelah signing tersedia, beri nama hasil `A-Zuha-Finance-v1.0.4.ipa` untuk versi ini. Workflow iOS manual memakai secrets `APPLE_CERTIFICATE_BASE64`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_PROVISIONING_PROFILE_BASE64`, dan `APPLE_TEAM_ID` untuk arsip ad hoc serta IPA bertanda tangan. Jalankan setelah Release Android signed tersedia agar IPA dapat ditambahkan ke Release versi yang sama. Tanpa secrets, hanya validasi simulator yang dijalankan.

@@ -2,6 +2,7 @@ import { openDB } from "idb";
 import { z } from "zod";
 import { validateData } from "./ledger";
 import type { Data } from "./model";
+import { NativeVault, nativeVaultAvailable } from "./nativeVault";
 const enc = new TextEncoder(),
   dec = new TextDecoder();
 const b64 = (b: Uint8Array) => {
@@ -101,7 +102,7 @@ export type Account = {
   username: string;
   password: Envelope;
   pin?: Envelope;
-  bio?: { id: string; salt: string; wrapped: Envelope };
+  bio?: { id: string; salt: string; wrapped: Envelope } | { provider: "native"; id: string };
   failures: number;
   lockedUntil: number;
 };
@@ -231,13 +232,17 @@ export async function registerBiometric(
   a: Account,
   key: string,
 ): Promise<Account> {
+  if (nativeVaultAvailable()) {
+    await NativeVault.storeKey({ accountId: a.username, key });
+    return { ...a, bio: { provider: "native", id: a.username } };
+  }
   if (!window.PublicKeyCredential)
     throw Error("Biometrik tidak didukung. Gunakan password/PIN.");
   const salt = crypto.getRandomValues(new Uint8Array(32));
   const credential = (await navigator.credentials.create({
     publicKey: {
       challenge: crypto.getRandomValues(new Uint8Array(32)),
-      rp: { name: "FINORA" },
+      rp: { name: "A-Zuha Finance" },
       user: {
         id: crypto.getRandomValues(new Uint8Array(16)),
         name: a.username,
@@ -297,6 +302,12 @@ export async function registerBiometric(
 }
 export async function unlockBiometric(a: Account) {
   if (!a.bio) throw Error("Biometrik belum diaktifkan.");
+  if ("provider" in a.bio) {
+    if (!nativeVaultAvailable())
+      throw Error("Biometrik native hanya tersedia dalam aplikasi perangkat.");
+    const result = await NativeVault.unlock({ accountId: a.bio.id });
+    return z.string().min(1).parse(result.key);
+  }
   const c = (await navigator.credentials.get({
     publicKey: {
       challenge: crypto.getRandomValues(new Uint8Array(32)),
@@ -319,4 +330,9 @@ export async function unlockBiometric(a: Account) {
   return z
     .object({ key: z.string() })
     .parse(await decryptJson(a.bio.wrapped, k)).key;
+}
+export async function removeBiometric(a: Account) {
+  if (a.bio && "provider" in a.bio && nativeVaultAvailable())
+    await NativeVault.remove();
+  return { ...a, bio: undefined };
 }

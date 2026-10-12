@@ -7,8 +7,8 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "FINORA — Keuangan Keluarga",
-        short_name: "FINORA",
+        name: "A-Zuha Finance — Keuangan Keluarga",
+        short_name: "A-Zuha Finance",
         description: "Kelola • Rencanakan • Evaluasi Keuangan Keluarga Anda",
         lang: "id",
         theme_color: "#163b78",

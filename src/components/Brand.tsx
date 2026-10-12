@@ -38,7 +38,7 @@ export function StartupBrand() {
     <div className="startup-brand">
       <img src="/icon-192.png" alt="Dompet dan koin Rupiah" />
       <h1>
-        FINORA
+        A-Zuha Finance
       </h1>
       <p>Keuangan Keluarga</p>
       <p>Kelola • Rencanakan • Evaluasi</p>

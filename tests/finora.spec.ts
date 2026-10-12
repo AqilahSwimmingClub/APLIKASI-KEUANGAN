@@ -12,9 +12,9 @@ async function createOwner(page: import("@playwright/test").Page) {
   await expect(page.getByTestId("balance")).toBeVisible();
 }
 
-test("FINORA owner, login focus and password reveal", async ({ page }) => {
+test("A-Zuha Finance owner, login focus and password reveal", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "FINORA" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "A-Zuha Finance" })).toBeVisible();
   await expect(page.getByText("Keuangan Keluarga", { exact: true })).toBeVisible();
   await createOwner(page);
   await page.reload();
@@ -34,7 +34,37 @@ test("FINORA owner, login focus and password reveal", async ({ page }) => {
   await expect(field).toHaveAttribute("type", "password");
   await page.getByRole("button", { name: "MASUK", exact: true }).click();
   await expect(page.getByTestId("balance")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "FINORA" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "A-Zuha Finance" })).toBeVisible();
+});
+
+test("portrait login keeps primary controls in one viewport and one focus ring", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 720 });
+  await createOwner(page);
+  await page.reload();
+  const controls = [
+    page.getByLabel("Username", { exact: true }),
+    page.getByLabel("Password", { exact: true }),
+    page.getByRole("button", { name: "MASUK", exact: true }),
+    page.getByRole("button", { name: "Sidik Jari" }),
+    page.getByRole("button", { name: "Masuk dengan PIN" }),
+  ];
+  for (const control of controls) {
+    const box = await control.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.y).toBeGreaterThanOrEqual(0);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(720);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(720);
+  const password = page.getByLabel("Password", { exact: true });
+  await password.focus();
+  const focus = await password.evaluate((el) => {
+    const input = getComputedStyle(el);
+    const wrapper = getComputedStyle(el.parentElement!);
+    return { border: input.borderWidth, shadow: input.boxShadow, wrapperShadow: wrapper.boxShadow };
+  });
+  expect(focus.border).toBe("0px");
+  expect(focus.shadow).toBe("none");
+  expect(focus.wrapperShadow).not.toBe("none");
 });
 
 test("tablet landscape centers login and pairs compact dashboard sections", async ({ page }) => {
@@ -92,10 +122,10 @@ for (const [width, height] of [
   [768, 1024], [800, 1280], [834, 1194],
   [1024, 768], [1194, 834], [1280, 800], [1366, 1024],
 ]) {
-  test(`FINORA login, owner, focus, keyboard and dashboard ${width}x${height}`, async ({ page }) => {
+  test(`A-Zuha Finance login, owner, focus, keyboard and dashboard ${width}x${height}`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "FINORA" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "A-Zuha Finance" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "BUAT AKUN PEMILIK" })).toBeVisible();
     const username = page.getByLabel("Username", { exact: true });
     await username.focus();
@@ -118,7 +148,7 @@ for (const [width, height] of [
     await page.locator("html").evaluate((el) => { el.dataset.keyboard = "closed"; });
     await page.setViewportSize({ width, height });
     await createOwner(page);
-    await expect(page.getByRole("heading", { name: "FINORA" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "A-Zuha Finance" })).toBeVisible();
     await expect(page.locator(".bottom-nav")).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });

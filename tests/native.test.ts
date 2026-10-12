@@ -11,7 +11,7 @@ test("native production bundles local assets, keeps app identity and allows rota
   expect(manifest).toContain("android.intent.category.LAUNCHER");
   expect(manifest).toContain("adjustResize");
   expect(read("android/app/src/main/res/values/strings.xml")).toContain(
-    "FINORA",
+    "A-Zuha Finance",
   );
 });
 test("iOS phone/tablet orientations, compatible SPM project and original opaque icon", () => {
@@ -37,18 +37,18 @@ test("release versions agree across package, Android, iOS and UI", async () => {
   expect(read("android/app/build.gradle")).toContain(
     `versionName "${pkg.version}"`,
   );
-  expect(read("android/app/build.gradle")).toContain("versionCode 4");
+  expect(read("android/app/build.gradle")).toContain("versionCode 5");
   expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
     `MARKETING_VERSION = ${pkg.version};`,
   );
   expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
-    "CURRENT_PROJECT_VERSION = 4;",
+    "CURRENT_PROJECT_VERSION = 5;",
   );
 });
 
-test("FINORA native display names and unsigned iOS validation workflow", () => {
-  expect(config.appName).toBe("FINORA");
-  expect(read("ios/App/App/Info.plist")).toContain("<string>FINORA</string>");
+test("A-Zuha Finance native display names and unsigned iOS validation workflow", () => {
+  expect(config.appName).toBe("A-Zuha Finance");
+  expect(read("ios/App/App/Info.plist")).toContain("<string>A-Zuha Finance</string>");
   const ios = read(".github/workflows/ios.yml");
   expect(ios).toContain("macos-latest");
   expect(ios).toContain("cap sync ios");
@@ -57,5 +57,17 @@ test("FINORA native display names and unsigned iOS validation workflow", () => {
   const android = read(".github/workflows/android.yml");
   for (const secret of ["ANDROID_KEYSTORE_BASE64", "ANDROID_KEY_ALIAS", "ANDROID_KEY_PASSWORD", "ANDROID_KEYSTORE_PASSWORD"])
     expect(android).toContain(secret);
-  expect(android).toContain("FINORA-android-v");
+  expect(android).toContain("A-Zuha-Finance-v");
+});
+
+test("native biometric bridges require protected key retrieval on both platforms", () => {
+  expect(read("android/app/src/main/java/id/fahmidjawas/keuanganrumah/MainActivity.java"))
+    .toContain("registerPlugin(NativeVaultPlugin.class)");
+  const android = read("android/app/src/main/java/id/fahmidjawas/keuanganrumah/NativeVaultPlugin.java");
+  expect(android).toContain("BiometricPrompt.CryptoObject(cipher)");
+  expect(android).toContain("setUserAuthenticationRequired(true)");
+  const ios = read("ios/App/App/AppDelegate.swift");
+  expect(ios).toContain(".biometryCurrentSet");
+  expect(ios).toContain("SecItemCopyMatching");
+  expect(read("ios/App/App/SceneDelegate.swift")).toContain("AzuhaBridgeViewController()");
 });

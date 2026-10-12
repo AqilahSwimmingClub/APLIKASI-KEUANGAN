@@ -1578,6 +1578,66 @@ textarea::selection {
   }
 }
 
+/* A wrapped field owns its focus border. The editable element has no second ring. */
+:is(.input-icon, .password-input, .money-input) input:not([type="checkbox"]):not([type="radio"]) {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0;
+}
+:is(.input-icon, .password-input, .money-input) input:not([type="checkbox"]):not([type="radio"]):focus {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.password-input {
+  overflow: visible;
+}
+.password-input button,
+.password-lock {
+  color: #6e8bb8;
+  background: transparent;
+}
+html[data-keyboard="open"] .baseline-login {
+  min-height: var(--visual-height, 100dvh);
+  align-content: start;
+  overflow-y: auto;
+  padding-top: calc(8px + var(--safe-top));
+  padding-bottom: calc(12px + var(--safe-bottom));
+}
+html[data-keyboard="open"] .baseline-login .finance-illustration,
+html[data-keyboard="open"] .baseline-login .login-security,
+html[data-keyboard="open"] .baseline-login .credit,
+html[data-keyboard="open"] .baseline-login .tagline {
+  display: none;
+}
+html[data-keyboard="open"] .baseline-login .login-methods {
+  margin: 8px 0;
+}
+@media (orientation: portrait) and (max-height: 740px) {
+  .baseline-login {
+    min-height: 100dvh;
+    align-content: start;
+    gap: 6px;
+    padding-top: calc(8px + var(--safe-top));
+    padding-bottom: calc(8px + var(--safe-bottom));
+  }
+  .baseline-login .finance-illustration {
+    height: clamp(72px, 12dvh, 105px);
+    max-height: none;
+    object-fit: cover;
+    margin-bottom: 0;
+  }
+  .baseline-login .login-methods {
+    margin: 8px 0;
+  }
+  .baseline-login .credit {
+    margin-top: 6px;
+  }
+}
+
 .login-heading .brand-descriptor {
   grid-column: 2;
   grid-row: 2;

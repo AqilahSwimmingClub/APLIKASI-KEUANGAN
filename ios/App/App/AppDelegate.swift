@@ -1,5 +1,103 @@
 import UIKit
 import Capacitor
+import LocalAuthentication
+import Security
+
+class AzuhaBridgeViewController: CAPBridgeViewController {
+    override func capacitorDidLoad() {
+        bridge?.registerPluginInstance(NativeVaultPlugin())
+    }
+}
+
+@objc(NativeVaultPlugin)
+class NativeVaultPlugin: CAPPlugin, CAPBridgedPlugin {
+    let identifier = "NativeVaultPlugin"
+    let jsName = "NativeVault"
+    let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "storeKey", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "unlock", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "remove", returnType: CAPPluginReturnPromise)
+    ]
+    private let service = "id.fahmidjawas.keuanganrumah.nativevault"
+
+    private func biometricAvailable() -> Bool {
+        let context = LAContext()
+        var error: NSError?
+        return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+    }
+
+    @objc func storeKey(_ call: CAPPluginCall) {
+        guard let accountId = call.getString("accountId"), !accountId.isEmpty,
+              let key = call.getString("key"), !key.isEmpty else {
+            call.reject("Akun atau kunci vault tidak valid.")
+            return
+        }
+        guard biometricAvailable() else {
+            call.reject("Biometrik belum tersedia atau belum didaftarkan. Gunakan password/PIN.")
+            return
+        }
+        guard let access = SecAccessControlCreateWithFlags(nil,
+            kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+            .biometryCurrentSet, nil) else {
+            call.reject("Keamanan perangkat tidak tersedia.")
+            return
+        }
+        let base: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: accountId
+        ]
+        SecItemDelete(base as CFDictionary)
+        var item = base
+        item[kSecAttrAccessControl as String] = access
+        item[kSecValueData as String] = Data(key.utf8)
+        let status = SecItemAdd(item as CFDictionary, nil)
+        if status == errSecSuccess { call.resolve() }
+        else { call.reject("Kunci biometrik tidak dapat disimpan di Keychain.") }
+    }
+
+    @objc func unlock(_ call: CAPPluginCall) {
+        guard let accountId = call.getString("accountId"), !accountId.isEmpty else {
+            call.reject("Akun biometrik tidak valid.")
+            return
+        }
+        guard biometricAvailable() else {
+            call.reject("Biometrik tidak tersedia. Gunakan password/PIN.")
+            return
+        }
+        DispatchQueue.global(qos: .userInitiated).async {
+            let context = LAContext()
+            context.localizedFallbackTitle = "Gunakan password/PIN"
+            let query: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: self.service,
+                kSecAttrAccount as String: accountId,
+                kSecReturnData as String: true,
+                kSecMatchLimit as String: kSecMatchLimitOne,
+                kSecUseAuthenticationContext as String: context,
+                kSecUseOperationPrompt as String: "Buka A-Zuha Finance"
+            ]
+            var result: CFTypeRef?
+            let status = SecItemCopyMatching(query as CFDictionary, &result)
+            guard status == errSecSuccess, let data = result as? Data,
+                  let key = String(data: data, encoding: .utf8) else {
+                call.reject("Biometrik dibatalkan atau kunci tidak tersedia. Gunakan password/PIN.")
+                return
+            }
+            call.resolve(["key": key])
+        }
+    }
+
+    @objc func remove(_ call: CAPPluginCall) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service
+        ]
+        let status = SecItemDelete(query as CFDictionary)
+        if status == errSecSuccess || status == errSecItemNotFound { call.resolve() }
+        else { call.reject("Akses biometrik tidak dapat dihapus.") }
+    }
+}
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

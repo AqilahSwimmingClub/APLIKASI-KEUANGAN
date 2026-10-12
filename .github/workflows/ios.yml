@@ -1,4 +1,4 @@
-name: iOS Simulator Build
+name: iOS Build
 on:
   push:
     branches: [main]
@@ -32,15 +32,103 @@ jobs:
             -configuration Debug \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath "$RUNNER_TEMP/finora-ios-derived" \
+            -derivedDataPath "$RUNNER_TEMP/azuha-ios-derived" \
             CODE_SIGNING_ALLOWED=NO \
             build
       - name: Package unsigned simulator application
         run: |
           VERSION=$(node -p 'require("./package.json").version')
-          ditto -c -k --sequesterRsrc --keepParent "$RUNNER_TEMP/finora-ios-derived/Build/Products/Debug-iphonesimulator/App.app" "$RUNNER_TEMP/FINORA-ios-simulator-v$VERSION.zip"
+          ditto -c -k --sequesterRsrc --keepParent "$RUNNER_TEMP/azuha-ios-derived/Build/Products/Debug-iphonesimulator/App.app" "$RUNNER_TEMP/A-Zuha-Finance-ios-simulator-v$VERSION.zip"
       - uses: actions/upload-artifact@v4
         with:
-          name: FINORA-ios-simulator-v${{ steps.version.outputs.version }}
-          path: ${{ runner.temp }}/FINORA-ios-simulator-v${{ steps.version.outputs.version }}.zip
+          name: A-Zuha-Finance-ios-simulator-v${{ steps.version.outputs.version }}
+          path: ${{ runner.temp }}/A-Zuha-Finance-ios-simulator-v${{ steps.version.outputs.version }}.zip
           if-no-files-found: error
+  signed_ipa:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Check Apple signing credentials
+        id: signing
+        env:
+          APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [[ -n "$APPLE_CERTIFICATE_BASE64" && -n "$APPLE_CERTIFICATE_PASSWORD" && -n "$APPLE_PROVISIONING_PROFILE_BASE64" && -n "$APPLE_TEAM_ID" ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Signed IPA unavailable: Apple certificate, provisioning profile, password, or Team ID is missing.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - run: npm ci && npm run ios:sync
+        if: steps.signing.outputs.ready == 'true'
+      - name: Install temporary Apple signing credentials
+        if: steps.signing.outputs.ready == 'true'
+        env:
+          APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          umask 077
+          printf '%s' "$APPLE_CERTIFICATE_BASE64" | base64 -D > "$RUNNER_TEMP/signing.p12"
+          printf '%s' "$APPLE_PROVISIONING_PROFILE_BASE64" | base64 -D > "$RUNNER_TEMP/app.mobileprovision"
+          KEYCHAIN_PASSWORD=$(openssl rand -hex 32)
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$RUNNER_TEMP/signing.keychain-db"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$RUNNER_TEMP/signing.keychain-db"
+          security set-keychain-settings -lut 21600 "$RUNNER_TEMP/signing.keychain-db"
+          security import "$RUNNER_TEMP/signing.p12" -k "$RUNNER_TEMP/signing.keychain-db" -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$RUNNER_TEMP/signing.keychain-db"
+          security list-keychains -d user -s "$RUNNER_TEMP/signing.keychain-db"
+          security cms -D -i "$RUNNER_TEMP/app.mobileprovision" > "$RUNNER_TEMP/profile.plist"
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profile.plist")
+          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' "$RUNNER_TEMP/profile.plist")
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$RUNNER_TEMP/app.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"
+          echo "PROFILE_NAME=$PROFILE_NAME" >> "$GITHUB_ENV"
+      - name: Archive and export signed IPA
+        if: steps.signing.outputs.ready == 'true'
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/A-Zuha-Finance.xcarchive" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" archive
+          python3 - <<'PY'
+          import os, plistlib
+          from pathlib import Path
+          options = {'method': 'ad-hoc', 'teamID': os.environ['APPLE_TEAM_ID'],
+                     'signingStyle': 'manual', 'provisioningProfiles':
+                     {'id.fahmidjawas.keuanganrumah': os.environ['PROFILE_NAME']}}
+          Path(os.environ['RUNNER_TEMP'], 'ExportOptions.plist').write_bytes(plistlib.dumps(options))
+          PY
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/A-Zuha-Finance.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/azuha-export"
+          VERSION=$(node -p 'require("./package.json").version')
+          cp "$RUNNER_TEMP/azuha-export/App.ipa" "$RUNNER_TEMP/A-Zuha-Finance-v$VERSION.ipa"
+      - uses: actions/upload-artifact@v4
+        if: steps.signing.outputs.ready == 'true'
+        with:
+          name: A-Zuha-Finance-v${{ github.run_number }}-signed-ipa
+          path: ${{ runner.temp }}/A-Zuha-Finance-v*.ipa
+          if-no-files-found: error
+      - name: Attach IPA to existing version release
+        if: steps.signing.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p 'require("./package.json").version')
+          IPA="$RUNNER_TEMP/A-Zuha-Finance-v$VERSION.ipa"
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            gh release upload "v$VERSION" "$IPA" --clobber
+          else
+            echo 'Signed IPA is available as an Actions artifact; Android signed release has not been published yet.' >> "$GITHUB_STEP_SUMMARY"

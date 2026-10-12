@@ -1,40 +1,71 @@
-"""Original wallet + Rupiah coin assets; no external artwork. Run python3 (Pillow)."""
-from PIL import Image, ImageDraw, ImageFont
+"""Resize the owner's original A-Zuha logo into native and web assets.
+
+Place the unchanged original at resources/azuha-logo-original.png before running.
+The script never draws or invents logo geometry.
+"""
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]
-FONT='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-BOLD='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
-def icon(size,foreground=False):
- s=1024;im=Image.new('RGBA',(s,s),(0,0,0,0) if foreground else '#163b78');d=ImageDraw.Draw(im)
- # Entire identity sits inside central 66% adaptive safe zone.
- d.rounded_rectangle((220,386,760,742),60,fill='#f3f8ff')
- d.rounded_rectangle((247,322,688,391),25,fill='#7cb7e8')
- d.rounded_rectangle((575,473,796,616),30,fill='#447ceb');d.ellipse((624,526,651,553),fill='white')
- d.ellipse((540,205,777,442),fill='#dba245',outline='#fff4d5',width=10);d.ellipse((562,227,755,420),fill='#ffe4a6',outline='#bb872c',width=5)
- d.text((657,320),'Rp',font=ImageFont.truetype(BOLD,76),fill='#94651e',anchor='mm')
- d.line((270,668,455,668),fill='#b5d0f5',width=12)
- return im.resize((size,size),Image.Resampling.LANCZOS)
-def splash(w,h):
- im=Image.new('RGB',(w,h),'#163b78');d=ImageDraw.Draw(im);unit=min(w,h);sz=int(unit*.25);logo=icon(sz);top=int(h*.5-sz*.9);im.paste(logo,((w-sz)//2,top),logo)
- fs=max(12,int(unit*.035));y=top+sz+int(unit*.04)
- for text in ['KEUANGAN','RUMAH TANGGA']:
-  d.text((w//2,y),text,font=ImageFont.truetype(BOLD,fs),fill='white',anchor='mt');y+=int(fs*1.5)
- d.text((w//2,y+fs//2),'Kelola • Rencanakan • Evaluasi',font=ImageFont.truetype(FONT,max(9,int(fs*.58))),fill='#c7dbf8',anchor='mt')
- return im
-icon(1024).convert('RGB').save(ROOT/'resources/app-icon-1024.png')
-icon(1024,True).save(ROOT/'resources/android-foreground.png')
-for s in (192,512):icon(s).save(ROOT/f'public/icon-{s}.png')
-r=ROOT/'android/app/src/main/res'
-for density,n in [('mdpi',48),('hdpi',72),('xhdpi',96),('xxhdpi',144),('xxxhdpi',192)]:
- folder=r/f'mipmap-{density}';folder.mkdir(exist_ok=True)
- icon(n).save(folder/'ic_launcher.png');icon(n).save(folder/'ic_launcher_round.png');icon(round(n*108/48),True).save(folder/'ic_launcher_foreground.png')
-for p in r.glob('drawable-*/splash.png'):
- w,h=Image.open(p).size;splash(w,h).save(p)
-p=r/'drawable/splash.png';w,h=Image.open(p).size;splash(w,h).save(p)
-branding=Image.new('RGBA',(720,180));d=ImageDraw.Draw(branding)
-d.text((360,10),'KEUANGAN RUMAH TANGGA',font=ImageFont.truetype(BOLD,39),anchor='mt',fill='white')
-d.text((360,90),'Kelola • Rencanakan • Evaluasi',font=ImageFont.truetype(FONT,27),anchor='mt',fill='#c7dbf8')
-(r/'drawable-nodpi').mkdir(exist_ok=True);branding.save(r/'drawable-nodpi/splash_branding.png')
-icon(1024).convert('RGB').save(ROOT/'ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png')
-# Square native launch canvas with compact central branding remains visible in both orientations.
-for p in (ROOT/'ios/App/App/Assets.xcassets/Splash.imageset').glob('*.png'):splash(2732,2732).save(p)
+from PIL import Image, ImageDraw, ImageFont
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE = ROOT / "resources/azuha-logo-original.png"
+if not SOURCE.is_file():
+    raise SystemExit("Original logo file is required: resources/azuha-logo-original.png")
+
+logo = Image.open(SOURCE).convert("RGB")
+FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+BACKGROUND = "#f6faff"
+
+
+def icon(size: int, fraction: float = 0.98) -> Image.Image:
+    canvas = Image.new("RGB", (size, size), BACKGROUND)
+    artwork = logo.copy()
+    edge = round(size * fraction)
+    artwork.thumbnail((edge, edge), Image.Resampling.LANCZOS)
+    canvas.paste(artwork, ((size - artwork.width) // 2, (size - artwork.height) // 2))
+    return canvas
+
+
+def splash(width: int, height: int) -> Image.Image:
+    canvas = Image.new("RGB", (width, height), BACKGROUND)
+    draw = ImageDraw.Draw(canvas)
+    logo_size = round(min(width * 0.58, height * 0.30))
+    artwork = icon(logo_size)
+    top = (height - logo_size) // 2 - round(min(width, height) * 0.08)
+    canvas.paste(artwork, ((width - logo_size) // 2, top))
+    title_size = max(16, round(min(width, height) * 0.052))
+    draw.text((width // 2, top + logo_size + title_size // 3), "A-Zuha Finance",
+              font=ImageFont.truetype(FONT, title_size), anchor="mt", fill="#163b78")
+    return canvas
+
+
+icon(1024).save(ROOT / "resources/app-icon-1024.png")
+icon(1024, 0.66).convert("RGBA").save(ROOT / "resources/android-foreground.png")
+for size in (192, 512):
+    icon(size).save(ROOT / f"public/icon-{size}.png")
+
+android = ROOT / "android/app/src/main/res"
+for density, size in (("mdpi", 48), ("hdpi", 72), ("xhdpi", 96),
+                      ("xxhdpi", 144), ("xxxhdpi", 192)):
+    folder = android / f"mipmap-{density}"
+    folder.mkdir(exist_ok=True)
+    icon(size).save(folder / "ic_launcher.png")
+    icon(size).save(folder / "ic_launcher_round.png")
+    icon(round(size * 108 / 48), 0.66).convert("RGBA").save(folder / "ic_launcher_foreground.png")
+
+for path in android.glob("drawable-*/splash.png"):
+    width, height = Image.open(path).size
+    splash(width, height).save(path)
+path = android / "drawable/splash.png"
+width, height = Image.open(path).size
+splash(width, height).save(path)
+
+branding = Image.new("RGBA", (720, 180), (0, 0, 0, 0))
+draw = ImageDraw.Draw(branding)
+draw.text((360, 50), "A-Zuha Finance", font=ImageFont.truetype(FONT, 52),
+          anchor="mt", fill="#163b78")
+(android / "drawable-nodpi").mkdir(exist_ok=True)
+branding.save(android / "drawable-nodpi/splash_branding.png")
+
+icon(1024).save(ROOT / "ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png")
+for path in (ROOT / "ios/App/App/Assets.xcassets/Splash.imageset").glob("*.png"):
+    splash(2732, 2732).save(path)
