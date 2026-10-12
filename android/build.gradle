@@ -19,10 +19,10 @@ apply from: "variables.gradle"
 
 allprojects {
     configurations.configureEach {
-        // Align legacy jdk7/jdk8 transitives with the merged Kotlin stdlib.
+        // Keep legacy jdk7/jdk8 transitives aligned with Capacitor Filesystem's Kotlin runtime.
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group == 'org.jetbrains.kotlin' && details.requested.name.startsWith('kotlin-stdlib')) {
-                details.useVersion '1.8.22'
+                details.useVersion '2.2.20'
             }
         }
     }
