@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.3 — 2026-10-12
+
+- Setoran Tabungan langsung tersedia dari tombol utama halaman Tabungan dan FAB; formulir khusus memakai tanggal, target, nominal, dan catatan.
+- Tabungan Umum dibuat otomatis dengan ID tetap pada akun baru dan vault lama, tanpa menghapus target lama; setoran, edit, hapus, progress, dan riwayat berasal dari transaksi yang sama.
+- KPI Pengeluaran kini hanya pengeluaran reguler; Tabungan dan Investasi dihitung sebagai alokasi tersendiri. Saldo mengurangi keempat arus dana satu kali.
+- Dashboard menampilkan setoran bulan terpilih, sedangkan halaman Tabungan dan portfolio Investasi menampilkan akumulasi seluruh bulan; laporan, kategori, perbandingan, evaluasi dan ekspor mengikuti model baru.
+- Uji regresi mencakup pemasukan Rp 900.000, setoran Rp 200.000, reload/login, edit Rp 250.000, hapus, lintas bulan, dan persistensi Android setelah Activity dibuat ulang.
+- Android versionName 1.0.3/versionCode 4, iOS MARKETING_VERSION 1.0.3/build 4; workflow iOS menyimpan aplikasi simulator unsigned sebagai artifact.
+
 ## 1.0.2 — 2026-10-07
 
 - Branding FINORA / Keuangan Keluarga pada web, PWA, Android, iOS, splash, laporan dan Tentang Aplikasi; package/bundle ID tetap.

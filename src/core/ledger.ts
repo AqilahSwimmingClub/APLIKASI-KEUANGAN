@@ -28,6 +28,13 @@ export const monthLabel = (s: string) => {
 };
 export const change = (now: number, prev: number) =>
   prev === 0 ? (now === 0 ? 0 : null) : ((now - prev) / prev) * 100;
+export const GENERAL_SAVINGS_ID = "system-general-savings";
+const generalSavings = () => ({
+  id: GENERAL_SAVINGS_ID,
+  name: "Tabungan Umum",
+  target: 0,
+  month: localDate().slice(0, 7),
+});
 export const emptyData = (): Data => ({
   version: 1,
   categories: [
@@ -50,7 +57,7 @@ export const emptyData = (): Data => ({
     ].map((name, i) => ({ id: `out-${i}`, name, type: "expense" as const })),
   ],
   transactions: [],
-  goals: [],
+  goals: [generalSavings()],
   investments: [],
   settings: { theme: "system", name: "FAHMI DJAWAS, S.Pd.", monthlyTarget: 0 },
 });
@@ -58,14 +65,16 @@ export const summarize = (d: Data, month: string) => {
   const t = d.transactions.filter((t) => t.date.slice(0, 7) === month);
   const sum = (p: (t: Transaction) => boolean) =>
     t.filter(p).reduce((s, t) => s + t.amount, 0);
-  const income = sum((t) => t.type === "income"),
-    expense = sum((t) => t.type === "expense");
+  const income = sum((t) => t.type === "income" && t.allocation === "regular"),
+    expense = sum((t) => t.type === "expense" && t.allocation === "regular"),
+    savings = sum((t) => t.allocation === "savings"),
+    investment = sum((t) => t.allocation === "investment");
   return {
     income,
     expense,
-    balance: income - expense,
-    savings: sum((t) => t.allocation === "savings"),
-    investment: sum((t) => t.allocation === "investment"),
+    balance: income - expense - savings - investment,
+    savings,
+    investment,
     transactions: t,
   };
 };
@@ -83,7 +92,8 @@ export const categoryTotals = (
           (t) =>
             t.date.startsWith(month) &&
             t.categoryId === c.id &&
-            t.type === type,
+            t.type === type &&
+            t.allocation === "regular",
         )
         .reduce((s, t) => s + t.amount, 0),
     }))
@@ -127,7 +137,10 @@ export function removeCategory(d: Data, id: string): Data {
   return { ...d, categories: d.categories.filter((c) => c.id !== id) };
 }
 export function validateData(input: unknown): Data {
-  const d = dataSchema.parse(input);
+  const parsed = dataSchema.parse(input);
+  const d = parsed.goals.some((g) => g.id === GENERAL_SAVINGS_ID)
+    ? parsed
+    : { ...parsed, goals: [...parsed.goals, generalSavings()] };
   if (new TextEncoder().encode(JSON.stringify(d)).byteLength > 12 * 1024 * 1024)
     throw Error(
       "Data terlalu besar (maksimal 12 MB sebelum enkripsi). Ekspor dan arsipkan transaksi sebelum menambah data.",
@@ -152,16 +165,26 @@ export function exportCsv(d: Data, month?: string) {
   return (
     "\uFEFF" +
     [
-      ["Tanggal", "Jenis", "Nama", "Kategori", "Nominal", "Alokasi", "Catatan"],
+      ["Tanggal", "Jenis", "Nama", "Kategori", "Nominal", "Kelompok", "Catatan"],
       ...d.transactions
         .filter((t) => !month || t.date.startsWith(month))
         .map((t) => [
           t.date,
-          t.type === "income" ? "Pemasukan" : "Pengeluaran",
+          t.allocation === "savings"
+            ? "Tabungan"
+            : t.allocation === "investment"
+              ? "Investasi"
+              : t.type === "income"
+                ? "Pemasukan"
+                : "Pengeluaran",
           t.title,
           d.categories.find((c) => c.id === t.categoryId)?.name ?? "",
           String(t.amount),
-          t.allocation,
+          t.allocation === "savings"
+            ? "Tabungan"
+            : t.allocation === "investment"
+              ? "Investasi"
+              : "Reguler",
           t.note,
         ]),
     ]
@@ -188,11 +211,15 @@ export function evaluations(d: Data, m: string) {
   if (i !== null && e !== null && e > i)
     result.push("Pengeluaran meningkat lebih cepat dibandingkan pemasukan.");
   const top = categoryTotals(d, m, "expense")[0];
+  if (a.savings > 0)
+    result.push(`Setoran tabungan bulan ini: ${rupiah(a.savings)}.`);
+  if (a.investment > 0)
+    result.push(`Investasi bulan ini: ${rupiah(a.investment)}.`);
   if (top)
     result.push(`Pengeluaran terbesar: ${top.name}, ${rupiah(top.amount)}.`);
   if (a.balance < 0)
     result.push(
-      "Pengeluaran melebihi pemasukan. Tinjau kebutuhan dan alokasi bulan ini.",
+      "Saldo tersedia negatif. Tinjau pengeluaran, tabungan, dan investasi bulan ini.",
     );
   return result;
 }

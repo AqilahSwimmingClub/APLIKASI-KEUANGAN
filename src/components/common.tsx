@@ -202,6 +202,10 @@ export function MoneyInput({
           required={required}
           onInput={(e) => {
             const el = e.currentTarget;
+            if (el.value.includes("-")) {
+              el.value = "";
+              return;
+            }
             const n = el.value.replace(/\D/g, "");
             el.value = n ? Number(n).toLocaleString("id-ID") : "";
           }}

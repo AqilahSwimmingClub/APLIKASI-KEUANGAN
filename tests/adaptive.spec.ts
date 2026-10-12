@@ -173,8 +173,8 @@ for (const [width, height] of sizes)
         await page
           .getByRole("button", { name: "Setor Liburan Keluarga" })
           .click();
-        await page.getByLabel("Nominal (Rp)").fill("50000");
-        await page.getByRole("button", { name: "SIMPAN TRANSAKSI" }).click();
+        await page.getByLabel("Nominal", { exact: true }).fill("50000");
+        await page.getByRole("button", { name: "SIMPAN SETORAN" }).click();
         await expect(page.getByRole("dialog")).toHaveCount(0);
       }
       if (target === "Investasi") {
@@ -187,8 +187,8 @@ for (const [width, height] of sizes)
         await page
           .getByRole("button", { name: "Tambah dana Reksa Dana Keluarga" })
           .click();
-        await page.getByLabel("Nominal (Rp)").fill("25000");
-        await page.getByRole("button", { name: "SIMPAN TRANSAKSI" }).click();
+        await page.getByLabel("Nominal", { exact: true }).fill("25000");
+        await page.getByRole("button", { name: "SIMPAN INVESTASI" }).click();
         await expect(page.getByRole("dialog")).toHaveCount(0);
         await expect(
           page.getByRole("img", { name: "Komposisi per kategori" }),

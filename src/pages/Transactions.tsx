@@ -10,17 +10,27 @@ export function TransactionList({
   onEdit,
   onDelete,
   grouped = false,
+  assetHistory = false,
 }: {
   grouped?: boolean;
   data: Data;
   rows: Transaction[];
   onEdit: (t: Transaction) => void;
   onDelete: (t: Transaction) => void;
+  assetHistory?: boolean;
 }) {
+  const displayDate = (date: string) =>
+    new Intl.DateTimeFormat("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date(`${date}T12:00:00`));
   if (!rows.length)
     return (
       <Empty>
-        Belum ada transaksi. Catat pemasukan atau pengeluaran pertama Anda.
+        {assetHistory
+          ? "Belum ada setoran tabungan. Mulai sisihkan dana untuk rencana Anda."
+          : "Belum ada transaksi. Catat pemasukan atau pengeluaran pertama Anda."}
       </Empty>
     );
   return (
@@ -42,15 +52,19 @@ export function TransactionList({
             <strong>{t.title}</strong>
             <small>
               {data.categories.find((c) => c.id === t.categoryId)?.name} ·{" "}
-              {!grouped && t.date}
+              {!grouped && (assetHistory ? displayDate(t.date) : t.date)}
               {t.allocation !== "regular"
                 ? ` · ${t.allocation === "savings" ? "Tabungan" : "Investasi"}`
                 : ""}
             </small>
             {t.note && <small>{t.note}</small>}
           </button>
-          <b className={t.type === "income" ? "positive" : "negative"}>
-            {t.type === "income" ? "+" : "−"}
+          <b
+            className={
+              t.type === "income" || assetHistory ? "positive" : "negative"
+            }
+          >
+            {t.type === "income" || assetHistory ? "+" : "−"}
             {rupiah(t.amount)}
           </b>
           <div className="tx-actions">

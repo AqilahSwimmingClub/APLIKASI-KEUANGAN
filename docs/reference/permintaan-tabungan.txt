@@ -1,0 +1,1006 @@
+KERJAKAN LANGSUNG PROJECT YANG SUDAH ADA DAN PERBAIKI BUG TABUNGAN SAMPAI TUNTAS.
+
+Repository:
+AqilahSwimmingClub/APLIKASI-KEUANGAN
+
+JANGAN membuat repository baru.
+JANGAN mengganti stack.
+JANGAN membangun ulang dari nol.
+JANGAN menghapus fitur yang sudah berfungsi.
+JANGAN menyentuh repository lain.
+
+PERTAHANKAN:
+- React
+- TypeScript
+- Vite
+- Capacitor Android
+- Capacitor iOS
+- IndexedDB / encrypted local vault
+- seluruh fitur aplikasi FINORA yang sudah ada
+
+TARGET PLATFORM:
+- Android Phone
+- Android Tablet
+- iPhone
+- iPad
+- Portrait
+- Landscape
+
+==================================================
+1. BUG UTAMA YANG HARUS DIPERBAIKI
+==================================================
+
+Saat pengguna memiliki pemasukan, misalnya:
+
+Pemasukan:
+Rp 900.000
+
+kemudian pengguna ingin NABUNG,
+
+aplikasi sekarang membingungkan karena tabungan tidak otomatis masuk ke data Tabungan kecuali pengguna memahami alur teknis:
+
+Pengeluaran
+→ Alokasi
+→ Tabungan
+→ Target
+
+Saya TIDAK MAU pengguna harus memahami alur teknis tersebut.
+
+Saya ingin menu TABUNGAN bekerja seperti aplikasi keuangan yang normal.
+
+==================================================
+2. ALUR TABUNGAN BARU
+==================================================
+
+Di halaman:
+
+TABUNGAN
+
+sediakan tombol utama:
+
++ TAMBAH SETORAN
+
+Saat ditekan:
+
+buka form khusus:
+
+TAMBAH SETORAN TABUNGAN
+
+Field:
+
+- Tanggal
+- Target Tabungan
+- Nominal
+- Catatan opsional
+
+Button:
+
+SIMPAN SETORAN
+
+Pengguna TIDAK perlu memilih:
+
+- Pengeluaran
+- Alokasi
+- Tabungan
+
+secara manual.
+
+Aplikasi yang mengurus pencatatan internalnya.
+
+==================================================
+3. JIKA BELUM ADA TARGET TABUNGAN
+==================================================
+
+Pengguna tetap harus bisa menabung.
+
+JANGAN blokir pengguna hanya karena belum membuat target.
+
+Sediakan otomatis:
+
+TABUNGAN UMUM
+
+sebagai target default/system target.
+
+Contoh:
+
+Tabungan Umum
+
+Pengguna bisa langsung:
+
+Tambah Setoran
+→ pilih Tabungan Umum
+→ masukkan nominal
+→ simpan
+
+Selain itu pengguna tetap dapat membuat target sendiri:
+
+- Dana Darurat
+- Liburan Keluarga
+- Pendidikan Anak
+- Rumah
+- Kendaraan
+- target custom lainnya
+
+==================================================
+4. TARGET TABUNGAN
+==================================================
+
+Halaman Tabungan menampilkan:
+
+TOTAL TABUNGAN
+
+contoh:
+Rp 200.000
+
+Kemudian:
+
+Target Tabungan
+
+Tabungan Umum
+Rp 200.000
+
+Dana Darurat
+Rp 1.500.000 / Rp 5.000.000
+30%
+
+Liburan Keluarga
+Rp 1.200.000 / Rp 2.000.000
+60%
+
+Gunakan progress bar untuk target yang memiliki nominal target.
+
+Tabungan Umum tidak wajib memiliki target akhir.
+
+==================================================
+5. RIWAYAT TABUNGAN
+==================================================
+
+Di halaman Tabungan tampilkan:
+
+RIWAYAT TABUNGAN
+
+Contoh:
+
+12 Okt 2026
+Setoran Tabungan Umum
++ Rp 200.000
+
+10 Okt 2026
+Setoran Dana Darurat
++ Rp 100.000
+
+Setiap setoran wajib langsung masuk ke Riwayat Tabungan.
+
+Setelah aplikasi:
+- ditutup
+- force stop
+- dibuka kembali
+- perangkat restart
+
+data tabungan HARUS tetap ada.
+
+==================================================
+6. SINGLE SOURCE OF TRUTH
+==================================================
+
+Jangan membuat database tabungan terpisah yang tidak sinkron.
+
+Gunakan transaksi sebagai single source of truth.
+
+Setoran tabungan harus menghasilkan transaksi internal dengan metadata:
+
+allocation = "savings"
+
+dan targetId sesuai target tabungan.
+
+Tetapi detail teknis ini JANGAN ditampilkan kepada pengguna pada flow normal.
+
+==================================================
+7. PERHITUNGAN KEUANGAN — JANGAN DOUBLE COUNT
+==================================================
+
+Perbaiki perhitungan supaya tabungan tidak dihitung dua kali.
+
+Gunakan model berikut:
+
+Pemasukan
+= seluruh transaksi income reguler
+
+Pengeluaran
+= HANYA pengeluaran reguler
+
+Tabungan
+= transaksi allocation = savings
+
+Investasi
+= transaksi allocation = investment
+
+SALDO TERSEDIA:
+
+Saldo =
+Pemasukan
+- Pengeluaran Reguler
+- Setoran Tabungan
+- Alokasi Investasi
+
+Contoh:
+
+Pemasukan:
+Rp 900.000
+
+Pengeluaran reguler:
+Rp 0
+
+Tabungan:
+Rp 200.000
+
+Investasi:
+Rp 0
+
+Maka:
+
+Saldo tersedia:
+Rp 700.000
+
+Dashboard:
+
+Pemasukan
+Rp 900.000
+
+Pengeluaran
+Rp 0
+
+Tabungan
+Rp 200.000
+
+Investasi
+Rp 0
+
+Saldo Bulan Ini
+Rp 700.000
+
+JANGAN menampilkan Pengeluaran = Rp 200.000 hanya karena pengguna menabung.
+
+Setoran tabungan adalah ALOKASI,
+bukan pengeluaran konsumtif.
+
+==================================================
+8. DASHBOARD KPI TABUNGAN
+==================================================
+
+Dashboard card:
+
+TABUNGAN
+
+menampilkan TOTAL SETORAN TABUNGAN untuk bulan yang sedang dipilih.
+
+Contoh Oktober:
+
+Setoran Oktober:
+Rp 200.000
+
+Dashboard:
+Tabungan Rp 200.000
+
+Perbandingan bulan:
+bandingkan setoran tabungan Oktober dengan September.
+
+==================================================
+9. HALAMAN TABUNGAN — TOTAL TABUNGAN
+==================================================
+
+Bedakan:
+
+A. Dashboard Tabungan
+= jumlah setoran pada bulan terpilih
+
+B. Halaman Tabungan → Total Tabungan
+= akumulasi seluruh setoran tabungan yang masih tercatat
+
+Contoh:
+
+September:
+Rp 300.000
+
+Oktober:
+Rp 200.000
+
+Dashboard Oktober:
+Tabungan Rp 200.000
+
+Halaman Tabungan:
+Total Tabungan Rp 500.000
+
+==================================================
+10. SETORAN DARI HALAMAN TABUNGAN
+==================================================
+
+Tombol:
+
++ TAMBAH SETORAN
+
+WAJIB berfungsi.
+
+Flow:
+
+Tabungan
+→ Tambah Setoran
+→ pilih target
+→ isi nominal
+→ SIMPAN
+
+Setelah simpan:
+
+WAJIB langsung memperbarui:
+
+- Total Tabungan
+- progress target
+- Riwayat Tabungan
+- Dashboard
+- Saldo
+- Laporan
+- perbandingan bulan
+- evaluasi keuangan
+
+Tanpa reload manual.
+
+==================================================
+11. SETORAN DARI TOMBOL + UTAMA
+==================================================
+
+Tombol + utama tetap bisa digunakan untuk transaksi.
+
+Tetapi apabila pengguna memilih:
+
+Tabungan
+
+buat UX sederhana.
+
+Jangan tampilkan istilah teknis "allocation".
+
+Gunakan pilihan user-facing:
+
+Pemasukan
+Pengeluaran
+Tabungan
+Investasi
+
+Jika Tabungan dipilih:
+
+form otomatis:
+- target
+- tanggal
+- nominal
+- catatan
+
+==================================================
+12. TABUNGAN UMUM SYSTEM TARGET
+==================================================
+
+Tabungan Umum harus dibuat dengan aman.
+
+Jangan membuat duplikat setiap startup.
+
+Gunakan stable ID khusus atau mekanisme system target.
+
+Contoh internal:
+
+system-general-savings
+
+Tetapi jangan bergantung pada literal tersebut jika arsitektur sekarang memiliki solusi lebih baik.
+
+Jika data lama tidak memiliki Tabungan Umum:
+
+buat melalui migration/default-data yang aman.
+
+JANGAN menghapus target tabungan lama pengguna.
+
+==================================================
+13. DATA LAMA
+==================================================
+
+WAJIB kompatibel dengan data lama.
+
+JANGAN:
+- reset vault
+- reset akun
+- menghapus transaksi
+- menghapus kategori
+- menghapus target lama
+- menghapus investasi
+
+Jika perlu perubahan schema:
+
+buat migration aman.
+
+==================================================
+14. EDIT SETORAN
+==================================================
+
+Pengguna dapat mengetuk riwayat setoran.
+
+Sediakan:
+
+EDIT SETORAN
+
+Field:
+
+- Tanggal
+- Target
+- Nominal
+- Catatan
+
+Saat disimpan:
+
+semua total dan progress diperbarui otomatis.
+
+==================================================
+15. HAPUS SETORAN
+==================================================
+
+Setoran dapat dihapus.
+
+WAJIB tampilkan konfirmasi:
+
+"Hapus setoran tabungan Rp xxx?"
+
+Setelah hapus:
+
+update otomatis:
+
+- Total Tabungan
+- progress
+- Dashboard
+- Saldo
+- Laporan
+- Riwayat
+
+==================================================
+16. VALIDASI NOMINAL
+==================================================
+
+Nominal setoran:
+
+- harus angka positif
+- tidak boleh 0
+- tidak boleh negatif
+- gunakan numeric keyboard
+- format Rupiah
+
+Jangan simpan nominal sebagai string berformat.
+
+==================================================
+17. UI TABUNGAN
+==================================================
+
+Pertahankan style FINORA:
+
+- modern
+- digital
+- premium
+- compact
+- biru / cyan
+- rounded cards
+- soft shadow
+
+DILARANG menggunakan:
+
+pig
+piggy bank
+ikon babi
+
+Gunakan:
+
+DOMPET + KOIN RUPIAH
+
+atau:
+
+TARGET + KOIN
+
+==================================================
+18. EMPTY STATE
+==================================================
+
+Jika belum ada setoran:
+
+Jangan buat area kosong besar.
+
+Tampilkan compact empty state:
+
+Belum ada setoran tabungan.
+
+Mulai sisihkan dana untuk rencana Anda.
+
+[ + Tambah Setoran ]
+
+==================================================
+19. RESPONSIVE
+==================================================
+
+Perubahan harus responsive untuk:
+
+Android Phone
+- portrait
+- landscape
+
+Android Tablet
+- portrait
+- landscape
+
+iPhone
+- portrait
+- landscape jika didukung
+
+iPad
+- portrait
+- landscape
+
+Jangan gunakan sidebar permanen.
+
+Bottom navigation tetap:
+
+Dashboard
+Transaksi
+(+)
+Laporan
+Pengaturan
+
+==================================================
+20. SAFE AREA
+==================================================
+
+Pastikan form Tabungan aman pada:
+
+Android:
+- status bar
+- gesture navigation
+- keyboard
+
+iPhone/iPad:
+- notch
+- Dynamic Island
+- Home Indicator
+
+==================================================
+21. TEST WAJIB — TABUNGAN
+==================================================
+
+Tambahkan automated tests:
+
+TEST 1:
+Pemasukan Rp 900.000
+Tabungan Rp 0
+Saldo Rp 900.000
+
+TEST 2:
+Tambah setoran Rp 200.000
+
+Expected:
+
+Pemasukan Rp 900.000
+Pengeluaran Rp 0
+Tabungan Rp 200.000
+Saldo Rp 700.000
+
+TEST 3:
+Halaman Tabungan menampilkan Total Tabungan Rp 200.000
+
+TEST 4:
+Riwayat menampilkan setoran Rp 200.000
+
+TEST 5:
+restart/reload
+Tabungan tetap Rp 200.000
+
+TEST 6:
+edit setoran dari Rp 200.000 menjadi Rp 250.000
+
+Expected:
+
+Tabungan Rp 250.000
+Saldo Rp 650.000
+
+TEST 7:
+hapus setoran
+
+Expected:
+
+Tabungan Rp 0
+Saldo Rp 900.000
+
+TEST 8:
+setoran bulan sebelumnya tidak ikut masuk KPI tabungan bulan sekarang
+
+TEST 9:
+Total Tabungan kumulatif tetap menjumlah semua bulan
+
+TEST 10:
+setoran tabungan TIDAK masuk ke KPI Pengeluaran reguler.
+
+TEST 11:
+Tambah Setoran bekerja meskipun sebelumnya belum ada target karena Tabungan Umum tersedia.
+
+==================================================
+22. TEST INVESTASI JUGA
+==================================================
+
+Audit logic Investasi karena modelnya mirip.
+
+Pastikan:
+
+Investasi tidak dihitung sebagai Pengeluaran Reguler.
+
+Saldo:
+
+Pemasukan
+- Pengeluaran reguler
+- Tabungan
+- Investasi
+
+Dashboard Investasi:
+menampilkan alokasi investasi bulan terpilih.
+
+Portfolio:
+menampilkan total investasi kumulatif.
+
+==================================================
+23. VERSIONING
+==================================================
+
+PERUBAHAN INI WAJIB MENAIKKAN VERSI PATCH.
+
+Baca versi sekarang.
+
+Jika sekarang:
+
+1.0.2
+
+naikkan menjadi:
+
+1.0.3
+
+Jika sekarang lebih tinggi:
+
+naikkan PATCH berikutnya.
+
+Update sinkron:
+
+- package.json
+- Android versionName
+- Android versionCode
+- iOS MARKETING_VERSION
+- iOS CURRENT_PROJECT_VERSION
+- Tentang Aplikasi
+- CHANGELOG.md
+- nama artifact
+- GitHub Release tag
+
+==================================================
+24. CHANGELOG
+==================================================
+
+Tambahkan perubahan nyata:
+
+- memperbaiki setoran Tabungan
+- menambahkan Tabungan Umum
+- menyederhanakan flow Tambah Setoran
+- memisahkan Pengeluaran Reguler dan alokasi Tabungan
+- memperbaiki saldo setelah setoran
+- memperbaiki progress dan riwayat
+- memperbaiki persistence
+- audit Investasi
+- test regresi
+
+==================================================
+25. ANDROID BUILD
+==================================================
+
+WAJIB jalankan:
+
+npm ci
+npm run lint
+npm run typecheck
+npm test
+npm run test:e2e
+npm run build
+npx cap sync android
+
+Kemudian:
+
+cd android
+./gradlew assembleDebug
+
+Jika Android release signing secrets tersedia:
+
+build juga:
+
+assembleRelease
+
+Verifikasi APK.
+
+==================================================
+26. ANDROID UPDATE / SIGNING
+==================================================
+
+Pertahankan:
+
+package ID:
+id.fahmidjawas.keuanganrumah
+
+JANGAN ganti package ID.
+
+versionCode HARUS naik.
+
+Jika permanent release keystore sudah tersedia:
+gunakan keystore yang sama.
+
+Jika belum tersedia:
+jangan klaim release-signed update sudah tersedia.
+
+==================================================
+27. IOS BUILD
+==================================================
+
+WAJIB sinkronkan iOS:
+
+npm run build
+npx cap sync ios
+
+Kemudian jalankan workflow iOS pada macOS runner.
+
+Workflow iOS WAJIB minimal memvalidasi:
+
+- npm ci
+- lint
+- typecheck
+- tests
+- production build
+- cap sync ios
+- xcodebuild simulator / unsigned validation
+
+==================================================
+28. IPHONE / IPAD
+==================================================
+
+Target aplikasi:
+
+FINORA
+
+WAJIB siap untuk:
+
+- iPhone
+- iPad
+- portrait
+- landscape
+- safe area iOS
+
+Jika Apple signing secrets tersedia:
+
+build signed archive / IPA.
+
+Jika belum tersedia:
+
+workflow validation tetap harus GREEN.
+
+Jangan mengklaim IPA installable jika Apple signing belum tersedia.
+
+==================================================
+29. GITHUB ACTIONS — LANGSUNG RUN WORKFLOW
+==================================================
+
+SETELAH CODE SELESAI:
+
+JANGAN berhenti hanya setelah push.
+
+LANGSUNG jalankan / dispatch workflow:
+
+1. CI
+2. Android
+3. iOS
+
+Pantau semua workflow.
+
+Jika ada yang gagal:
+
+- baca log
+- diagnosis
+- perbaiki code/config
+- commit
+- push
+- jalankan ulang
+
+ULANGI sampai workflow yang dapat dijalankan tanpa external credentials GREEN.
+
+==================================================
+30. GITHUB RELEASE
+==================================================
+
+Setelah build berhasil:
+
+buat GitHub Release untuk versi terbaru.
+
+Contoh:
+
+FINORA v1.0.3
+
+Tag:
+
+v1.0.3
+
+Target release:
+
+commit terbaru di main.
+
+==================================================
+31. ISI RELEASE
+==================================================
+
+ANDROID:
+
+Jika signed release APK tersedia:
+
+FINORA-v1.0.3-release.apk
+
+Jika release signing belum tersedia:
+
+FINORA-v1.0.3-debug.apk
+
+IPHONE:
+
+Jika Apple signing tersedia:
+
+FINORA-v1.0.3.ipa
+
+Jika belum tersedia:
+
+JANGAN membuat IPA palsu.
+
+Upload artifact iOS validation/simulator terpisah jika berguna,
+dan laporkan credential Apple yang masih diperlukan.
+
+==================================================
+32. RELEASE NOTES
+==================================================
+
+Release notes harus ringkas dan jelas.
+
+Contoh:
+
+FINORA v1.0.3
+
+Perbaikan:
+- Setoran Tabungan sekarang langsung tersimpan
+- Tabungan Umum otomatis tersedia
+- Total Tabungan dan progress target sinkron
+- Pengeluaran Reguler tidak lagi mencampur alokasi Tabungan
+- Saldo dihitung ulang dengan benar
+- Investasi diaudit agar tidak double count
+- Persistence setelah restart diperbaiki
+- Android/iOS regression tests diperbarui
+
+==================================================
+33. JANGAN RUSAK FITUR LAIN
+==================================================
+
+PERTAHANKAN:
+
+- Login
+- Owner Setup
+- Password fleksibel
+- PIN
+- Biometrik
+- Dashboard
+- Transaksi
+- Kategori
+- Laporan
+- Tabungan
+- Investasi
+- Pengaturan
+- Backup/Restore
+- CSV/PDF
+- Tema
+- Offline-first
+- Encryption
+- responsive UI
+
+==================================================
+34. ACCEPTANCE TEST MANUAL
+==================================================
+
+Sebelum selesai:
+
+simulasikan alur berikut:
+
+1. Buat akun.
+2. Tambah pemasukan Rp 900.000.
+3. Buka Dashboard.
+4. Pastikan saldo Rp 900.000.
+5. Buka Tabungan.
+6. Tambah Setoran Rp 200.000 ke Tabungan Umum.
+7. Simpan.
+8. Pastikan Tabungan Rp 200.000.
+9. Pastikan Dashboard Tabungan Rp 200.000.
+10. Pastikan Pengeluaran tetap Rp 0.
+11. Pastikan Saldo menjadi Rp 700.000.
+12. Tutup/reload aplikasi.
+13. Login ulang.
+14. Pastikan Rp 200.000 masih tersimpan.
+15. Edit menjadi Rp 250.000.
+16. Pastikan Saldo Rp 650.000.
+17. Hapus setoran.
+18. Pastikan Saldo kembali Rp 900.000.
+
+SEMUA HARUS LULUS.
+
+==================================================
+35. COMMIT DAN PUSH
+==================================================
+
+Setelah seluruh test lokal lulus:
+
+- update version
+- update CHANGELOG
+- commit
+- push origin/main
+
+Gunakan commit message yang jelas.
+
+Contoh:
+
+fix: persist savings deposits and separate allocations from expenses (1.0.3)
+
+==================================================
+36. LAPORAN AKHIR
+==================================================
+
+JANGAN menyatakan selesai sebelum workflow sudah dijalankan.
+
+Laporkan:
+
+1. versi terbaru
+2. commit SHA
+3. perubahan logic Tabungan
+4. status Tabungan Umum
+5. hasil test skenario Rp 900.000 → nabung Rp 200.000
+6. hasil unit test
+7. hasil E2E
+8. hasil Android native test
+9. status CI workflow
+10. status Android workflow
+11. status iOS workflow
+12. Android APK artifact
+13. Android release signing status
+14. iOS build artifact
+15. status IPA
+16. credential Apple yang masih diperlukan jika IPA belum bisa signed
+17. GitHub Release/tag
+18. daftar file yang ada di Release
+
+==================================================
+37. ATURAN FINAL
+==================================================
+
+KERJAKAN LANGSUNG.
+
+JANGAN meminta saya coding manual.
+
+JANGAN berhenti di tahap source code.
+
+JANGAN berhenti setelah push.
+
+LANGSUNG RUN WORKFLOW.
+
+TARGET WAJIB:
+ANDROID + IPHONE/IPAD.
+
+JANGAN membuat pengguna harus memahami istilah teknis allocation.
+
+SETOR TABUNGAN HARUS LANGSUNG MASUK KE DATA TABUNGAN.
+
+PENGELUARAN REGULER DAN TABUNGAN HARUS DIPISAH.
+
+SALDO HARUS TETAP BENAR.
+
+DATA HARUS PERSIST SETELAH APP DITUTUP.
+
+SETIAP PERBAIKAN WAJIB NAIK VERSI.

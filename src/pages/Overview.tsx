@@ -269,7 +269,7 @@ export function Overview({
               </div>
             )}
             {data.goals
-              .filter((g) => g.month === month)
+              .filter((g) => g.month === month && g.target > 0)
               .map((g) => (
                 <div className="goal-mini" key={g.id}>
                   <strong>{g.name}</strong>
@@ -279,7 +279,7 @@ export function Overview({
                   <progress value={targetTotal(data, g.id)} max={g.target} />
                 </div>
               ))}
-            {!data.goals.some((g) => g.month === month) &&
+            {!data.goals.some((g) => g.month === month && g.target > 0) &&
               !data.settings.monthlyTarget && (
                 <Empty>Atur target tabungan untuk rencana bulan ini.</Empty>
               )}
@@ -370,8 +370,8 @@ export function Overview({
       )}
       </div>
       <p className="hint">
-        Saldo = pemasukan − seluruh pengeluaran, termasuk alokasi tabungan dan
-        investasi. Nilai investasi adalah modal tercatat, bukan harga pasar.
+        Saldo = pemasukan − pengeluaran − setoran tabungan − investasi.
+        Nilai investasi adalah modal tercatat, bukan harga pasar.
       </p>
     </div>
   );

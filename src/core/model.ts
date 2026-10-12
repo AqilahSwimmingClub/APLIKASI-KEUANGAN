@@ -42,7 +42,7 @@ export const dataSchema = z.object({
       z.object({
         id,
         name,
-        target: money,
+        target: z.number().int().nonnegative().max(1e14),
         month: z.string().regex(/^\d{4}-\d{2}$/),
       }),
     )

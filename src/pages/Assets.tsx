@@ -2,7 +2,7 @@ import { SavingsIcon } from "../components/Brand";
 import { useState } from "react";
 import { TrendingUp, Pencil, Trash2, Plus } from "lucide-react";
 import type { Data, Goal, Investment, Transaction } from "../core/model";
-import { targetTotal, rupiah } from "../core/ledger";
+import { GENERAL_SAVINGS_ID, targetTotal, rupiah } from "../core/ledger";
 import {
   Modal,
   Panel,
@@ -92,6 +92,20 @@ export function Assets({
           {investment ? "Tambah investasi" : "Tambah target"}
         </button>
       </div>
+      {!investment && (
+        <button
+          className="primary full savings-primary"
+          onClick={() =>
+            onAdd({
+              type: "expense",
+              allocation: "savings",
+              targetId: GENERAL_SAVINGS_ID,
+            })
+          }
+        >
+          <Plus size={20} /> TAMBAH SETORAN
+        </button>
+      )}
       <div className="asset-grid">
         {items.map((g) => {
           const amount = targetTotal(data, g.id),
@@ -107,53 +121,63 @@ export function Assets({
                   <small>
                     {investment
                       ? (g as Investment).kind
-                      : `Target ${goal.month}`}
+                      : goal.target > 0
+                        ? `Target ${goal.month}`
+                        : "Tanpa target akhir"}
                   </small>
                 </div>
-                <button
-                  className="icon-button"
-                  aria-label={`Edit target ${g.name}`}
-                  onClick={() => {
-                    setEditing(g);
-                    setError("");
-                  }}
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  className="icon-button danger"
-                  aria-label={`Hapus target ${g.name}`}
-                  onClick={() =>
-                    confirm(
-                      "Hapus " + (investment ? "investasi" : "target"),
-                      data.transactions.some((t) => t.targetId === g.id)
-                        ? "Target masih digunakan. Hapus atau pindahkan seluruh transaksi tertaut terlebih dahulu."
-                        : "Target yang belum digunakan akan dihapus.",
-                      async () => {
-                        if (data.transactions.some((t) => t.targetId === g.id))
-                          throw Error("Target masih memiliki transaksi.");
-                        await onSave(
-                          investment
-                            ? {
-                                ...data,
-                                investments: data.investments.filter(
-                                  (i) => i.id !== g.id,
-                                ),
-                              }
-                            : {
-                                ...data,
-                                goals: data.goals.filter((i) => i.id !== g.id),
-                              },
-                        );
-                      },
-                    )
-                  }
-                >
-                  <Trash2 size={16} />
-                </button>
+                {(investment || g.id !== GENERAL_SAVINGS_ID) && (
+                  <button
+                    className="icon-button"
+                    aria-label={`Edit target ${g.name}`}
+                    onClick={() => {
+                      setEditing(g);
+                      setError("");
+                    }}
+                  >
+                    <Pencil size={16} />
+                  </button>
+                )}
+                {(investment || g.id !== GENERAL_SAVINGS_ID) && (
+                  <button
+                    className="icon-button danger"
+                    aria-label={`Hapus target ${g.name}`}
+                    onClick={() =>
+                      confirm(
+                        "Hapus " + (investment ? "investasi" : "target"),
+                        data.transactions.some((t) => t.targetId === g.id)
+                          ? "Target masih digunakan. Hapus atau pindahkan seluruh transaksi tertaut terlebih dahulu."
+                          : "Target yang belum digunakan akan dihapus.",
+                        async () => {
+                          if (
+                            data.transactions.some((t) => t.targetId === g.id)
+                          )
+                            throw Error("Target masih memiliki transaksi.");
+                          await onSave(
+                            investment
+                              ? {
+                                  ...data,
+                                  investments: data.investments.filter(
+                                    (i) => i.id !== g.id,
+                                  ),
+                                }
+                              : {
+                                  ...data,
+                                  goals: data.goals.filter(
+                                    (i) => i.id !== g.id,
+                                  ),
+                                },
+                          );
+                        },
+                      )
+                    }
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
               </div>
               <strong className="asset-value">{rupiah(amount)}</strong>
-              {!investment && (
+              {!investment && goal.target > 0 && (
                 <>
                   <div className="progress-caption">
                     <span>dari {rupiah(goal.target)}</span>
@@ -208,7 +232,23 @@ export function Assets({
             .slice(0, 8)}
           onEdit={onEdit}
           onDelete={onDelete}
+          assetHistory={!investment}
         />
+        {!investment &&
+          !data.transactions.some((t) => t.allocation === "savings") && (
+            <button
+              className="secondary savings-empty-action"
+              onClick={() =>
+                onAdd({
+                  type: "expense",
+                  allocation: "savings",
+                  targetId: GENERAL_SAVINGS_ID,
+                })
+              }
+            >
+              <Plus size={16} /> Tambah Setoran
+            </button>
+          )}
       </Panel>
       {history && (
         <Modal
@@ -222,6 +262,7 @@ export function Assets({
               .sort((a, b) => b.date.localeCompare(a.date))}
             onEdit={onEdit}
             onDelete={onDelete}
+            assetHistory={!investment}
           />
         </Modal>
       )}

@@ -11,6 +11,8 @@ import {
   removeCategory,
   validateData,
   exportCsv,
+  GENERAL_SAVINGS_ID,
+  targetTotal,
 } from "../src/core/ledger";
 import {
   seal,
@@ -58,7 +60,7 @@ describe("ledger", () => {
     );
     expect(summarize(d, "2026-10")).toMatchObject({
       income: 10000000,
-      expense: 450000,
+      expense: 350000,
       balance: 9550000,
       savings: 100000,
     });
@@ -108,6 +110,34 @@ describe("ledger", () => {
   it("CSV aman dari formula injection dan mengutip koma", () => {
     const d = putTransaction(emptyData(), tx({ title: "=SUM(1,2)" }));
     expect(exportCsv(d)).toContain("'=SUM(1,2)");
+  });
+});
+
+describe("setoran tabungan dan investasi", () => {
+  it("menyediakan Tabungan Umum tanpa duplikasi atau menghapus target lama", () => {
+    const old = { ...emptyData(), goals: [{ id: "lama", name: "Dana Darurat", target: 500000, month: "2026-12" }] };
+    const migrated = validateData(old);
+    expect(migrated.goals.map((g) => g.id)).toEqual(["lama", GENERAL_SAVINGS_ID]);
+    expect(validateData(migrated).goals).toEqual(migrated.goals);
+    expect(migrated.goals.at(-1)?.target).toBe(0);
+  });
+  it("memisahkan KPI reguler, tabungan, investasi dan saldo tanpa hitung ganda", () => {
+    let d = putTransaction(emptyData(), tx({ amount: 900000 }));
+    expect(summarize(d, "2026-10")).toMatchObject({ income: 900000, expense: 0, savings: 0, investment: 0, balance: 900000 });
+    d = putTransaction(d, tx({ id: "s", type: "expense", categoryId: "out-0", amount: 200000, allocation: "savings", targetId: GENERAL_SAVINGS_ID }));
+    expect(summarize(d, "2026-10")).toMatchObject({ income: 900000, expense: 0, savings: 200000, investment: 0, balance: 700000 });
+    expect(targetTotal(d, GENERAL_SAVINGS_ID)).toBe(200000);
+    d = putTransaction(d, tx({ id: "s", type: "expense", categoryId: "out-0", amount: 250000, allocation: "savings", targetId: GENERAL_SAVINGS_ID }));
+    expect(summarize(d, "2026-10").balance).toBe(650000);
+    d = removeTransaction(d, "s");
+    expect(summarize(d, "2026-10")).toMatchObject({ savings: 0, balance: 900000 });
+    d = putTransaction(d, tx({ id: "old", type: "expense", date: "2026-09-15", categoryId: "out-0", amount: 300000, allocation: "savings", targetId: GENERAL_SAVINGS_ID }));
+    expect(summarize(d, "2026-10").savings).toBe(0);
+    expect(targetTotal(d, GENERAL_SAVINGS_ID)).toBe(300000);
+    d = { ...d, investments: [{ id: "gold", name: "Emas", kind: "Emas" }] };
+    d = putTransaction(d, tx({ id: "i", type: "expense", categoryId: "out-0", amount: 100000, allocation: "investment", targetId: "gold" }));
+    expect(summarize(d, "2026-10")).toMatchObject({ expense: 0, investment: 100000, balance: 800000 });
+    expect(targetTotal(d, "gold")).toBe(100000);
   });
 });
 describe("vault", () => {

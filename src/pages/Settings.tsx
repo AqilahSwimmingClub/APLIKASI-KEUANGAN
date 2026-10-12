@@ -595,7 +595,8 @@ export function Settings(p: Props) {
                   <p>Versi {APP_VERSION} • Keuangan pribadi, offline.</p>
                   <p>
                     Data dienkripsi di perangkat. Saldo berasal dari ledger
-                    transaksi, termasuk alokasi tabungan dan investasi. Nilai
+                    transaksi; pengeluaran reguler, tabungan, dan investasi
+                    dihitung terpisah. Nilai
                     aset merupakan modal tercatat.
                   </p>
                   <Credit />

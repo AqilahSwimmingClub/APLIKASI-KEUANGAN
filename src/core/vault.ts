@@ -205,8 +205,10 @@ export async function createVault(a: Account, d: Data, key: string) {
 }
 export async function readData(key: string): Promise<Data> {
   const e = await (await db()).get("vault", "data");
-  const d = validateData(await decryptJson(e, await rawKey(key)));
+  const original = await decryptJson(e, await rawKey(key));
+  const d = validateData(original);
   expectedCipher = e.cipher;
+  if (JSON.stringify(original) !== JSON.stringify(d)) await saveData(d, key);
   return d;
 }
 export async function saveData(d: Data, key: string) {

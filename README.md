@@ -44,7 +44,7 @@ npm run preview
 
 Jika Chromium sudah disediakan mesin, gunakan `PLAYWRIGHT_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`. Pengujian browser membuat akun dan transaksi dalam konteks browser terisolasi, bukan data produksi. Unit mencakup kalkulasi, tanggal, CRUD, kategori, backup/crypto dan persistensi. E2E mencakup akun, transaksi, laporan, tabungan, investasi, restore, export, PIN, tema, 21 ukuran layar wajib, rotasi form, history Back dan offline/reload.
 
-## FINORA dan akun pemilik (1.0.2)
+## FINORA dan akun pemilik (1.0.3)
 
 UI mengikuti gambar referensi final: ilustrasi finansial 3D yang dibundel, branding FINORA dan descriptor Keuangan Keluarga, login putih, footer gelombang biru, kartu saldo cyan/biru, KPI warna hijau/merah/biru/ungu, daftar tanggal, filter sheet, tabs laporan, target/progress, donut portfolio dan settings compact.
 
@@ -52,13 +52,15 @@ Instalasi pertama menampilkan **BUAT AKUN PEMILIK** dengan nama (default FAHMI D
 
 Password akun, perubahan password dan backup menerima **setiap string yang tidak kosong**, tanpa batas minimal sepuluh karakter atau kewajiban kombinasi. Konfirmasi harus sama persis. PIN tetap tepat enam digit angka. AES-GCM, PBKDF2 SHA-256 310.000 iterasi, rate limiting dan penyimpanan credential terenkripsi dipertahankan. Password panjang lebih aman; peringatan tidak memblokir password pendek.
 
-Versi web/UI/Android/iOS 1.0.2, Android versionCode 3 dan iOS build 3; lihat CHANGELOG.md. Mengedit transaksi dilakukan dengan mengetuk judul baris, menghapus melalui tombol baris dengan konfirmasi.
+Versi web/UI/Android/iOS 1.0.3, Android versionCode 4 dan iOS build 4; lihat CHANGELOG.md. Mengedit transaksi dilakukan dengan mengetuk judul baris, menghapus melalui tombol baris dengan konfirmasi.
 
 ## Model data dan konsistensi
 
 `Transaction` merupakan single source of truth: nominal integer Rupiah positif, `income`/`expense`, tanggal lokal `YYYY-MM-DD`, kategori, catatan dan timestamp. Timestamp audit menggunakan ISO UTC; tanggal transaksi tidak dikonversi UTC. `SavingsEntry` adalah proyeksi transaksi `allocation=savings`; riwayat aset berasal dari `allocation=investment`.
 
-**Setoran tabungan dan pembelian investasi dihitung sebagai pengeluaran sekali saja.** Saldo bulan adalah pemasukan dikurangi seluruh pengeluaran; kartu tabungan/investasi adalah rincian alokasi, bukan pengurangan tambahan. Saldo tersebut merupakan arus kas bersih bulan, bukan total kekayaan. Total tabungan/portfolio adalah akumulasi modal dari transaksi, **bukan nilai pasar**. Edit/hapus setoran dilakukan melalui transaksi atau riwayat dan memperbarui semua halaman. Target/aset dengan transaksi tidak dapat dihapus sebelum transaksi dipindahkan/dihapus. Pengembalian dana dapat dicatat sebagai pemasukan biasa dengan catatan; pencatatan penarikan/kinerja pasar otomatis belum disediakan.
+Di halaman Tabungan, **Tambah Setoran** membuka formulir khusus dan Tabungan Umum selalu tersedia. Target ini tidak memerlukan nominal akhir. Vault lama mendapat target bawaan sekali saat dibaca ulang, tanpa menghapus target atau transaksi pengguna. Setoran, edit, dan hapus langsung memperbarui total kumulatif, riwayat, Dashboard serta laporan. KPI Pengeluaran hanya transaksi reguler. Saldo tersedia = Pemasukan − Pengeluaran reguler − Tabungan − Investasi.
+
+Setoran tabungan dan investasi mengurangi saldo tersedia satu kali, namun tampil pada KPI sendiri dan tidak menambah KPI Pengeluaran reguler. Saldo bulanan adalah arus kas tersedia, bukan total kekayaan. Total tabungan/portfolio adalah akumulasi modal dari transaksi, **bukan nilai pasar**. Edit/hapus setoran dilakukan melalui riwayat dan memperbarui semua halaman. Target/aset dengan transaksi tidak dapat dihapus sebelum transaksi dipindahkan/dihapus. Pengembalian dana dapat dicatat sebagai pemasukan biasa dengan catatan; pencatatan penarikan/kinerja pasar otomatis belum disediakan.
 
 ## Keamanan dan backup
 
@@ -107,10 +109,10 @@ Production tidak mengatur `server.url`. `cap sync` menyalin bundle lokal ke Andr
 
 ## GitHub Actions
 
-- `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **FINORA-web-v1.0.2**.
-- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back dan persistensi setelah Activity/WebView dibuat ulang; artifact **FINORA-android-v1.0.2-debug.apk**; release signed hanya jika keempat secret tersedia.
+- `.github/workflows/ci.yml`: push main, pull request, manual `workflow_dispatch`; npm ci, lint, typecheck, unit, E2E, build; artifact **FINORA-web-v1.0.3**.
+- `.github/workflows/android.yml`: push main/manual; Java 21, Node 22, SDK 36, build web, Capacitor sync, Gradle debug APK dan emulator API 35 untuk instalasi, startup offline, rotasi, hardware Back serta persistensi transaksi dan setoran setelah Activity/WebView dibuat ulang; artifact **FINORA-android-v1.0.3-debug.apk**; release signed hanya jika keempat secret tersedia.
 
-Actions → Android APK → run → Artifacts. Debug tidak membutuhkan secret. `.github/workflows/ios.yml` memvalidasi build simulator unsigned pada runner macOS. Semua workflow memakai `contents: read`.
+Actions → Android APK → run → Artifacts. Debug tidak membutuhkan secret. `.github/workflows/ios.yml` memvalidasi build simulator unsigned pada runner macOS dan menyimpan ZIP aplikasi simulator; ZIP tersebut bukan IPA untuk pemasangan iPhone/iPad. Semua workflow memakai `contents: read`.
 
 ## Struktur
 

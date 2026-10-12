@@ -1705,3 +1705,29 @@ html[data-keyboard="open"] .baseline-login::after {
 .asset-hero + .panel {
   margin-bottom: 16px;
 }
+.asset-hero:not(.violet) {
+  background: linear-gradient(135deg, #11bde7, #087cff 58%, #0754dd);
+  box-shadow: 0 10px 24px #087cff29;
+}
+.savings-primary {
+  margin: 0 0 16px;
+  min-height: 48px;
+  justify-content: center;
+}
+.savings-empty-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px auto 0;
+}
+.entry-mode {
+  gap: 5px;
+}
+.entry-mode button {
+  padding: 8px 3px;
+  border-radius: 10px;
+}
+.entry-mode button.active {
+  background: linear-gradient(180deg, #1385ff, #0060ff);
+  color: white;
+}

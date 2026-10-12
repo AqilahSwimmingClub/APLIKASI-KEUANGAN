@@ -63,8 +63,8 @@ test("akun, transaksi CRUD, perbandingan, kategori, tabungan, investasi, backup 
   await page.getByLabel("Target (Rp)").fill("5000000");
   await page.getByRole("button", { name: "Simpan target" }).click();
   await page.getByRole("button", { name: "Setor Dana Darurat" }).click();
-  await page.getByLabel("Nominal (Rp)").fill("1000000");
-  await page.getByRole("button", { name: "SIMPAN TRANSAKSI" }).click();
+  await page.getByLabel("Nominal", { exact: true }).fill("1000000");
+  await page.getByRole("button", { name: "SIMPAN SETORAN" }).click();
   await expect(page.getByText("20%")).toBeVisible();
   await page
     .getByRole("button", { name: "Investasi", exact: true })
@@ -74,8 +74,8 @@ test("akun, transaksi CRUD, perbandingan, kategori, tabungan, investasi, backup 
   await page.getByLabel("Nama investasi").fill("Emas keluarga");
   await page.getByRole("button", { name: "Simpan investasi" }).click();
   await page.getByRole("button", { name: "Tambah dana Emas keluarga" }).click();
-  await page.getByLabel("Nominal (Rp)").fill("500000");
-  await page.getByRole("button", { name: "SIMPAN TRANSAKSI" }).click();
+  await page.getByLabel("Nominal", { exact: true }).fill("500000");
+  await page.getByRole("button", { name: "SIMPAN INVESTASI" }).click();
   await page
     .getByRole("button", { name: "Dashboard", exact: true })
     .first()

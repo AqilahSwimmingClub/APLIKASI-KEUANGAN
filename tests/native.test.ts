@@ -37,12 +37,12 @@ test("release versions agree across package, Android, iOS and UI", async () => {
   expect(read("android/app/build.gradle")).toContain(
     `versionName "${pkg.version}"`,
   );
-  expect(read("android/app/build.gradle")).toContain("versionCode 3");
+  expect(read("android/app/build.gradle")).toContain("versionCode 4");
   expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
     `MARKETING_VERSION = ${pkg.version};`,
   );
   expect(read("ios/App/App.xcodeproj/project.pbxproj")).toContain(
-    "CURRENT_PROJECT_VERSION = 3;",
+    "CURRENT_PROJECT_VERSION = 4;",
   );
 });
 

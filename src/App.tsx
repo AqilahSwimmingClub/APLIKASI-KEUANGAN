@@ -16,7 +16,7 @@ import {
 import { registerSW } from "virtual:pwa-register";
 import { readSession, rememberSession, forgetSession } from "./core/session";
 import type { Data, Transaction } from "./core/model";
-import { emptyData, localDate, removeTransaction } from "./core/ledger";
+import { emptyData, localDate, removeTransaction, rupiah } from "./core/ledger";
 import {
   type Account,
   loadAccount,
@@ -230,8 +230,10 @@ export default function App() {
   };
   const remove = (t: Transaction) =>
     confirm(
-      "Hapus transaksi",
-      `Hapus “${t.title}”? Dashboard, laporan dan riwayat alokasi akan diperbarui.`,
+      t.allocation === "savings" ? "Hapus setoran" : "Hapus transaksi",
+      t.allocation === "savings"
+        ? `Hapus setoran tabungan ${rupiah(t.amount)}?`
+        : `Hapus “${t.title}”? Dashboard dan laporan akan diperbarui.`,
       async () => {
         await onSave(removeTransaction(data!, t.id));
         setToast("Transaksi dihapus");

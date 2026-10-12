@@ -60,6 +60,19 @@ public class OfflineStartupTest {
             until(scenario,"document.querySelector('.baseline-login') !== null");
             evaluate(scenario,"document.querySelector('[name=username]').value='native-test'; document.querySelector('[name=password]').value='1'; document.querySelector('.login-card').requestSubmit();true");
             until(scenario,"document.querySelector('[data-testid=balance]')?.textContent.includes('100.000') === true");
+            evaluate(scenario,"[...document.querySelectorAll('.app-shortcuts button')].find(b=>b.textContent.trim()==='Tabungan').click();true");
+            until(scenario,"document.querySelector('.page-title h1')?.textContent === 'Tabungan'");
+            assertEquals("true",evaluate(scenario,"document.body.innerText.includes('Tabungan Umum')"));
+            evaluate(scenario,"[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='TAMBAH SETORAN').click();true");
+            until(scenario,"document.querySelector('dialog[open]')?.textContent.includes('TAMBAH SETORAN TABUNGAN') === true");
+            evaluate(scenario,"document.querySelector('dialog [name=amount]').value='25000'; document.querySelector('dialog form').requestSubmit();true");
+            until(scenario,"document.querySelector('dialog[open]') === null && document.querySelector('.asset-hero')?.textContent.includes('25.000') === true");
+            scenario.recreate();
+            until(scenario,"document.querySelector('.baseline-login') !== null");
+            evaluate(scenario,"document.querySelector('[name=username]').value='native-test'; document.querySelector('[name=password]').value='1'; document.querySelector('.login-card').requestSubmit();true");
+            until(scenario,"document.querySelector('[data-testid=balance]')?.textContent.includes('125.000') === true");
+            evaluate(scenario,"[...document.querySelectorAll('.app-shortcuts button')].find(b=>b.textContent.trim()==='Tabungan').click();true");
+            until(scenario,"document.querySelector('.asset-hero')?.textContent.includes('25.000') === true");
         }
     }
 }
